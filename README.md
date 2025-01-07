@@ -2,8 +2,7 @@
 
 # Alantes
 
-
-Currently, this repo uses Python 3.10.
+This repo stores training, inference, and deployment code for real-time global scale GPS trajectory modeling. The models were developed at Ai2.
 
 ## Repository Structure
 
