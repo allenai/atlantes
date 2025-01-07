@@ -1,8 +1,7 @@
 
 
-# Environmental AI Team Repository Overview
+# Alantes
 
-Welcome to the Environmental AI Team repository! This repository serves as a central hub for various projects related to environmental AI research and development.
 
 Currently, this repo uses Python 3.10.
 
@@ -10,8 +9,6 @@ Currently, this repo uses Python 3.10.
 
 The repository is organized into the following top-level directories and subdirectories:
 
-
-**Atlantes Project**
 
 - `ais`: Contains scripts and modules for loading, cleaning, and preprocessing AIS data.
     - `src/atlantes`: Holds the core logic for the Atlantes system, including data processing, model training, and deployment.
@@ -51,13 +48,6 @@ Reccomended:
 - Parquet Viewer
 - githubactions
 
-### Specific Projects
-
-To get started with a specific project, please refer to the relevant README file in the project's directory.
-
-**Atlantes Project** : See the [Atlantes README](ais/README.md) for more information.
-
-
 ## Contributing
 
 Contributions to this repository are welcome! If you'd like to contribute, please follow these steps:
@@ -66,14 +56,14 @@ Contributions to this repository are welcome! If you'd like to contribute, pleas
 2. Create a new branch for your feature or bug fix.
 3. Make your changes and commit them.
 4. Push your branch to the remote repository.
-5. Open a pull request against the `develop` branch of this repository.
+5. Open a pull request against the `main` branch of this repository.
 
 Please ensure that your code follows the project's coding standards and includes appropriate tests.
 
 ## License
 
-TBD
+Apache 2.0
 
 ## Acknowledgments
 
-This project was developed by the EAI team at the Allen Institute for Artificial Intelligence (Ai2).
+This project was developed by the Allen Institute for Artificial Intelligence (Ai2).
