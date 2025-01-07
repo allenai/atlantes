@@ -1,0 +1,19 @@
+{
+  "predictions": [
+    [
+      "vessel",
+      {
+        "confidence": 0.9951587319374084,
+        "confidence_threshold": 0.5,
+        "model": "ATLAS-Entity: AIS Transformer Learning with Active Subpaths",
+        "outputs": [
+          0.9951587319374084,
+          0.00484120100736618
+        ],
+        "postprocess_rule_applied": false,
+        "postprocessed_classification": "vessel",
+        "predicted_classification": "vessel"
+      }
+    ]
+  ]
+}

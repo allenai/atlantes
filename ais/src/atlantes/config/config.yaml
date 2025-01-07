@@ -1,0 +1,13 @@
+utils:
+  LABEL_MAPPING:
+    0: "none"
+    10: "trawling"
+    11: "longlining"
+    12: "purse_seining"
+    13: "squid_jigging"
+    14: "setting_pots"
+    15: "gear_based"
+    20: "one_sided_rendezvous"
+  OSR_TRAINING:
+    0: "none"
+    1: "one_sided_rendezvous"

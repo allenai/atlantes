@@ -1,0 +1,76 @@
+train:
+  PROJECT_NAME: "ATLAS-Buoy"
+  MODEL_LOAD_DIR: "./models" # Where we load models from
+  MODEL_SAVE_DIR: "./models_buoy"
+  USE_CACHED_RUN_ID: False # If true, will use the run_id written to the txt file allows to ocntinue training from a previous run for a pre-empted job
+  OPTIMIZER: AdamW
+  LR_SCHEDULER: none
+  N_TOTAL_TRAJECTORIES: 500000 # this is the total number of trajectories that will be used for training
+  VAL_SIZE: 15 # this is the percentage of trajectories that will be used for validation
+  N_EPOCHS: 50 # number of epochs to train for
+  TRAIN_BATCH_SIZE: 16 #This total batch size is split across all GPUs. n.b. must be >= 2, Effective Batch Size // Num_GPUS =Per-GPU Batch Size
+  VAL_BATCH_SIZE: 8 # n.b. must be >= 2 always on a single gpu
+  SGD_MOMENTUM: 0.8
+  LEARNING_RATE: 0.00001 # initial learning rate
+  WEIGHT_DECAY: 0.001
+  MAX_GRAD_NORM: 1.0
+  ETA_MIN: 0.0000001 # Minimum learning rate for cosine annealing
+  MAX_NUM_BATCHES_TO_LOG: 10000 # number of batches to log to wandb
+  MAX_NUM_BATCHES_TO_LOG_IMAGES: 3 # of batches to visualize and upload outputs to wandb with beaker make sure this is small
+  RANDOM_STATE: 42
+  MODEL_ARCHITECTURE: ATLAS
+  ANNEALING_TMAX: 200000 # Maximum number of iterations.
+  SWEEP: TRUE
+  NUM_DATA_WORKERS: 0 # tune this to your hardware
+  PROFILING: True
+  USE_CLASS_WEIGHTED_LOSS: True # whether to weight the loss function by the class frequency in the batch, mutually exclusive with weighted smapler
+  PIN_MEMORY: True # pin memory for faster data loading
+  ENTITY_CLASS_LABELS_PATH: "gs://ais-track-data/labels/entity_dataset_2022_to_2023_21-06-2024-20-48-59_named.csv"
+  WARMUP_STEPS: 100 # number of steps to warmup the learning rate scheduler to the initial learning rate (batch steps)
+  USE_WEIGHTED_SAMPLER_TRAIN: False # whether to use weighted sampler to oversample the minority class (fishing)
+  USE_WEIGHTED_SAMPLER_VAL: False # whether to use weighted sampler to oversample the minority class (fishing)
+  NUM_GPUS: 1 #`number of GPUs to use for training
+  EVAL_CADENCE: 500000000000000000000 # number of steps between each evaluation
+  TIMEOUT: 1000 # number of seconds to wait for a batch to be ready
+  MODEL_CHECKPOINT: null
+  USE_FEATURES_ONLY: False # whether to use only the features in the model, and creat a new activity head for transfer learning
+  DEBUG_MODE: False # Set to True to enable debugging, see activity_trainer for details
+  EVAL_BEFORE_TRAIN: True # Set to True to evaluate the model before training
+  EVAL_EPOCH_CADENCE: 1 # number of epochs between evaluations
+  USE_WEKA: False # whether to use weka for data loading
+
+hyperparameters:
+  N_PRE_SQUEEZE_TRANSFORMER_LAYERS: 4 # number of transformer layers, attn between tokens
+  N_HEADS: 4
+  TOKEN_DIM: 64 # dimension of the token embedding
+  MLP_DIM: 32 # dimension of the MLP
+  CPE_LAYERS: 3 # number of layers in the continuous point embedding
+  CNN_LAYERS: 6 # number of layers in the CNN
+  CNN_KERNEL_SIZE: 3 # size of the kernel in the CNN
+  USE_RESIDUAL_CNN: True # whether to use residual connections in the CNN
+  USE_LAYERNORM_CNN: True # whether to use layer normalization in the CNN
+  USE_CHANNEL_DIM_LN_CNN: True # whether to use layer normalization only on the channel dimension
+  DROPOUT_P: 0.1 # dropout probability
+  QKV_BIAS: False # whether to use bias in the QKV projection layers
+  USE_SHIP_TYPE: False # whether to use ship type in the model
+  USE_PREPAD: False # whether to pre-pad/left pad the trajectory, if false, the trajectory will be right/post padded
+
+data:
+  MODEL_INPUT_COLUMNS_ENTITY: ["lat", "lon", "sog", "cog", "dist2coast", "rel_cog"] # this should be you just pass the keyword of the normalization as they are xor
+  FEATURE_NORMALIZATION_CONFIG_ENTITY: {"lat": {"log": False, "sqrt": False, "z-scale": False}, "lon": {"log": False, "sqrt": False, "z-scale": False}, "sog": {"log": True, "sqrt": False, "z-scale": False}, "cog": {"log": True, "sqrt": False, "z-scale": False}, "dist2coast": {"log": False, "sqrt": False, "z-scale": False}, "rel_cog": {"log": False, "sqrt": False, "z-scale": False}}
+  CPE_KERNEL_SIZE: 5 # size of the kernel in the CPE
+  MAX_TRAJECTORY_LENGTH: 4000 # this is the maximum number of lines that will be read for each trajectory. On CPU this can be arbitralily large, but on GPU it is limited by the amount of memory available. high, but on GPU it must be a smaller number if you are not chunking the data.
+  MIN_AIS_MESSAGES: 200 # this is
+  USE_WEKA: True # whether to use weka for data loading
+  TRAJECTORY_LENGTHS_FILE: "gs://ais-track-data/labels/trajectory_lengths/trajectory_lengths_2022_2023_0.parquet"
+  AUGMENTATION: # See Augmentation Registry for more details
+  - name: random_context_length
+    apply: True  # Will apply this augmentation
+    params:
+      min_context_length: 1
+      max_context_length: 2048
+  - name: random_message_dropout
+    apply: False  # Will skip this augmentation
+    params:
+      dropout_rate: 0.1
+      min_messages: 100

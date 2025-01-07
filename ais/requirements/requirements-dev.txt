@@ -1,0 +1,5 @@
+beaker>=1.5.0,<2
+black
+elasticsearch>=7.17.1,<8
+interrogate==1.5.0
+pre-commit==3.5.0

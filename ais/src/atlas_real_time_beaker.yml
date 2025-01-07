@@ -1,0 +1,59 @@
+version: v2
+budget: ai2/skylight
+description: activity-data-mix-1-composableaugs-9layer
+tasks:
+- name: activity-data-mix-1-composableaugs-9layer
+  image:
+    beaker: henryh/composableaugs
+  command:
+  - python
+  - -u
+  - src/atlantes/training_scripts/launch_train_atlas_activity_real_time.py
+  - NUM_GPUS=8
+  # - MODEL_SAVE_DIR=/models
+  # - EVAL_BEFORE_TRAIN=False
+  # - PROJECT_NAME=ATLAS-Activity-Real-Time
+  # - MODEL_LOAD_DIR=src/atlantes/models
+  # - NUM_DATA_WORKERS=8
+  # - TRAIN_BATCH_SIZE=256
+  # - VAL_BATCH_SIZE=256
+  # - N_EPOCHS=7
+  # - USE_CACHED_RUN_ID=True
+  # - N_PRE_SQUEEZE_TRANSFORMER_LAYERS=9
+  # - USE_WEKA=True
+  # - MODEL_INPUT_COLUMNS_ACTIVITY=["sog", "cog", "dist2coast", "rel_cog", "amount_of_light"]
+  # - TEST_DIST_BEFORE_TRAIN=False
+  # - DIST_TEST_LABELS_FILES=null
+  - ACTIVITY_LABEL_DATASET_FILES:
+    - "gs://ais-track-data/labels/end_of_sequence_activity_dataset_2024-09-11-18-24-51/human_annotation_acitivity_labels_subsample_every_nth_percentile_of_same_activity.csv"
+    - "gs://ais-track-data/labels/end_of_sequence_activity_dataset_2024-09-11-23-22-17/machine_annotated_activity_labels_anchored_non_fishing_vessels_subsample_random_subsample_trackId_stratified.csv"
+    - "gs://ais-track-data/labels/end_of_sequence_activity_dataset_2024-09-12-00-50-06/machine_annotated_activity_labels_moored_non_fishing_vessels_subsample_random_subsample_random.csv"
+    - "gs://ais-track-data/labels/end_of_sequence_activity_dataset_2024-09-12-00-53-48/machine_annotated_activity_labels_mid_speed_transiting_non_fishing_vessels_subsample_random_subsample_random.csv"
+  - ACTIVITY_LABEL_VAL_DATASET_FILES:
+    - "gs://ais-track-data/labels/end_of_sequence_activity_dataset_2024-08-06-17-11-12/middle_of_activity_human_annotation_acitivity_labels_subsampled_val.csv"
+    - "gs://ais-track-data/labels/end_of_sequence_activity_dataset_2024-08-06-17-11-12/activity_change_boundaries_human_annotation_acitivity_labels_val.csv"
+    - "gs://ais-track-data/val_eos/machine_annotated_activity_labels_mid_speed_transiting_non_fishing_vessels_subsample_random_subsample_random.csv"
+
+  envVars:
+  - name: WANDB_API_KEY
+    secret: WANDB_API_KEY
+  - name: GOOGLE_APPLICATION_CREDENTIALS
+    secret: GCP_CREDENTIALS_PATH
+  datasets:
+  - mountPath: /data
+    source:
+      weka: skylight-default
+  - mountPath: /etc/credentials/credentials.json
+    source:
+      secret: GCP_CREDENTIALS
+  result:
+    path: /models
+  resources:
+    gpuCount: 8
+    sharedMemory: 256 GiB
+  context:
+    priority: urgent
+    preemptible: true
+  constraints:
+    cluster:
+    - ai2/jupiter-cirrascale-2

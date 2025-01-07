@@ -1,0 +1,107 @@
+train:
+  PROJECT_NAME: "ATLAS-Activity-Real-Time" # Name of the project
+  EXPERIMENT_NAME: "hard-negative-data-mix-new" # Optional, Name of the experiment
+  MODEL_LOAD_DIR: "src/atlantes/models" # Where we load models from
+  MODEL_SAVE_DIR: /models # Where we save models too, this MUST MATCH Beaker Results dir to make the training pre-emptable For non-premeptable use none to avoid confusion
+  USE_CACHED_RUN_ID: True # If true, will use the run_id written to the txt file allows to ocntinue training from a previous run for a pre-empted job
+  OPTIMIZER: AdamW
+  LR_SCHEDULER: none
+  VAL_SIZE: 10 # this is the percentage of trajectories that will be used for validation, only applicable if val label files are NOT provided
+  N_EPOCHS: 10 # number of epochs to train for
+  TRAIN_BATCH_SIZE: 256 # This is the TOTAL batch size, n.b. must be >= 2, Effective Batch Size // Num_GPUS =Per-GPU Batch Size
+  VAL_BATCH_SIZE: 256 # n.b. must be >= 2
+  SGD_MOMENTUM: 0.9
+  WEIGHT_DECAY: 0.1
+  MAX_GRAD_NORM: 1.0
+  LEARNING_RATE: 0.0001 # initial learning rate
+  MAX_NUM_BATCHES_TO_LOG_IMAGES: 1 # of batches to visualize and upload outputs to wandb for
+  MODEL_ARCHITECTURE: ATLAS
+  ANNEALING_TMAX: 1000 # Maximum number of iterations.
+  ETA_MIN: 0.00001 # Minimum learning rate for cosine annealing
+  KERNEL_SIZE: 7 # must be an odd number -- this is the size of the kernel in the continuous point embedding,
+  MAX_TRAJECTORY_LENGTH: 2048 # Max number fo messages to use for a predicition after preprocessing
+  SWEEP: TRUE # not implemented
+  NUM_DATA_WORKERS: 8 # tune this to your hardware
+  PROFILING: True
+  ACTIVITY_LABEL_DATASET_FILES:
+    - "gs://ais-track-data/labels/end_of_sequence_activity_dataset_2024-08-09-06-33-28/human_annotation_acitivity_labels_subsample_every_nth_plus_all_anchored_and_moored.csv"
+    - gs://ais-track-data/labels/end_of_sequence_activity_dataset_2024-08-01-17-52-52/machine_annotated_acitivity_labels_high_speed_transiting.csv
+    - "gs://ais-track-data/labels/end_of_sequence_activity_dataset_2024-10-07-17-33-33/fishing_false_positives_labeled_dataset.csv"
+  ACTIVITY_LABEL_VAL_DATASET_FILES: # We double check that there are no overlapping trackIds between the training and validation datasets
+    - "gs://ais-track-data/labels/end_of_sequence_activity_dataset_2024-08-06-17-11-12/middle_of_activity_human_annotation_acitivity_labels_subsampled_val.csv"
+    - "gs://ais-track-data/labels/end_of_sequence_activity_dataset_2024-08-06-17-11-12/activity_change_boundaries_human_annotation_acitivity_labels_val.csv"
+    - gs://ais-track-data/labels/eval/eval_9_30_24_labels.csv
+    - gs://ais-track-data/labels/feedback/end_of_sequence/feedback_val_df.csv
+  WARMUP_STEPS: 100 # number of steps to warmup the learning rate scheduler to the initial learning rate (batch steps)
+  EVAL_CADENCE: 10000000 # TRAINING LOOP SPECIFIC -- this only affects whether evaluation/validation occurs within the training loop see also MAX_NUM_BATCHES_TO_LOG_IMAGES
+  NUM_GPUS: 8 #`number of GPUs to use for training
+  USE_GCS: True # TODO: remove this
+  USE_CLASS_WEIGHTED_LOSS: True # whether to weight the loss function by the class frequency in the batch, mutually exclusive with weighted smapler
+  TIMEOUT: 10000 # enable dataloading to not quit in multiprocessing mode
+  PIN_MEMORY: False # pin memory for faster data loading
+  MODEL_CHECKPOINT: ATLAS-Activity-Real-Time_no_git_hash_2024-09-06-19-56-12_epoch2.pt # If not resuming make this None
+  USE_FEATURES_ONLY: False # whether to use only the features in the model, and creat a new activity head for transfer learning
+  # Configurations for freezing the feature layers, only use when USE_FEATURES_ONLY is True
+  FREEZE_FEATURE_LAYER: False  # whether to freeze the feature layers
+  DEBUG_MODE: False # Set to True to enable debugging, see activity_trainer for details
+  EVAL_BEFORE_TRAIN: False # Set to True to evaluate the model before training
+  EVAL_EPOCH_CADENCE: 1 # number of epochs between evaluations
+  DIST_TEST_LABELS_FILES: # todo, allow for omitting activitylabelset files and activity label val set files if only dist test is desired.
+  TEST_DIST_BEFORE_TRAIN: False # whether to evaluate the test set distribution before training
+  # Configurations for LoRA
+  USE_LORA: False
+  LORA_R: 8  # Rank of the low-rank adaptation
+  LORA_ALPHA: 16  # Scaling factor for LoRA
+  LORA_TARGET_MODULES: ['q_proj', 'k_proj', 'v_proj', 'out_proj']  # Modules to apply LoRA
+  LORA_DROPOUT: 0.1  # Dropout rate for LoRA
+
+
+hyperparameters:
+  N_PRE_SQUEEZE_TRANSFORMER_LAYERS: 9 # number of transformer layers, attn between tokens
+  N_HEADS: 8
+  TOKEN_DIM: 256 # dimension of the token embedding
+  MLP_DIM: 128 # dimension of the MLP
+  CPE_LAYERS: 6 # number of layers in the continuous point embedding
+  CNN_LAYERS: 3 # number of layers in the CNN
+  CNN_KERNEL_SIZE: 3 # size of the kernel in the CNN
+  USE_RESIDUAL_CNN: True # whether to use residual connections in the CNN
+  USE_LAYERNORM_CNN: True # whether to use layer normalization in the CNN
+  USE_CHANNEL_DIM_LN_CNN: True # whether to use layer normalization only on the channel dimension
+  DROPOUT_P: 0.3 # dropout probability
+  QKV_BIAS: False # whether to use bias in the QKV projection layers
+  USE_SHIP_TYPE: False # whether to use ship type in the model
+  USE_PREPAD: False # whether to pre-pad/left pad the trajectory, if false, the trajectory will be right/post padded
+
+
+data:
+  FEATURE_NORMALIZATION_CONFIG_ACTIVITY:
+    {
+      "lat": { "log": False, "sqrt": False, "z-scale": False },
+      "lon": { "log": False, "sqrt": False, "z-scale": False },
+      "sog": { "log": False, "sqrt": False, "z-scale": False },
+      "cog": { "log": False, "sqrt": False, "z-scale": False },
+      "dist2coast": { "log": False, "sqrt": False, "z-scale": False },
+      "rel_cog": { "log": False, "sqrt": False, "z-scale": False },
+      "amount_of_light": { "log": False, "sqrt": False, "z-scale": False },
+    }
+  MODEL_INPUT_COLUMNS_ACTIVITY: ["sog", "cog", "dist2coast", "rel_cog"]
+  RANDOM_STATE: 42
+  CPE_KERNEL_SIZE: 7 # must be an odd number -- this is the size of the kernel in the continuous point embedding,
+  MAX_TRAJECTORY_LENGTH: 2048 # Max number fo messages to use for a predicition after postprocessing
+  MIN_AIS_MESSAGES: 100 # this is the minimum number of AIS messages that a trajectory must have to be included in the dataset
+  N_TOTAL_TRAJECTORIES: 5000000000000000000000 # this is the total number of trajectories that will be used for training or validation
+  USE_WEKA: True # whether to use weka for data loading
+  AUGMENTATION: # See Augmentation Registry for more details
+    mode: "compose" # Options are "compose" or "random_choice" if using 1 augmentation it does not matter
+    augmentations:
+      - name: random_context_length
+        apply: False # If true, will apply this augmentation
+        params:
+          min_context_length: 100 # set more than min ais messages
+          max_context_length: 2048
+      - name: random_message_dropout
+        apply: False # If true, will apply this augmentation
+        params:
+          min_dropout_rate: 0.0
+          max_dropout_rate: 0.4
+          min_messages: 100

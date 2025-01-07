@@ -1,0 +1,6 @@
+.git
+ais/build/**
+ais/data/**
+ais/src/skylight/ml/ais/data/**
+ais/docs/**
+.vscode/

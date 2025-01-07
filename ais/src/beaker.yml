@@ -1,0 +1,47 @@
+version: v2
+budget: ai2/skylight
+description: realtimeatlas-using weka
+tasks:
+  - name: real-time-atlas-activity-subsampled
+    image:
+      beaker: patrickb/atlas-activity-weka3
+    command: [
+        python,
+        -u,
+        src/atlantes/training_scripts/launch_train_atlas_activity_real_time.py,
+        NUM_GPUS=8,
+        MODEL_SAVE_DIR=/models,
+        EVAL_BEFORE_TRAIN=False,
+        ActivityDatasetEndOfSequence
+        MODEL_LOAD_DIR=src/atlantes/models,
+        DROPOUT_P=0.2,
+        NUM_DATA_WORKERS=12,
+        TRAIN_BATCH_SIZE=256,
+        EVAL_CADENCE=5000,
+        VAL_BATCH_SIZE=124,
+        N_EPOCHS=30,
+        LEARNING_RATE=0.0005,
+      ]
+    envVars:
+      - name: WANDB_API_KEY
+        secret: WANDB_API_KEY
+      - name: GOOGLE_APPLICATION_CREDENTIALS
+        secret: GCP_CREDENTIALS_PATH
+    datasets:
+      - mountPath: /data
+        source:
+          weka: skylight-default
+      - mountPath: /etc/credentials/credentials.json
+        source:
+          secret: GCP_CREDENTIALS
+    result:
+      path: /models
+    resources:
+      gpuCount: 8
+      sharedMemory: 256 GiB
+    context:
+      priority: high
+      preemptible: true
+    constraints:
+      cluster:
+        - ai2/jupiter-cirrascale-2

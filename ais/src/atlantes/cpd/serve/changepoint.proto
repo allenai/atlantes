@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package atlanteschangepoint;
+
+enum ChangepointReasons {
+  SOG = 0;
+  TIME = 1;
+  NO_CHANGEPOINT = 2;
+  NOT_ENOUGH_MESSAGES = 3;
+  MAX_DURATION_EXCEEDED = 4;
+  MAX_NUM_MESSAGES_EXCEEDED = 5;
+}
+
+message ChangepointInput {
+  repeated float sogs = 1;
+  repeated google.protobuf.Timestamp times = 2;
+}
+
+message ChangepointOutput {
+  bool is_changepoint = 1;
+  ChangepointReasons changepoint_reason = 2;
+}
+
+service ChangepointService {
+  rpc IsChangepoint(ChangepointInput) returns (ChangepointOutput) {}
+}

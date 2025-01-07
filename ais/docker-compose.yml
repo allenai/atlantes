@@ -1,0 +1,98 @@
+# Define a common build configuration
+x-common-build: &ais-image
+  context: .
+  dockerfile: Dockerfile
+  args:
+    MOUNTED_CREDENTIALS_PATH: /mnt/gcloud/gcp_application_credentials.json
+
+services:
+  test_activity:
+    hostname: ais-test-activity
+    build: *ais-image
+    shm_size: '4.77gb'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    stdin_open: true
+    ports:
+      - "6666:6666"
+      - "8000:8000" # port for ray serve
+      - "8265:8265" # port for ray dashboard
+    volumes:
+      - ${GOOGLE_APPLICATION_CREDENTIALS}:/mnt/gcloud/gcp_application_credentials.json
+    command: ["python3", "src/main_activity.py"]
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "nc -zv 127.0.0.1 8000"
+        ]
+      interval: 2s
+      timeout: 2s
+      retries: 120
+  test_entity:
+    hostname: ais-test-entity
+    build: *ais-image
+    shm_size: '4.77gb'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    stdin_open: true
+    ports:
+      - "6667:6667"
+      - "8001:8001" # port for ray serve
+      - "8266:8266" # port for ray dashboard
+    volumes:
+      - ${GOOGLE_APPLICATION_CREDENTIALS}:/mnt/gcloud/gcp_application_credentials.json
+    command: ["python3", "src/main_entity.py"]
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "nc -zv 127.0.0.1 8001"
+        ]
+      interval: 2s
+      timeout: 2s
+      retries: 120
+  test_cpd_grpc:
+    hostname: ais-test-cpd-grpc
+    build: *ais-image
+    shm_size: '4.77gb'
+    environment:
+        - CPD_ADDRESS=0.0.0.0
+        - CPD_PORT=5206
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    stdin_open: true
+    ports:
+      - "5206:5206"
+    command: ["python3", "/ais/src/atlantes/cpd/serve/serve_grpc.py"]
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "nc -zv 127.0.0.1 5206"
+        ]
+      interval: 2s
+      timeout: 2s
+      retries: 120
+  test_entity_postprocessor_grpc:
+    hostname: ais-test-entity-postprocessor-grpc
+    build: *ais-image
+    shm_size: '4.77gb'
+    environment:
+      - ENTITY_POSTPROCESSOR_GRPC_ADDRESS=0.0.0.0
+      - ENTITY_POSTPROCESSOR_GRPC_PORT=5207
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    stdin_open: true
+    ports:
+      - "5207:5207"
+    command: ["python3", "/ais/src/atlantes/inference/atlas_entity/grpc_serve/serve_grpc.py"]
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "nc -zv 127.0.0.1 5207"
+        ]
+      interval: 2s
+      timeout: 2s
+      retries: 120

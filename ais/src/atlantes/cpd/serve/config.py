@@ -1,0 +1,7 @@
+from os import environ
+
+CPD_PORT_DEFAULT = 5206
+CPD_PORT = int(environ.get('CPD_PORT', CPD_PORT_DEFAULT))
+
+CPD_ADDRESS_DEFAULT = '0.0.0.0'  # nosec B104
+CPD_ADDRESS = environ.get('CPD_ADDRESS', CPD_ADDRESS_DEFAULT)

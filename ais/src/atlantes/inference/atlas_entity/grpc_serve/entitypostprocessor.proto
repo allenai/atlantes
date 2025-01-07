@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package atlantesentitypostprocessor;
+
+
+enum AtlasEntityLabelsTrainingWithUnknown {
+    VESSEL = 0;
+    BUOY = 1;
+    UNKNOWN = -100;
+}
+
+message EntityMetadata {
+    optional int32 binned_ship_type = 1;
+    int32 ais_type = 2;
+    string flag_code = 3;
+    string entity_name = 4;
+    optional int32 track_length = 5;
+    string mmsi = 6;
+    string trackId = 7;
+    optional string file_location = 8;
+}
+
+message EntityPostprocessorInputDetails {
+  string model = 1;
+  float confidence = 2;
+  repeated float outputs = 3;
+}
+
+message EntityPostprocessorOutputDetails {
+  string predicted_classification = 1;
+  string model = 2;
+  float confidence = 3;
+  repeated float outputs = 4;
+  string postprocessed_classification = 5;
+  bool postprocess_rule_applied = 6;
+  float confidence_threshold = 7;
+}
+
+message EntityPostprocessorInput {
+  optional AtlasEntityLabelsTrainingWithUnknown predicted_class = 1;
+  optional EntityPostprocessorInputDetails entity_classification_details = 2;
+  EntityMetadata metadata = 3;
+}
+
+
+message EntityPostprocessorOutput {
+  AtlasEntityLabelsTrainingWithUnknown entity_class = 1;
+  EntityPostprocessorOutputDetails entity_classification_details = 2;
+}
+
+service EntityPostprocessorService {
+  rpc Postprocess(EntityPostprocessorInput) returns (EntityPostprocessorOutput) {}
+}

@@ -1,0 +1,58 @@
+hyperparameters:
+  N_PRE_SQUEEZE_TRANSFORMER_LAYERS: 9 # number of transformer layers, attn between tokens
+  N_HEADS: 8
+  TOKEN_DIM: 256 # dimension of the token embedding
+  MLP_DIM: 128 # dimension of the MLP
+  CPE_LAYERS: 6 # number of layers in the continuous point embedding
+  CNN_LAYERS: 3 # number of layers in the CNN
+  CNN_KERNEL_SIZE: 3
+  DROPOUT_P: 0.2 # dropout probability
+  QKV_BIAS: False # whether to use bias in the QKV projection layers
+  USE_SHIP_TYPE: False # whether to use ship type in the model
+  USE_RESIDUAL_CNN: True # whether to use residual connections in the CNN
+  USE_LAYERNORM_CNN: True # whether to use layer normalization in the CNN
+  USE_CHANNEL_DIM_LN_CNN: True # whether to use layer normalization only on the channel dimension
+  USE_PREPAD: False # whether to pre-pad/left pad the trajectory, if false, the trajectory will be right/post padded
+
+model:
+  ATLAS_ACTIVITY_MODEL_ID: ATLAS-Activity-Real-Time_no_git_hash_2024-09-06-19-56-12_epoch2.pt
+
+offline_inference:
+  BATCH_SIZE: 64 # PER GPU
+  N_WORKERS: 8 # PER GPU
+  N_GPUS: 8 # Numnber of GPUs to use, not the number to request from the cluster
+  OUTPUT_DIR: /models/inference_outputs
+  NUM_YEARS: 2
+  NUM_OUTPUTS_TO_WRITE_AT_ONCE: 10000
+  # potentially add number of epochs to get different outputs
+
+
+data:
+  FEATURE_NORMALIZATION_CONFIG_ACTIVITY:
+    {
+      "lat": { "log": False, "sqrt": False, "z-scale": False },
+      "lon": { "log": False, "sqrt": False, "z-scale": False },
+      "sog": { "log": False, "sqrt": False, "z-scale": False },
+      "cog": { "log": False, "sqrt": False, "z-scale": False },
+      "dist2coast": { "log": False, "sqrt": False, "z-scale": False },
+      "rel_cog": { "log": False, "sqrt": False, "z-scale": False },
+      "amount_of_light": { "log": False, "sqrt": False, "z-scale": False },
+    }
+  MODEL_INPUT_COLUMNS_ACTIVITY: ["sog", "cog", "dist2coast", "rel_cog"]
+  MAX_TRAJECTORY_LENGTH: 2048 # Max number fo messages to use for a predicition after preprocessing
+  MIN_AIS_MESSAGES: 100 # this is the minimum number of AIS messages that a trajectory must have to be included in the dataset
+  CPE_KERNEL_SIZE: 7 # must be an odd number because includes the anchor point -- this is the size of the kernel in the continuous point embedding,
+  USE_WEKA: True
+
+postprocessor:
+  apply_transiting_rule: true
+  apply_anchored_rule: true
+  apply_moored_rule: true
+  apply_stationary_rule: true
+  apply_near_shore_rule: true
+  apply_fishing_or_unknown_rule: true
+  apply_confidence_threshold_rule: true
+  apply_stationary_rule_displacement: true
+  is_traveling_straight: true
+  collision_avoidance_rule: true
+  geofence_high_traffic_ports: true

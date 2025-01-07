@@ -1,0 +1,55 @@
+version: v2
+budget: ai2/skylight
+description: vessel-type-pretrain-5class-new-200k-full-dist
+tasks:
+  - name: vessel-type-pretrain-5class-new-200k
+    image:
+      beaker: henryh/vtypemaskfix3
+    command:
+      - python
+      - -u
+      - src/atlantes/training_scripts/launch_atlas_vessel_type_pretrain.py
+      - MODEL_SAVE_DIR=/models
+      - MODEL_LOAD_DIR=src/atlantes/models
+      - EVAL_BEFORE_TRAIN=False
+      - EVAL_EPOCH_CADENCE=1
+      - N_TOTAL_TRAJECTORIES=10000000000
+      - NUM_DATA_WORKERS=8
+      - NUM_GPUS=8
+      - TRAIN_BATCH_SIZE=128
+      - LEARNING_RATE=.0001
+      - WEIGHT_DECAY=.01
+      - VAL_BATCH_SIZE=64
+      - MAX_TRAJECTORY_LENGTH=3000
+      - MAX_NUM_BATCHES_TO_LOG=4000
+      - MAX_NUM_BATCHES_TO_LOG_IMAGES=0
+      - USE_WEKA=True
+      - ENTITY_CLASS_LABELS_PATH=gs://ais-track-data/labels/vesseltype/vessel_type_entity_labels_top5_14-06-2024-00-10-47_filtered_full_distribution_2022_5_classes.csv
+      - MODEL_INPUT_COLUMNS_ENTITY=["sog", "cog", "dist2coast", "rel_cog", "amount_of_light"]
+      - USE_CACHED_RUN_ID=True
+      - CNN_LAYERS=6
+      - LABEL_ENUM_KEY=top5
+      - MLP_DIM=256
+    envVars:
+      - name: WANDB_API_KEY
+        secret: WANDB_API_KEY
+      - name: GOOGLE_APPLICATION_CREDENTIALS
+        secret: GCP_CREDENTIALS_PATH
+    datasets:
+    - mountPath: /data
+      source:
+        weka: skylight-default
+    - mountPath: /etc/credentials/credentials.json
+      source:
+        secret: GCP_CREDENTIALS
+    result:
+      path: /models
+    resources:
+      gpuCount: 8
+      sharedMemory: 256 GiB
+    context:
+      priority: high
+      preemptible: true
+    constraints:
+      cluster:
+        - ai2/jupiter-cirrascale-2

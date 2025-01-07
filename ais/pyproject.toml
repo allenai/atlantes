@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "atlantes"
+authors = [{name = "Skylight Team", email = "skylight@skylight.global"}]
+readme = "README.md"
+dynamic = ["version", "dependencies"]
+requires-python = "~=3.10"
+urls = { Home = "https://skylight.global" }
+description = "AIS based ML for Skylight"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+atlantes = ["atlas/config/*yaml", "atlas/config/*.csv", "config/*.yaml", "config/*.csv", "models/*.pt"]
+
+[tool.setuptools.dynamic.dependencies]
+file = ["requirements/requirements.txt"]
+
+[tool.setuptools.dynamic.optional-dependencies]
+dev = { file = ["requirements/requirements-dev.txt"] }

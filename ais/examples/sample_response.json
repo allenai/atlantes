@@ -1,0 +1,17 @@
+{
+  "predictions": [
+    "transiting",
+    {
+      "confidence": 0.9619398713111877,
+      "model": "ATLAS-Activity: AIS Transformer Learning with Active Subpaths",
+      "original_classification": "transiting",
+      "outputs": [
+        0.030075395479798317,
+        0.0005686724907718599,
+        0.007416137959808111,
+        0.9619398713111877
+      ],
+      "postprocessed_classification": "transiting"
+    }
+  ]
+}

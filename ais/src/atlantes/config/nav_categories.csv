@@ -1,0 +1,18 @@
+num,desc,category,category_desc
+0,under_way_engine,0,under_way_engine
+1,Anchored,1,Anchored
+2,Not_under_command,7,other
+3,Restricted_maneuverability,6,Restricted_maneuverability
+4,Constrained_draught,8,Constrained_draught
+5,Moored,2,Moored
+6,Aground,4,Aground
+7,Fishing,3,Fishing
+8,Under_way_sailing,5,Under_way_sailing
+9,Reserved1,7,other
+10,Reserved2,7,other
+11,Reserved3,7,other
+12,Reserved4,7,other
+13,Reserved5,7,other
+14,AIS-SART,7,other
+15,Not_defined,7,other
+16,NAN,9, other_nan

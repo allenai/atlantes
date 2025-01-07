@@ -1,0 +1,19 @@
+build:
+  path_to_initial_labels: # path to the initial labels file
+  use_human_annotated_data: True
+  mine:
+    searcher_strategy: moored
+    filter_strategy: non_fishing_vessels
+    min_trajectory_length: 100 # Minimum number of messages in a month to grab examples from the trackfile
+    num_samples_per_file: 2 # maximum number of samples to take from each file
+    sample_pool_size: 10000 # number of samples to take from the pool, set very high to use everything
+    debug_mode: False
+subsample:
+  strategy: random_trackId_fraction # random or percentile
+  use_params: True # whether to use the params below in the subsampling
+  kwargs: # make sure to toggle use_params to True to use these
+    fraction: 1.0 # fraction of the data to use
+    nth_percentile: 5 # every nth percentile
+export:
+  output_dir: test # use this to override the default output directory
+  label_file_name: null # use this to override the default label file name

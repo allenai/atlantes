@@ -1,0 +1,42 @@
+hyperparameters:
+  N_POST_SQUEEZE_TRANSFORMER_LAYERS: 0 # number of transformer layers, attn between subpaths
+  N_PRE_SQUEEZE_TRANSFORMER_LAYERS: 4 # number of transformer layers, attn between tokens
+  N_HEADS: 4
+  TOKEN_DIM: 64 # dimension of the token embedding
+  MLP_DIM: 32 # dimension of the MLP
+  CPE_LAYERS: 3 # number of layers in the continuous point embedding
+  CNN_LAYERS: 6 # number of layers in the CNN
+  CNN_KERNEL_SIZE: 3 # size of the kernel in the CNN
+  USE_CAUSAL_MASKS: False # whether to use casual masks in the transformer layers (both pre and post squeeze),
+  DROPOUT_P: 0.2 # dropout probability
+  QKV_BIAS: False # whether to use bias in the QKV projection layers
+  USE_SHIP_TYPE: False # whether to use ship type in the model
+  USE_RESIDUAL_CNN: False # whether to use residual connections in the CNN
+  USE_LAYERNORM_CNN: False # whether to use layer normalization in the CNN
+  USE_CHANNEL_DIM_LN_CNN: False # whether to use layer normalization only on the channel dimension
+  USE_PREPAD: TRUE # whether to pre-pad/left pad the trajectory, if false, the trajectory will be right/post padded
+
+model:
+  ATLAS_ENTITY_MODEL_ID: ATLAS-Buoy_no_git_hash_2024-08-20-23-16-27_epoch2.pt
+
+data:
+  MODEL_INPUT_COLUMNS_ENTITY: [
+      "lat",
+      "lon",
+      "sog",
+      "cog",
+      "dist2coast",
+      "rel_cog",
+    ] # this should be you just pass the keyword of the normalization as they are xor
+  FEATURE_NORMALIZATION_CONFIG_ENTITY:
+    {
+      "lat": { "log": False, "sqrt": False, "z-scale": False },
+      "lon": { "log": False, "sqrt": False, "z-scale": False },
+      "sog": { "log": True, "sqrt": False, "z-scale": False },
+      "cog": { "log": True, "sqrt": False, "z-scale": False },
+      "dist2coast": { "log": False, "sqrt": False, "z-scale": False },
+      "rel_cog": { "log": False, "sqrt": False, "z-scale": False },
+    }
+  CPE_KERNEL_SIZE: 5 # size of the kernel in the CPE
+  MAX_TRAJECTORY_LENGTH: 4000 # this is the maximum number of lines that will be read for each trajectory. On CPU this can be arbitralily large, but on GPU it is limited by the amount of memory available. high, but on GPU it must be a smaller number if you are not chunking the data.
+  MIN_AIS_MESSAGES: 500 # this i
