@@ -9,11 +9,13 @@ from typing import Any
 import click
 import pandas as pd
 import pandera as pa
+from google.cloud import storage
+from pandera.typing import DataFrame
+
 from atlantes.datautils import GCP_TRACK_DATA_BUCKET
 from atlantes.human_annotation.schemas import TrackMetadataIndex
 from atlantes.log_utils import get_logger
-from google.cloud import storage
-from pandera.typing import DataFrame
+from atlantes.utils import read_df_file_type_handler
 
 logger = get_logger(__name__)
 
@@ -98,10 +100,12 @@ def filter_index_by_month(
 )
 @click.option("--blob-name", required=True, help="Name of the blob")
 @click.option("--file-type", default="parquet", help="Type of the file")
+@click.option("--use-folder-structure", is_flag=True, help="Use the folder structure to create the metadata index")
 def create_metadata_index_parquet(
     bucket_name: str,
     blob_name: str,
     file_type: str = "parquet",
+    use_folder_structure: bool = False,
 ) -> None:
     """Create a metadata index for the ATLAS activity model training data."""
     # Get a list of all the parquet files in the training data bucket
@@ -123,36 +127,68 @@ def create_metadata_index_parquet(
     # Iterate over the parquet files and extract the metadata
     # Get year outside of the loop
     blob_path = Path(blob_name)
-    year = blob_path.parts[0]
-    dataset_name = blob_path.parts[1]
+    if use_folder_structure:
+        year = blob_path.parts[0]
+        dataset_name = blob_path.parts[1]
+    else:
+        year = None
+        dataset_name = None
+    years = []
     flag_codes = []
     ais_types = []
     trackIds = []
     months = []
     file_names = []
     full_paths = []
+    files_found = 0
+    logger.info(f"Iterating over {blob_name} in {bucket_name}")
     for file in bucket.list_blobs(prefix=blob_name):
-        file_name = Path(file.name)
-        file_name_parts = file_name.parts
-        if not file.name.endswith(f".{file_type}"):
-            continue
-        # Extract the metadata from the file name
-        flag_code = file_name_parts[3]
-        ais_type = file_name_parts[2]
-        trackId = file_name_parts[5]
-        month = str(file_name.stem).split("_")[1]
         full_path = f"gs://{bucket_name}/{file.name}"
+        if use_folder_structure:
+            file_name = Path(file.name)
+            file_name_parts = file_name.parts
+            if not file.name.endswith(f".{file_type}"):
+                continue
+            # Extract the metadata from the file name
+            flag_code = file_name_parts[3]
+            ais_type = file_name_parts[2]
+            trackId = file_name_parts[5]
+            month = str(file_name.stem).split("_")[1]
+            full_path = f"gs://{bucket_name}/{file.name}"
+        else:
+            df = read_df_file_type_handler(full_path)
+            first_row = df.iloc[0]
+            flag_code = first_row["flag_code"]
+            ais_type = first_row["category"]
+            trackId = first_row["trackId"]
+            send = first_row["send"]
+            month = pd.to_datetime(send).strftime("%m")
+            year = pd.to_datetime(send).strftime("%Y")
+        logger.info(
+            f"Extracted metadata: "
+            f"year={year}, "
+            f"flag_code={flag_code}, "
+            f"ais_type={ais_type}, "
+            f"trackId={trackId}, "
+            f"month={month}, "
+            f"file={file.name}, "
+            f"path={full_path}"
+        )
+        files_found += 1
         # Append the metadata to the lists
+        years.append(year)
         flag_codes.append(flag_code)
         ais_types.append(ais_type)
         trackIds.append(trackId)
         months.append(month)
         file_names.append(file.name)
         full_paths.append(full_path)
+    if files_found % 20 == 0:
+        logger.info(f"Found {files_found} files")
 
     # Add the metadata to the dataframe
     metadata_index["file_name"] = file_names
-    metadata_index["year"] = year
+    metadata_index["year"] = years
     metadata_index["flag_code"] = flag_codes
     metadata_index["month"] = months
     metadata_index["ais_type"] = ais_types
@@ -166,6 +202,7 @@ def create_metadata_index_parquet(
     validated_metadata_index.to_parquet(
         output_path, engine="pyarrow", compression="snappy", index=False
     )
+    logger.info(f"Saved the metadata index to {output_path}")
 
 
 if __name__ == "__main__":
