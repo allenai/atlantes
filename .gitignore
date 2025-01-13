@@ -7,7 +7,6 @@ ais/data/raw
 **/wandb**
 ais/gfw/**
 **/ipynb_checkpoints
-**/*ipynb*
 ais/EDA/notebooks
 ais/EDA/notebooks
 ais/data/gebco_2022_sub_ice_topo/*.nc

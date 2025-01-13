@@ -13,6 +13,10 @@ import numpy as np
 import torch
 import torch.nn as nn
 import wandb
+from sklearn.model_selection import train_test_split
+from torch.distributed import reduce
+from torch.utils.data import DataLoader, Subset
+
 from atlantes.atlas.ais_dataset import ActivityDatasetEndOfSequence
 from atlantes.atlas.atlas_eval_utils import (log_all_class_subpath_metrics,
                                              log_target_class_or_not_metrics)
@@ -24,9 +28,6 @@ from atlantes.atlas.collate import (
 from atlantes.atlas.training_utils import rank_zero_only
 from atlantes.log_utils import get_logger
 from atlantes.utils import NUM_TO_CATEGORY_DESC, get_vessel_type_name
-from sklearn.model_selection import train_test_split
-from torch.distributed import reduce
-from torch.utils.data import DataLoader, Subset
 
 logger = get_logger(__name__)
 MODELS_DIR_DEFAULT = str(Path(__file__).parent.parent / "models")

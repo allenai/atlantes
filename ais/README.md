@@ -131,4 +131,4 @@ See the [deployment documentation](docs/deployment.md) for more details.
 
 ## Tutorials
 
-See the [tutorials folder](tutorials) for more details.
+See the [tutorials folder](tutorials) for more details. The open source data for the tutorial is available at (location on internet where the data is).
