@@ -28,9 +28,6 @@ import pandera as pa
 import pyproj
 import torch
 import yaml
-from atlantes.datautils import MMSI_FLAG_CODES
-from atlantes.human_annotation.schemas import LocationDataModel
-from atlantes.log_utils import get_logger
 from dask.diagnostics import ProgressBar
 from geopandas import GeoDataFrame
 from google.cloud import storage
@@ -38,6 +35,10 @@ from pandera.typing import DataFrame
 from pydantic import BaseModel
 from shapely.geometry import Point
 from tqdm import tqdm
+
+from atlantes.datautils import MMSI_FLAG_CODES
+from atlantes.human_annotation.schemas import LocationDataModel
+from atlantes.log_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -209,7 +210,7 @@ def load_all_dataset_points(
     paths_to_files: Union[list[str], np.ndarray]
 ) -> DataFrame[LocationDataModel]:
     """Load all the dataset points."""
-    dfcols = ["lat", "lon"]
+    dfcols = ["lat", "lon", "send"]
     logger.info(f"Loading all dataset points {paths_to_files[:10]}")
 
     with ProgressBar():
