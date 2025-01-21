@@ -7,10 +7,11 @@ from typing import Generator
 import numpy as np
 import pandas as pd
 import pytest
-from atlantes.atlas.atlas_utils import (get_atlas_activity_inference_config,
-                                        get_atlas_entity_inference_config)
 from google.cloud import storage
 from shapely.geometry import Point
+
+from atlantes.atlas.atlas_utils import (get_atlas_activity_inference_config,
+                                        get_atlas_entity_inference_config)
 
 logger = logging.getLogger(__name__)  # not using atlantes.utils logger for tests
 
@@ -25,18 +26,18 @@ TEST_PROJECTS_FOLDER = os.path.join(
 TEST_GOLD_STANDARD_FOLDER = os.path.join(TEST_PROJECTS_FOLDER, "test_goldstandardproj")
 GOLD_STANDARD_PROJECTS = ["test_goldstandardproj"]
 GCP_TEST_BUCKET = "ais-track-data"
-GCP_TEST_PREFIX = f"{TEST_PROJECTS_FOLDER}/completed".replace("gs://ais-track-data/", "")
+GCP_TEST_PREFIX = f"{TEST_PROJECTS_FOLDER}/completed"
 TEST_AIS_DATA_FOLDER = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/test-ais-tracks")
-OBVIOUS_TRANSITING_DATA_FOLDER = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/obvious-transiting-tracks").replace("gs://ais-track-data/", "")
-OBVIOUS_MOORED_DATA_FOLDER = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/obvious-moored-tracks").replace("gs://ais-track-data/", "")
-OBVIOUS_ANCHORED_DATA_FOLDER = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/obvious-anchored-tracks").replace("gs://ais-track-data/", "")
-NEAR_SHORE_DATA_FOLDER = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/near-shore-tracks").replace("gs://ais-track-data/", "")
-NON_FISHING_NON_UNKNOWN_FOLDER = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/non-fishing-non-unknown-ves-tracks").replace("gs://ais-track-data/", "")
-OBVIOUS_STATIONARY_DATA_FOLDER = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/stationary-vessel-tracks").replace("gs://ais-track-data/", "")
-TRANSITING_DF_FOLDER = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/transiting-vessel-tracks").replace("gs://ais-track-data/", "")
-FISHING_DATA_FOLDER = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/fishing-vessel-tracks").replace("gs://ais-track-data/", "")
-HIGH_TRAFFIC_PORTS = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/high-traffic-port-tracks").replace("gs://ais-track-data/", "")
-MARINE_INFRA_SUPPLY_VESSELS = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/offshore_marine_infra_transiting_df_list").replace("gs://ais-track-data/", "")
+OBVIOUS_TRANSITING_DATA_FOLDER = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/obvious-transiting-tracks")
+OBVIOUS_MOORED_DATA_FOLDER = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/obvious-moored-tracks")
+OBVIOUS_ANCHORED_DATA_FOLDER = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/obvious-anchored-tracks")
+NEAR_SHORE_DATA_FOLDER = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/near-shore-tracks")
+NON_FISHING_NON_UNKNOWN_FOLDER = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/non-fishing-non-unknown-ves-tracks")
+OBVIOUS_STATIONARY_DATA_FOLDER = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/stationary-vessel-tracks")
+TRANSITING_DF_FOLDER = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/transiting-vessel-tracks")
+FISHING_DATA_FOLDER = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/fishing-vessel-tracks")
+HIGH_TRAFFIC_PORTS = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/high-traffic-port-tracks")
+MARINE_INFRA_SUPPLY_VESSELS = os.path.join(TEST_PROJECTS_FOLDER_PREFIX, "test-data/offshore_marine_infra_transiting_df_list")
 
 
 @pytest.fixture(autouse=True)
