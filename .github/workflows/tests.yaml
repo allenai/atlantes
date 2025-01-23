@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  unit-tests:
+  tests:
     runs-on: ubuntu-latest-m
     env:
       COMPOSE_FILE: docker-compose.yml
@@ -38,6 +38,7 @@ jobs:
         uses: "google-github-actions/auth@v2"
         with:
           credentials_json: ${{secrets.GOOGLE_CREDENTIALS }}
+
       - name: Build docker images
         run: |
           COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ais/docker-compose.yml build

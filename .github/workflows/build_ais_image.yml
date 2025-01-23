@@ -3,6 +3,10 @@ name: Create and publish AIS Docker image
 on:
   push:
     branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
 
 env:
   REGISTRY: ghcr.io
@@ -20,9 +24,7 @@ jobs:
       contents: read
       packages: write
     outputs:
-      deploy_env: ${{ steps.get-env-info.outputs.deploy_env }} # One of development, integration, production
       ghcr_docker_image: ${{ steps.image-names.outputs.ghcr_image_name }}
-      gcr_docker_image: ${{ steps.image-names.outputs.gcr_image_name }}
 
     steps:
       - name: Checkout repository
@@ -33,16 +35,6 @@ jobs:
       - name: Get short SHA
         run: echo "GIT_COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
-      - name: Get Environment Info
-        # Figures out variables relevant to this build. { docker_image_path, deploy_env, branch }
-        id: get-env-info
-        uses: VulcanSkylight/skylight-shared-actions/get-env-info@develop
-
-      - name: Setup GCloud
-        # Installs and configures our connection to google cloud
-        uses: VulcanSkylight/skylight-shared-actions/setup-gcloud@develop
-        with:
-          ENCODED_GCR_KEY: ${{ secrets.ENCODED_GCR_KEY }}
 
       - name: Log in to the Container registry
         uses: docker/login-action@v3
@@ -57,7 +49,6 @@ jobs:
         with:
           images: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-            ${{ steps.get-env-info.outputs.docker_image_path }}/${{ env.SERVICE_NAME }}
           tags: |
             type=sha,format=long
             type=sha,format=short
@@ -82,14 +73,3 @@ jobs:
           GHCR_IMAGE=`echo ${GHCR_IMAGE} | tr '[:upper:]' '[:lower:]'` # docker requires that all image names be lowercase
           echo "ghcr.io Docker image name is ${GHCR_IMAGE}"
           echo "ghcr_image_name=\"${IMAGE}\"" >> $GITHUB_OUTPUT
-          GCR_IMAGE="${{ steps.get-env-info.outputs.docker_image_path }}/${{ env.SERVICE_NAME }}@${{ steps.build-push.outputs.digest }}"
-          GCR_IMAGE=`echo ${GCR_IMAGE} | tr '[:upper:]' '[:lower:]'` # docker requires that all image names be lowercase
-          echo "gcr.io Docker image name is ${GCR_IMAGE}"
-          echo "gcr_image_name=\"${GCR_IMAGE}\"" >> $GITHUB_OUTPUT
-
-      - name: Slack Alert
-        if: ${{ failure() }}
-        uses: VulcanSkylight/skylight-shared-actions/slack-alert@develop
-        with:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ALERT_URL }}
-          message: "Failed to build docker image"
