@@ -13,7 +13,8 @@ ais/EDA/notebooks
 ais/data/gebco_2022_sub_ice_topo/*.nc
 trajectory_lengths.csv
 ais/data/sample_events/sentinel2/iceberg_detection_dataset.csv
-
+figures/**/*
+figures.zip
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
