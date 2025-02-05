@@ -65,7 +65,6 @@ Please ensure that your code follows the project's coding standards and includes
 Apache 2.0
 
 ## Acknowledgments
-
 This project was developed by the Allen Institute for Artificial Intelligence (Ai2).
 
 ## Contact
