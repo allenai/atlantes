@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   tests:
-    runs-on: ubuntu-latest-gpu-m
+    runs-on: GPU-Enabled-Runner
     env:
       COMPOSE_FILE: docker-compose.yml
 
