@@ -26,7 +26,10 @@ RUN mkdir -p /ais/src/atlantes/data && wget -O /ais/src/atlantes/data/latest_mar
 
 RUN pip3 install --no-cache-dir .
 
+ENV PORT=8080
+EXPOSE ${PORT}
+
 # Note that the line below may need to be specific to service,
 # if we want a single dockerfile/or can have multiple docker-compose files.
 # Either way, adding this so that tests/main.py can be run in the with gh-actions
-CMD ["python3", "src/main.py"]
+CMD ["python3", "src/main_activity.py"]

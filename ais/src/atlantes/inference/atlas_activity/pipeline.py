@@ -8,31 +8,21 @@ from typing import Any, Awaitable
 import pandas as pd
 from atlantes.atlas.atlas_utils import AtlasActivityLabelsTraining
 from atlantes.atlas.schemas import TrackfileDataModelTrain
-from atlantes.inference.atlas_activity.preprocessor import \
-    PreprocessedActivityData
-from atlantes.inference.common import (AtlasInferenceError, ATLASRequest,
-                                       ATLASResponse)
+from atlantes.inference.atlas_activity.preprocessor import PreprocessedActivityData
+from atlantes.inference.common import AtlasInferenceError, ATLASRequest, ATLASResponse
 from atlantes.log_utils import get_logger
 from fastapi import FastAPI
 from pandera.errors import SchemaError
 from pandera.typing import DataFrame
-from ray import serve
-from ray.serve.handle import DeploymentHandle, DeploymentResponse
 
 app = FastAPI()
 
-logger = get_logger("ray.serve")
+logger = get_logger("activity_classifier")
 
 
 @app.get("/")
 async def home() -> dict:
-    return {"message": "ATLAS Activity Ray App"}
-
-
-# This is temporary code -- all of this should be handled via ray config
-
-NUM_CPUS = 1
-NUM_REPLICAS = 1
+    return {"message": "ATLAS Activity Classifier"}
 
 
 class AtlasActivityClassifier:
@@ -62,13 +52,7 @@ class AtlasActivityClassifier:
     ) -> tuple[
         AtlasActivityLabelsTraining, dict, dict
     ]:
-        """Run inference on the preprocessed data using the mode
-
-        Although the model supports batching, this pipeline does not.
-        This is because Ray serve handles batching inputs from the
-        preprocessor and unbatching
-        to the postprocessor.
-        """
+        """Run inference on the preprocessed data"""
         if not isinstance(preprocessed_data_stream, PreprocessedActivityData):
             raise ValueError(
                 f"The preprocessed_data_stream must be a PreprocessedActivityData, not a {type(preprocessed_data_stream)} \
@@ -120,13 +104,6 @@ class AtlasActivityClassifier:
             raise AtlasInferenceError(f"Error while running inference: {e}") from e
 
 
-@serve.deployment(
-    num_replicas=NUM_REPLICAS,
-    ray_actor_options={
-        "num_cpus": NUM_CPUS,
-    },
-)
-@serve.ingress(app)
 class AtlasActivityClassifierDeployment(AtlasActivityClassifier):
     """Class for classifying the activity of a trajectory using the Atlantes system for AIS behavior classification
 

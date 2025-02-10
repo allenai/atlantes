@@ -7,13 +7,13 @@ from pydantic import BaseModel
 class ATLASRequest(BaseModel):
     """Request object for ATLAS"""
 
-    track: list[dict]
+    tracks: list[list[dict]]
 
 
 class ATLASResponse(BaseModel):
     """Request object for ATLAS"""
 
-    predictions: tuple[str, dict]
+    predictions: list[tuple[str, dict]]
 
 
 class AtlasInferenceError(Exception):

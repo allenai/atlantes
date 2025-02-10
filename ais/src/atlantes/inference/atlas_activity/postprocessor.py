@@ -1,4 +1,4 @@
-""" Activity postprocessor class and ray serve deployment
+"""Activity postprocessor class
 
 Do we want metrics when we are not deployed? I think yes
 """
@@ -7,30 +7,51 @@ from datetime import timedelta
 
 import numpy as np
 import pandas as pd
-from atlantes.atlas.atlas_utils import (AtlasActivityLabelsTraining,
-                                        AtlasActivityLabelsWithUnknown,
-                                        get_atlas_activity_inference_config,
-                                        haversine_distance_radians)
+from atlantes.atlas.atlas_utils import (
+    AtlasActivityLabelsTraining,
+    AtlasActivityLabelsWithUnknown,
+    get_atlas_activity_inference_config,
+    haversine_distance_radians,
+)
 from atlantes.datautils import NAV_NAN
 from atlantes.inference.atlas_activity.utils import ports
 from atlantes.log_utils import get_logger
 from atlantes.machine_annotation.data_annotate_utils import (  # TODO possibly move these to a constants file rather than data_annotate_utils
     ANCHORED_MAX_SOG_METERS_PER_SECOND,
     MAX_SOG_FOR_ANCHORED_MOORED_METERS_PER_SECOND,
-    MOORED_MAX_SOG_METERS_PER_SECOND, TRANSITING_MAX_MEAN_REL_COG_DEGREES,
+    MOORED_MAX_SOG_METERS_PER_SECOND,
+    TRANSITING_MAX_MEAN_REL_COG_DEGREES,
     TRANSITING_MIN_HIGH_CONFIDENCE_SOG_METERS_PER_SECOND,
-    TRANSITING_MIN_MED_CONFIDENCE_SOG_METERS_PER_SECOND)
-from atlantes.utils import (AIS_CATEGORIES, get_nav_status,
-                            read_geojson_and_convert_coordinates)
-from ray import serve
-from ray.serve import metrics
+    TRANSITING_MIN_MED_CONFIDENCE_SOG_METERS_PER_SECOND,
+)
+from atlantes.utils import (
+    AIS_CATEGORIES,
+    get_nav_status,
+    read_geojson_and_convert_coordinates,
+)
 from shapely.geometry import Point, Polygon
 
-logger = get_logger("ray.serve")
+logger = get_logger("atlas_activity_postprocessor")
 
-NUM_REPLICAS = 1
-NUM_CPUS = 1
-NUM_GPUS = 0
+
+class Counter:
+    """
+    placeholder metrics class
+    """
+
+    def __init__(self, name: str) -> None:
+        self.name = name
+        self.count = 0
+
+    def inc(self) -> None:
+        self.count += 1
+        logger.debug(f"{self.name} count: {self.count}")
+
+    @property
+    def _name(self) -> str:
+        return self.name
+
+
 DIST_TO_COAST_THRESHOLD_METERS = 2000
 STATIONARY_THRESHOLD = 0.0  # sog
 DIS_THRESHOLD_METERS = 100  # Threshold for cumulative displacement
@@ -79,50 +100,48 @@ class AtlasActivityPostProcessor:
 
         Always add a counter for each postprocessing rule"""
 
-        self.no_postprocessing_rule_applied = metrics.Counter(
+        self.no_postprocessing_rule_applied = Counter(
             "activity_post_processed_no_rule_applied"
         )
-        self.transiting_post_processed_rule_applied = metrics.Counter(
+        self.transiting_post_processed_rule_applied = Counter(
             "activity_post_processed_high_mid_speed_transiting"
         )
-        self.confidence_threshold_rule_applied = metrics.Counter(
+        self.confidence_threshold_rule_applied = Counter(
             "activity_post_processed_confidence_threshold"
         )
-        self.num_non_fishing_unknown_vessels_classified_as_fishing = metrics.Counter(
+        self.num_non_fishing_unknown_vessels_classified_as_fishing = Counter(
             "num_non_fishing_unknown_vessels_classified_as_fishing"
         )
-        self.still_anchored_based_on_nav_and_sog_rule_applied = metrics.Counter(
+        self.still_anchored_based_on_nav_and_sog_rule_applied = Counter(
             "num_anchored_vessels_classifed_as_fishing"
         )
-        self.still_moored_based_on_nav_and_sog_rule_applied = metrics.Counter(
+        self.still_moored_based_on_nav_and_sog_rule_applied = Counter(
             "num_moored_vessels_classifed_as_fishing"
         )
-        self.is_stationary_rule_applied_nav_unknown = metrics.Counter(
+        self.is_stationary_rule_applied_nav_unknown = Counter(
             "is_stationary_rule_applied_nav_unknown"
         )
-        self.is_near_shore_threshold_applied = metrics.Counter(
+        self.is_near_shore_threshold_applied = Counter(
             "is_near_shore_threshold_applied"
         )
-        self.is_not_fishing_or_unknown_vessel_type = metrics.Counter(
+        self.is_not_fishing_or_unknown_vessel_type = Counter(
             "is_near_shore_threshold_applied"
         )
-        self.is_stationary_rule_applied_displacement = metrics.Counter(
+        self.is_stationary_rule_applied_displacement = Counter(
             "is_stationary_rule_applied_displacement"
         )
-        self.is_traveling_straight_rule_applied = metrics.Counter(
+        self.is_traveling_straight_rule_applied = Counter(
             "is_traveling_straight_rule_applied"
         )
-        self.is_collision_avoidance_rule = metrics.Counter(
+        self.is_collision_avoidance_rule = Counter(
             "is_collision_avoidance_rule_applied"
         )
-        self.is_near_high_traffic_port_rule_applied = metrics.Counter(
+        self.is_near_high_traffic_port_rule_applied = Counter(
             "is_near_high_traffic_port"
         )
-        self.removed_detections_near_infra = metrics.Counter(
-            "removed_detections_near_infra"
-        )
+        self.removed_detections_near_infra = Counter("removed_detections_near_infra")
 
-        self.is_too_fast_for_anchored_moored_rule_applied = metrics.Counter(
+        self.is_too_fast_for_anchored_moored_rule_applied = Counter(
             "is_too_fast_for_anchored_moored_rule_applied"
         )
 
@@ -299,10 +318,11 @@ class AtlasActivityPostProcessor:
         if cog_variance < COG_VARIANCE_THRESHOLD:
             return True
         else:
-
             return False
 
-    def is_confident_activity_class(self, confidence: float, binned_ship_type: int) -> bool:
+    def is_confident_activity_class(
+        self, confidence: float, binned_ship_type: int
+    ) -> bool:
         """
         Determines if the activity class confidence meets the threshold based on vessel type.
 
@@ -334,7 +354,6 @@ class AtlasActivityPostProcessor:
                 port_polygon = Polygon([tuple(coord) for coord in port_polygon_coords])
 
                 if port_polygon.contains(event_point):
-
                     return True
             except TypeError as e:
                 logger.error(f"Error processing polygon for port {port_name}: {e}")
@@ -413,7 +432,6 @@ class AtlasActivityPostProcessor:
 
         # If the time gap is greater than or equal to the gap threshold, include the second-to-last message
         if time_gap >= timedelta(minutes=gap_threshold_minutes):
-
             # Ensure the second-to-last message is included
             second_last_message = message_df.iloc[-2].to_frame().T
             filtered_df = pd.concat(
@@ -613,9 +631,7 @@ class AtlasActivityPostProcessor:
         most_recent_sog = most_recent_message_df["sog"].iloc[-1]
         dist2coast = most_recent_message_df.get(
             "dist2coast", pd.Series([DIST_TO_COAST_THRESHOLD_METERS * 10])
-        ).iloc[
-            -1
-        ]  # 1e9 bc we want to make sure it is not near the coast
+        ).iloc[-1]  # 1e9 bc we want to make sure it is not near the coast
         binned_ship_type = metadata["binned_ship_type"]
         most_recent_nav_status = most_recent_message_df.get(
             "nav", pd.Series([NAV_NAN])
@@ -650,26 +666,3 @@ class AtlasActivityPostProcessor:
             postprocessed_activity_class_name,
             activity_classification_details,
         )
-
-
-@serve.deployment(
-    num_replicas=NUM_REPLICAS,
-    ray_actor_options={"num_cpus": NUM_CPUS, "num_gpus": NUM_GPUS},
-)
-class AtlasActivityPostProcessorDeployment(AtlasActivityPostProcessor):
-    """Class for deploying the postprocessor for Atlas activity classification"""
-
-    def __init__(self) -> None:
-        super().__init__()
-
-    def reconfigure(self, user_config: dict) -> None:
-        """Reconfigure the postprocessor with a new user config
-
-        Is called and updated when the serve config is updated and application is redeployed
-
-        Parameters
-        ----------
-        user_config : dict
-            The user config
-        """
-        self.ACTIVITY_CLASS_CONFIDENCE_THRESHOLD = user_config["confidence_threshold"]

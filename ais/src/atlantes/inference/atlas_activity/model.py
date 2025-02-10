@@ -1,8 +1,6 @@
 """Main model inference module for the atlas activity application
 
 Loads the model and runs inference on the data
-
-This includes a base class and a ray serve deployment class
 """
 
 import os
@@ -12,19 +10,20 @@ from typing import Optional
 
 import torch
 from atlantes.atlas.atlas_net import AtlasActivityEndOfSequenceTaskNet
-from atlantes.atlas.atlas_utils import (AtlasActivityLabelsTraining,
-                                        get_atlas_activity_inference_config,
-                                        remove_module_from_state_dict)
+from atlantes.atlas.atlas_utils import (
+    AtlasActivityLabelsTraining,
+    get_atlas_activity_inference_config,
+    remove_module_from_state_dict,
+)
 from atlantes.atlas.collate import (
-    ActivityDatasetEndOfSequenceCollatedDataOutput, RealTimeActivityCollater)
-from atlantes.inference.atlas_activity.datamodels import \
-    PreprocessedActivityData
+    ActivityDatasetEndOfSequenceCollatedDataOutput,
+    RealTimeActivityCollater,
+)
+from atlantes.inference.atlas_activity.datamodels import PreprocessedActivityData
 from atlantes.log_utils import get_logger
 from atlantes.utils import get_commit_hash
-from ray import serve
-from ray.serve import metrics
 
-logger = get_logger("ray.serve")
+logger = get_logger("atlas_activity_classifier")
 
 # Only matters for cI
 if torch.cuda.is_available():
@@ -107,14 +106,12 @@ class AtlasActivityModel:
         single_gpu_state_dict = remove_module_from_state_dict(atlas_activity_state_dict)
         model.load_state_dict(single_gpu_state_dict)
         logger.debug(f"Number of parameters in model: {model.param_num()}")
-        logger.debug(f"model memory size (MB): {model.param_num() * 4 / 1024 ** 2}")
+        logger.debug(f"model memory size (MB): {model.param_num() * 4 / 1024**2}")
         return model
 
     # Correctly manage device placement
     def _get_device(self, device: int = 0) -> torch.device:
-        """Get the device to run the model on
-        Ray treats all GPU as gpu 0
-        """
+        """Get the device to run the model on"""
         if torch.cuda.is_available():
             logger.info("GPU detected, using GPU")
             # Device count what is that
@@ -123,7 +120,6 @@ class AtlasActivityModel:
         else:
             logger.info("No GPU detected, using CPU")
             device = torch.device("cpu")
-            logger.info("No GPUs available for ray serve.")
         return device
 
     def _initialize_atlas_activity_model_inference(
@@ -218,13 +214,8 @@ class AtlasActivityModel:
         return class_ouputs_with_details_batch
 
 
-@serve.deployment(
-    num_replicas=NUM_REPLICAS,
-    ray_actor_options={
-        "num_cpus": NUM_CPUS,
-        "num_gpus": NUM_GPUS,
-    },
-)
+'''
+
 class AtlasActivityModelDeployment(AtlasActivityModel):
     """Class for Deployment of the Atlas Activity Model on Ray Serve"""
 
@@ -240,10 +231,6 @@ class AtlasActivityModelDeployment(AtlasActivityModel):
             boundaries=[1, 2, 4, 8, 16, 32],
         )
 
-    @serve.batch(
-        max_batch_size=ATLAS_ACTIVITY_BATCH_MAX_SIZE,
-        batch_wait_timeout_s=ATLAS_ACTIVITY_BATCH_WAIT_TIMEOUT_S,
-    )
     async def batch_handler_run_inference(
         self, preprocessed_data_stream: list[PreprocessedActivityData]
     ) -> list[tuple[AtlasActivityLabelsTraining, dict, dict]]:
@@ -269,3 +256,5 @@ class AtlasActivityModelDeployment(AtlasActivityModel):
         self.batch_handler_run_inference.set_batch_wait_timeout_s(
             user_config["batch_wait_timeout_s"]
         )
+
+'''

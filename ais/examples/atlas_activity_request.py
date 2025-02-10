@@ -1,8 +1,10 @@
 """This example does not work yet, please do not use.
+
 """
 
 import json
 import os
+import sys
 import time
 from pathlib import Path
 
@@ -12,8 +14,8 @@ from atlantes.log_utils import get_logger
 
 logger = get_logger(__name__)
 
-PORT = os.getenv("ATLAS_PORT", default=8000)
-ATLAS_ENDPOINT = f"http://0.0.0.0:{PORT}/trackclassify"
+PORT = os.getenv("ATLAS_PORT", default=8080)
+ATLAS_ENDPOINT = f"http://0.0.0.0:{PORT}"
 TIMEOUT_SECONDS = 600
 
 example_dir = Path(__file__).parent.parent
@@ -31,11 +33,11 @@ EXAMPLE_TRACK_JSON = (
             "nav",
             "mmsi",
             "trackId",
-            'dist2coast',
+            "dist2coast",
             "name",
             "flag_code",
             "category",
-            "subpath_num"  # I should drop that from activity preprocess validate
+            "subpath_num",  # I should drop that from activity preprocess validate
         ],
     )
     .head(1000)
@@ -51,21 +53,28 @@ def sample_request() -> None:
     """Sample request for files stored locally"""
     start = time.time()
 
+    N = int(sys.argv[1])  # Number of records to classify
+    track = json.loads(EXAMPLE_TRACK_JSON)
     REQUEST_BODY = {
-        "track": json.loads(EXAMPLE_TRACK_JSON),  # Ensure proper JSON format
+        "tracks": [track] * N,  # Ensure proper JSON format
     }
-    # serialize the request body to a JSON string
-    # logger.info(f"{REQUEST_BODY}")
     try:
         response = requests.post(
-            ATLAS_ENDPOINT, json=REQUEST_BODY, timeout=TIMEOUT_SECONDS
+            ATLAS_ENDPOINT + "/classify",
+            json=REQUEST_BODY,
+            timeout=TIMEOUT_SECONDS,
         )
-        if response.ok:
-            logger.info(response.json())
-            with open(OUTPUT_FILENAME, "w") as outfile:
-                json.dump(response.json(), outfile)
-        else:
-            logger.info(f"Request failed with status code {response.status_code}")
+        if not response.ok:
+            logger.warning(f"Request failed with status code {response.status_code}")
+        response_data = response.json()
+
+        classifications = [prediction[0] for prediction in response_data["predictions"]]
+        classification_count = len(classifications)
+        logger.info(f"Classification {classification_count=}, {classifications=}")
+
+        with open(OUTPUT_FILENAME, "w") as outfile:
+            json.dump(response_data, outfile)
+            logger.info(f"response saved to {OUTPUT_FILENAME}")
     except requests.exceptions.RequestException as e:
         logger.exception(f"Request failed: {e}")
 

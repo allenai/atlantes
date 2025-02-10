@@ -1,4 +1,4 @@
-""" Activity preprocessor class and ray serve deployment
+"""Activity preprocessor class
 
 # TODO: Deal with the subpath at the end being removed or the last points so that we can
 provide the right classification for a given time
@@ -9,13 +9,11 @@ from __future__ import annotations
 from atlantes.atlas.ais_dataset import ActivityDatasetEndOfSequence
 from atlantes.atlas.atlas_utils import get_atlas_activity_inference_config
 from atlantes.atlas.schemas import TrackfileDataModelTrain
-from atlantes.inference.atlas_activity.datamodels import \
-    PreprocessedActivityData
+from atlantes.inference.atlas_activity.datamodels import PreprocessedActivityData
 from atlantes.log_utils import get_logger
 from pandera.typing import DataFrame
-from ray import serve
 
-logger = get_logger("ray.serve")
+logger = get_logger("atlas_activity_preprocessor")
 
 
 # ONLY TAKE effect during testing
@@ -42,13 +40,3 @@ class AtlasActivityPreprocessor:
             in_memory_data=[track_data],
         )
         return PreprocessedActivityData(**activity_dataset[0])
-
-
-@serve.deployment(
-    num_replicas=NUM_REPLICAS,
-    ray_actor_options={"num_cpus": NUM_CPUS, "num_gpus": NUM_GPUS},
-)
-class AtlasActivityPreprocessorDeployment(AtlasActivityPreprocessor):
-    """Class for deploying the preprocessor for Atlas activity classification"""
-
-    pass
