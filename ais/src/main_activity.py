@@ -3,7 +3,6 @@
 """
 
 import os
-from typing import Any
 
 import pandas as pd
 from atlantes.atlas.atlas_utils import AtlasActivityLabelsTraining
@@ -12,7 +11,6 @@ from atlantes.inference.atlas_activity.model import AtlasActivityModel
 from atlantes.inference.atlas_activity.postprocessor import AtlasActivityPostProcessor
 from atlantes.inference.atlas_activity.preprocessor import (
     AtlasActivityPreprocessor,
-    PreprocessedActivityData,
 )
 from atlantes.inference.common import AtlasInferenceError, ATLASRequest, ATLASResponse
 from atlantes.log_utils import get_logger
@@ -22,7 +20,7 @@ from pandera.typing import DataFrame
 
 app = Flask(__name__)
 
-logger = get_logger("vertex_activity_api")
+logger = get_logger("atlas_activity_api")
 
 
 class AtlasActivityClassifier:

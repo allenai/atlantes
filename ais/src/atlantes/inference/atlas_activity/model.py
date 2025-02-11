@@ -167,6 +167,7 @@ class AtlasActivityModel:
                     ActivityDatasetEndOfSequenceCollatedDataOutput: {collated_data=}"
             )
         batch_size = len(collated_data.metadata)
+        logger.info(f"Running inference on batch of {batch_size} items")
         inputs = collated_data.input_tensor.to(self.device)
         spatiotemporal_intervals = collated_data.spatiotemporal_interval_tensor.to(
             self.device
@@ -212,49 +213,3 @@ class AtlasActivityModel:
         ]
 
         return class_ouputs_with_details_batch
-
-
-'''
-
-class AtlasActivityModelDeployment(AtlasActivityModel):
-    """Class for Deployment of the Atlas Activity Model on Ray Serve"""
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._init_metrics()
-
-    def _init_metrics(self) -> None:
-        """Initialize metrics for the model"""
-        self.activity_inference_batch_size = metrics.Histogram(
-            "activity_inference_batch_size",
-            description="Batch size for activity inference",
-            boundaries=[1, 2, 4, 8, 16, 32],
-        )
-
-    async def batch_handler_run_inference(
-        self, preprocessed_data_stream: list[PreprocessedActivityData]
-    ) -> list[tuple[AtlasActivityLabelsTraining, dict, dict]]:
-        batch_size = len(preprocessed_data_stream)
-        logger.info(
-            f"Running batch inference on the ATLAS activity model with {batch_size} items"
-        )
-        self.activity_inference_batch_size.observe(batch_size)
-        return self.run_inference(preprocessed_data_stream)
-
-    def reconfigure(self, user_config: dict) -> None:
-        """Reconfigure the activity model with a new user config
-
-        Is called and updated when the serve config is updated and application is redeployed
-
-        Parameters
-        ----------
-        user_config : dict
-            The new user config to update different parameters of the deployment"""
-        self.batch_handler_run_inference.set_max_batch_size(
-            user_config["max_batch_size"]
-        )
-        self.batch_handler_run_inference.set_batch_wait_timeout_s(
-            user_config["batch_wait_timeout_s"]
-        )
-
-'''
