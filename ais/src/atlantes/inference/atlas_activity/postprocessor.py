@@ -117,6 +117,7 @@ class AtlasActivityPostProcessor:
         self.still_moored_based_on_nav_and_sog_rule_applied = Counter(
             "num_moored_vessels_classifed_as_fishing",
             "Moored vessels classified as fishing",
+            registry=REGISTRY,
         )
         self.is_stationary_rule_applied_nav_unknown = Counter(
             "is_stationary_rule_applied_nav_unknown",
@@ -129,7 +130,7 @@ class AtlasActivityPostProcessor:
             registry=REGISTRY,
         )
         self.is_not_fishing_or_unknown_vessel_type = Counter(
-            "is_near_shore_threshold_applied",
+            "is_not_fishing_or_unknown_vessel_type",
             "Not fishing or unknown vessel type",
             registry=REGISTRY,
         )
@@ -157,7 +158,6 @@ class AtlasActivityPostProcessor:
             "Removed detections near marine infrastructure",
             registry=REGISTRY,
         )
-
         self.is_too_fast_for_anchored_moored_rule_applied = Counter(
             "is_too_fast_for_anchored_moored_rule_applied",
             "Too fast for anchored/moored rule applied",
