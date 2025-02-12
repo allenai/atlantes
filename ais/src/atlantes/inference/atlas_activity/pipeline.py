@@ -5,11 +5,10 @@
 
 from typing import Any, Awaitable
 
-import pandas as pd
 from atlantes.atlas.atlas_utils import AtlasActivityLabelsTraining
 from atlantes.atlas.schemas import TrackfileDataModelTrain
 from atlantes.inference.atlas_activity.preprocessor import PreprocessedActivityData
-from atlantes.inference.common import AtlasInferenceError, ATLASRequest, ATLASResponse
+from atlantes.inference.common import AtlasInferenceError
 from atlantes.log_utils import get_logger
 from fastapi import FastAPI
 from pandera.errors import SchemaError
@@ -49,9 +48,7 @@ class AtlasActivityClassifier:
 
     def _apply_model(
         self, preprocessed_data_stream: PreprocessedActivityData
-    ) -> tuple[
-        AtlasActivityLabelsTraining, dict, dict
-    ]:
+    ) -> tuple[AtlasActivityLabelsTraining, dict, dict]:
         """Run inference on the preprocessed data"""
         if not isinstance(preprocessed_data_stream, PreprocessedActivityData):
             raise ValueError(
@@ -102,57 +99,3 @@ class AtlasActivityClassifier:
             return activity_class_details_tuples
         except SchemaError as e:
             raise AtlasInferenceError(f"Error while running inference: {e}") from e
-
-
-class AtlasActivityClassifierDeployment(AtlasActivityClassifier):
-    """Class for classifying the activity of a trajectory using the Atlantes system for AIS behavior classification
-
-    The trajectory is passed through a pipeline of preprocessor, model, and postprocessor to classify the activity of the trajectory.
-    The activity will be one of the predefined activity classes."""
-
-    def __init__(
-        self,
-        preprocessor: DeploymentHandle,
-        model: DeploymentHandle,
-        postprocessor: DeploymentHandle,
-    ) -> None:
-        """Load the preprocessor, model, and postprocessor for the activity classifier DeploymentHandle"""
-        if not isinstance(preprocessor, DeploymentHandle):
-            raise ValueError(
-                f"The preprocessor must be a DeploymentHandle, not a {type(preprocessor)} "
-            )
-        if not isinstance(model, DeploymentHandle):
-            raise ValueError(
-                f"The model must be a DeploymentHandle, not a {type(model)} "
-            )
-        if not isinstance(postprocessor, DeploymentHandle):
-            raise ValueError(
-                f"The postprocessor must be a DeploymentHandle, not a {type(postprocessor)} "
-            )
-
-        super().__init__(preprocessor, model, postprocessor)
-
-    def _apply_preprocessing(
-        self, track_data: DeploymentResponse
-    ) -> DeploymentResponse:
-        return self.preprocessor.preprocess.remote(track_data)
-
-    def _apply_model(
-        self, preprocessed_data_dict_stream: DeploymentResponse
-    ) -> DeploymentResponse:
-        return self.model.batch_handler_run_inference.remote(
-            preprocessed_data_dict_stream
-        )
-
-    def _apply_postprocessing(
-        self,
-        activity_class_details_metadata_tuples: DeploymentResponse,
-    ) -> DeploymentResponse:
-        return self.postprocessor.postprocess.remote(
-            activity_class_details_metadata_tuples
-        )
-
-    @app.post("/classify", response_model=ATLASResponse)
-    async def classify_track_activity(self, request: ATLASRequest) -> ATLASResponse:
-        predictions = await self.run_pipeline(pd.DataFrame(request.track))  # type: ignore
-        return ATLASResponse(predictions=predictions)
