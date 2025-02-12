@@ -24,7 +24,6 @@ datashader>=0.16,<1
 decorator>=5.1,<6
 docker-pycreds>=0.4,<1
 fastavro>=1.9,<2
-Flask==3.1.0
 filelock>=3.13,<4
 fiona>=1.9,<2
 fonttools>=4.47,<5

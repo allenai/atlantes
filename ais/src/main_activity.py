@@ -5,6 +5,7 @@
 import os
 
 import pandas as pd
+import uvicorn
 from atlantes.atlas.atlas_utils import AtlasActivityLabelsTraining
 from atlantes.atlas.schemas import TrackfileDataModelTrain
 from atlantes.inference.atlas_activity.model import AtlasActivityModel
@@ -14,15 +15,14 @@ from atlantes.inference.atlas_activity.preprocessor import (
 )
 from atlantes.inference.common import AtlasInferenceError, ATLASRequest, ATLASResponse
 from atlantes.log_utils import get_logger
-from flask import Flask, request
+from fastapi import FastAPI
 from pandera.errors import SchemaError
 from pandera.typing import DataFrame
-
-app = Flask(__name__)
+from pydantic import BaseModel
 
 logger = get_logger("atlas_activity_api")
 
-
+app = FastAPI()
 class AtlasActivityClassifier:
     """Class for classifying the activity of a trajectory using the Atlantes system for AIS behavior classification
     The trajectory is passed through a pipeline of preprocessor, model, and postprocessor to classify the activity of the trajectory.
@@ -97,18 +97,21 @@ classifier = AtlasActivityClassifier(
 )
 
 
-@app.route("/info", methods=["GET"])
+class Info(BaseModel):
+    git_commit_hash: str
+
+
+@app.get("/info", response_model=Info)
 def index():
     git_commit_hash = os.getenv("GIT_COMMIT_HASH", default="unknown")
-    return {"git_commit_hash": git_commit_hash}
+    return Info(git_commit_hash=git_commit_hash)
 
 
-@app.route("/classify", methods=["POST"])
-def classify():
+@app.post("/classify", response_model=ATLASResponse)
+def classify(request: ATLASRequest):
     try:
-        atlas_request = ATLASRequest(**request.json)
         result = classifier.run_pipeline(
-            [pd.DataFrame(track) for track in atlas_request.tracks]
+            [pd.DataFrame(track) for track in request.tracks]
         )
         return ATLASResponse(predictions=result).model_dump(mode="json")
     except Exception as e:
@@ -118,4 +121,4 @@ def classify():
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", default=8080))
-    app.run(host="0.0.0.0", port=port)
+    uvicorn.run(app, host="0.0.0.0", port=port)
