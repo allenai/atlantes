@@ -19,6 +19,12 @@ jobs:
       COMPOSE_FILE: docker-compose.yml
 
     steps:
+      - name: Install Git LFS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git-lfs
+          git lfs install
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
