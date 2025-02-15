@@ -23,7 +23,7 @@ The **Automatic Identification System (AIS)** is a tracking system used on ships
    - Vessel vs. Buoy Classification: Given an AIS trajectory, classify whether the entity transmitting the AIS messages is a vessel or buoy. (In Integration)
    - Vessel Type Classification: Given a trajectory, classify the vessel type of the trajectory. (e.g. fishing, cargo, tanker, etc.)
 
-## Core Stack
+## Core Libraries
 
 - **Torch**: Modeling Library
 - **Dask**: Parallel and Distributed dataprocessing
@@ -62,10 +62,8 @@ The **Automatic Identification System (AIS)** is a tracking system used on ships
    `wandb login`
 
    <summary><b> Set up Elastic Search </b> </summary>
-
-   After getting access to Elastic Search from skylight-eng
-   Export your credentials as environment variables:
-
+   Note that this only applies to developers at Ai2 with access to Skylight's elastic search.
+   This is not needed for deployment, it is only used for some specific dataset generation tasks.
    `export SEARCH_USERNAME=<username>` \
    `export SEARCH_PASSWORD=<password>`
 
@@ -109,11 +107,6 @@ The **Automatic Identification System (AIS)** is a tracking system used on ships
    2. Navigate to eai/ais. Run `docker-compose up`
    3. Example request: `python examples/atlas_activity_request.py`
 
-   #### Note about inference/builds on M1
-
-   Note that if if you build the image on M1 devices, you will need to specify a amd64 to run the docker container on non-m1 platforms.
-   E.g. `docker build --platform=linux/amd64 -t <image-name>:<version>-amd64 .`
-`
 
 ## Dataset Creation
 
