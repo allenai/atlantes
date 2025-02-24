@@ -14,11 +14,17 @@ concurrency:
 
 jobs:
   tests:
-    runs-on: ubuntu-latest-m
+    runs-on: GPU-Enabled-Runner
     env:
       COMPOSE_FILE: docker-compose.yml
 
     steps:
+      - name: Install Git LFS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git-lfs
+          git lfs install
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:

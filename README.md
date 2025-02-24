@@ -3,7 +3,7 @@
 # Alantes
 
 
-Currently, this repo uses Python 3.10.
+This repository stores the ATLAS model alongside training, inference, and deployment libraries for real-time global-scale GPS trajectory modeling. The models were developed at Ai2 and are currently deployed in the [skylight](https://www.skylight.global/) maritime intelligence platform.
 
 ## Repository Structure
 
@@ -65,5 +65,7 @@ Please ensure that your code follows the project's coding standards and includes
 Apache 2.0
 
 ## Acknowledgments
-
 This project was developed by the Allen Institute for Artificial Intelligence (Ai2).
+
+## Contact
+patrickb@allenai.org
