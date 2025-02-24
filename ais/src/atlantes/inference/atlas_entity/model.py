@@ -2,7 +2,7 @@
 
 Loads the model and runs inference on the data
 
-This includes a base class and a ray serve deployment class
+This includes a base class
 """
 
 import os
@@ -11,21 +11,27 @@ from pathlib import Path
 
 import torch
 from atlantes.atlas.atlas_net import AtlasEntity
-from atlantes.atlas.atlas_utils import (AtlasEntityLabelsTraining,
-                                        AtlasEntityLabelsTrainingWithUnknown,
-                                        get_atlas_entity_inference_config,
-                                        remove_module_from_state_dict)
-from atlantes.atlas.collate import (EntityDatasetCollatedDataOutput,
-                                    ais_collate_entity_class_with_subpaths)
+from atlantes.atlas.atlas_utils import (
+    AtlasEntityLabelsTraining,
+    AtlasEntityLabelsTrainingWithUnknown,
+    get_atlas_entity_inference_config,
+    remove_module_from_state_dict,
+)
+from atlantes.atlas.collate import (
+    EntityDatasetCollatedDataOutput,
+    ais_collate_entity_class_with_subpaths,
+)
 from atlantes.inference.atlas_entity.datamodels import (
-    EntityMetadata, EntityPostprocessorInput, EntityPostprocessorInputDetails,
-    PreprocessedEntityData)
+    EntityMetadata,
+    EntityPostprocessorInput,
+    EntityPostprocessorInputDetails,
+    PreprocessedEntityData,
+)
 from atlantes.log_utils import get_logger
 from atlantes.utils import get_commit_hash
-from ray import serve
 from torch.nn import functional as F
 
-logger = get_logger("ray.serve")
+logger = get_logger("atlas_entity_classifier")
 
 # Only matters for cI
 if torch.cuda.is_available():
@@ -195,45 +201,3 @@ class AtlasEntityModel:
                 )
             )
         return output_tuple_lst
-
-
-@serve.deployment(
-    num_replicas=NUM_REPLICAS,
-    ray_actor_options={
-        "num_cpus": NUM_CPUS,
-        "num_gpus": NUM_GPUS,
-    },
-)
-class AtlasEntityModelDeployment(AtlasEntityModel):
-    """Class for Deployment of the Atlas Entity Model on Ray Serve"""
-
-    def __init__(self) -> None:
-        super().__init__()
-
-    @serve.batch(
-        max_batch_size=ATLAS_ENTITY_BATCH_MAX_SIZE,
-        batch_wait_timeout_s=ATLAS_ENTITY_BATCH_WAIT_TIMEOUT_S,
-    )
-    async def batch_handler_run_inference(
-        self, preprocessed_data_stream: list[PreprocessedEntityData]
-    ) -> list[EntityPostprocessorInput]:
-        logger.info(
-            f"Running batch inference on the ATLAS Entity model with {len(preprocessed_data_stream)} items"
-        )
-        return self.run_inference(preprocessed_data_stream)
-
-    def reconfigure(self, user_config: dict) -> None:
-        """Reconfigure the entity modelwith a new user config
-
-        Is called and updated when the serve config is updated and application is redeployed
-
-        Parameters
-        ----------
-        user_config : dict
-            The new user config to update different parameters of the deployment"""
-        self.batch_handler_run_inference.set_max_batch_size(
-            user_config["max_batch_size"]
-        )
-        self.batch_handler_run_inference.set_batch_wait_timeout_s(
-            user_config["batch_wait_timeout_s"]
-        )

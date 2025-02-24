@@ -103,6 +103,22 @@ class EntityPostprocessorOutput(NamedTuple):
     entity_class: str
     entity_classification_details: EntityPostprocessorOutputDetails
 
+    def serialize(self) -> tuple[str, dict]:
+        postprocessed_classification_details = self.entity_classification_details
+        entity_classification_details = {
+            "predicted_classification": postprocessed_classification_details.predicted_classification,
+            "model": postprocessed_classification_details.model,
+            "confidence": postprocessed_classification_details.confidence,
+            "outputs": postprocessed_classification_details.outputs,
+            "postprocessed_classification": postprocessed_classification_details.postprocessed_classification,
+            "postprocess_rule_applied": postprocessed_classification_details.postprocess_rule_applied,
+            "confidence_threshold": postprocessed_classification_details.confidence_threshold,
+        }
+        return (
+            self.entity_class,
+            entity_classification_details,
+        )
+
 
 class EntityPostprocessorInput(NamedTuple):
     """Input to the entity postprocessor"""

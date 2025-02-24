@@ -10,9 +10,7 @@ from atlantes.atlas.atlas_utils import AtlasActivityLabelsTraining
 from atlantes.atlas.schemas import TrackfileDataModelTrain
 from atlantes.inference.atlas_activity.model import AtlasActivityModel
 from atlantes.inference.atlas_activity.postprocessor import AtlasActivityPostProcessor
-from atlantes.inference.atlas_activity.preprocessor import (
-    AtlasActivityPreprocessor,
-)
+from atlantes.inference.atlas_activity.preprocessor import AtlasActivityPreprocessor
 from atlantes.inference.common import AtlasInferenceError, ATLASRequest, ATLASResponse
 from atlantes.log_utils import get_logger
 from fastapi import FastAPI
@@ -98,13 +96,14 @@ classifier = AtlasActivityClassifier(
 
 
 class Info(BaseModel):
+    model_type: str
     git_commit_hash: str
 
 
 @app.get("/info", response_model=Info)
 def index():
     git_commit_hash = os.getenv("GIT_COMMIT_HASH", default="unknown")
-    return Info(git_commit_hash=git_commit_hash)
+    return Info(model_type="activity", git_commit_hash=git_commit_hash)
 
 
 @app.post("/classify", response_model=ATLASResponse)
