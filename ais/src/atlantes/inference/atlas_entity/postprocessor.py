@@ -14,6 +14,7 @@ from atlantes.inference.atlas_entity.datamodels import (
 from atlantes.log_utils import get_logger
 from atlantes.machine_annotation.buoy_vessel_annotate import is_buoy_based_on_name
 from atlantes.utils import AIS_CATEGORIES, VESSEL_TYPES_BIN_DICT
+from prometheus_client import CollectorRegistry, Counter
 
 logger = get_logger("atlas_entity_postprocessor")
 
@@ -54,18 +55,29 @@ class AtlasEntityPostProcessor:
         """Initialize the metrics for the postprocessor
 
         Always add a counter for each postprocessing rule"""
-        self.buoy_post_processed_rule_applied = metrics.Counter(
-            "entity_post_processed_buoy_in_name"
+
+        REGISTRY = CollectorRegistry(auto_describe=True)
+
+        self.buoy_post_processed_rule_applied = Counter(
+            "entity_post_processed_buoy_in_name",
+            "Buoy in name",
+            registry=REGISTRY,
         )
-        self.known_binned_ship_type_post_processed_rule_applied = metrics.Counter(
-            "entity_post_processed_known_binned_ship_type"
+        self.known_binned_ship_type_post_processed_rule_applied = Counter(
+            "entity_post_processed_known_binned_ship_type",
+            "Known binned ship type",
+            registry=REGISTRY,
         )
-        self.confidence_threshold_rule_applied = metrics.Counter(
-            "entity_post_processed_confidence_threshold"
+        self.confidence_threshold_rule_applied = Counter(
+            "entity_post_processed_confidence_threshold",
+            "Confidence threshold",
+            registry=REGISTRY,
         )
 
-        self.not_enough_messages_rule_applied = metrics.Counter(
-            "entity_post_processed_not_enough_messages"
+        self.not_enough_messages_rule_applied = Counter(
+            "entity_post_processed_not_enough_messages",
+            "Not enough messages",
+            registry=REGISTRY,
         )
 
     def is_binned_ship_type_known(self, binned_ship_type: int) -> bool:

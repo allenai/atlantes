@@ -6,6 +6,7 @@ from __future__ import annotations
 import os
 
 import uvicorn
+from atlantes.atlas.schemas import TrackfileDataModelTrain
 from atlantes.inference.atlas_entity.datamodels import (
     EntityPostprocessorInput,
     EntityPostprocessorOutput,
@@ -18,13 +19,11 @@ from atlantes.inference.atlas_entity.postprocessor import (
 )
 from atlantes.inference.atlas_entity.preprocessor import AtlasEntityPreprocessor
 from atlantes.inference.common import AtlasInferenceError, ATLASRequest, ATLASResponse
+from atlantes.log_utils import get_logger
 from fastapi import FastAPI
 from pandera.errors import SchemaError
 from pandera.typing import DataFrame
 from pydantic import BaseModel
-
-from .atlantes.atlas.schemas import TrackfileDataModelTrain
-from .atlantes.log_utils import get_logger
 
 logger = get_logger("atlas_entity_api")
 
@@ -120,12 +119,13 @@ class Info(BaseModel):
 
 @app.get("/info", response_model=Info)
 def index():
-    git_commit_hash = os.getenv("GIT_COMMIT_HASH", default="unknown")
-    return Info(model_type="entity", git_commit_hash=git_commit_hash)
+    info = Info(model_type="entity", git_commit_hash="unknown")
+    logger.info(f"Received request for {info=}")
+    return info
 
 
 @app.post("/classify", response_model=ATLASResponse)
-async def classify(request: ATLASRequest):
+def classify(request: ATLASRequest):
     try:
         tracks = [DataFrame(track) for track in request.tracks]
         results = classifier.run_pipeline(tracks)

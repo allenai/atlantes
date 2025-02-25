@@ -65,7 +65,11 @@ def sample_request() -> None:
             timeout=TIMEOUT_SECONDS,
         )
         if not response.ok:
-            logger.warning(f"Request failed with status code {response.status_code}")
+            logger.warning(
+                f"Request failed with status code {response.status_code}, {response.text}"
+            )
+            return
+
         response_data = response.json()
 
         classifications = [prediction[0] for prediction in response_data["predictions"]]
