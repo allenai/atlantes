@@ -5,6 +5,7 @@ Do we want metrics when we are not deployed? I think yes
 
 import os
 from datetime import timedelta
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -91,8 +92,8 @@ class AtlasActivityPostProcessor:
         by the prometheus scrape handler in the worker container.
         """
 
-        if not os.path.exists(PROMETHEUS_MULTIPROC_DIR):
-            os.makedirs(PROMETHEUS_MULTIPROC_DIR, exist_ok=True)
+        prom_dir = Path(PROMETHEUS_MULTIPROC_DIR)
+        prom_dir.mkdir(parents=True, exist_ok=True)
         REGISTRY = CollectorRegistry(auto_describe=True)
 
         self.no_postprocessing_rule_applied = Counter(

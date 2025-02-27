@@ -1,5 +1,7 @@
 """Entity postprocessor class"""
 
+import os
+from pathlib import Path
 from typing import Optional
 
 from atlantes.atlas.atlas_utils import (
@@ -15,6 +17,10 @@ from atlantes.log_utils import get_logger
 from atlantes.machine_annotation.buoy_vessel_annotate import is_buoy_based_on_name
 from atlantes.utils import AIS_CATEGORIES, VESSEL_TYPES_BIN_DICT
 from prometheus_client import CollectorRegistry, Counter
+
+PROMETHEUS_MULTIPROC_DIR = os.environ.get(
+    "PROMETHEUS_MULTIPROC_DIR", "/tmp/prom_multiproc"
+)
 
 logger = get_logger("atlas_entity_postprocessor")
 
@@ -56,6 +62,8 @@ class AtlasEntityPostProcessor:
 
         Always add a counter for each postprocessing rule"""
 
+        prom_dir = Path(PROMETHEUS_MULTIPROC_DIR)
+        prom_dir.mkdir(parents=True, exist_ok=True)
         REGISTRY = CollectorRegistry(auto_describe=True)
 
         self.buoy_post_processed_rule_applied = Counter(
