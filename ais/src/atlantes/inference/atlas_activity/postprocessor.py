@@ -3,6 +3,7 @@
 Do we want metrics when we are not deployed? I think yes
 """
 
+import os
 from datetime import timedelta
 
 import numpy as np
@@ -49,6 +50,9 @@ N_MESSAGES_FOR_COG_VARIANCE = 200
 MARINE_INFRA_THRESHOLD = 600  # meters
 MARINE_INFRA_LAT, MARINE_INFRA_LON = read_geojson_and_convert_coordinates()
 
+PROMETHEUS_MULTIPROC_DIR = os.environ.get(
+    "PROMETHEUS_MULTIPROC_DIR", "/tmp/prom_multiproc"
+)
 
 class AtlasActivityPostProcessor:
     """Class for postprocessing AIS trajectory activity classifications"""
@@ -87,6 +91,8 @@ class AtlasActivityPostProcessor:
         by the prometheus scrape handler in the worker container.
         """
 
+        if not os.path.exists(PROMETHEUS_MULTIPROC_DIR):
+            os.makedirs(PROMETHEUS_MULTIPROC_DIR, exist_ok=True)
         REGISTRY = CollectorRegistry(auto_describe=True)
 
         self.no_postprocessing_rule_applied = Counter(
