@@ -103,15 +103,16 @@ class Info(BaseModel):
 @app.get("/info", response_model=Info)
 def index():
     git_commit_hash = os.getenv("GIT_COMMIT_HASH", default="unknown")
-    return Info(model_type="activity", git_commit_hash=git_commit_hash)
+    info = Info(model_type="entity", git_commit_hash=git_commit_hash)
+    logger.info(f"Received request for {info=}")
+    return info
 
 
 @app.post("/classify", response_model=ATLASResponse)
 def classify(request: ATLASRequest):
     try:
-        result = classifier.run_pipeline(
-            [pd.DataFrame(track) for track in request.tracks]
-        )
+        tracks = [DataFrame(track) for track in request.tracks]
+        result = classifier.run_pipeline(tracks)
         return ATLASResponse(predictions=result).model_dump(mode="json")
     except Exception as e:
         logger.exception(f"Error while running inference: {e}")

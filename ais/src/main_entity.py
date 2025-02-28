@@ -119,7 +119,8 @@ class Info(BaseModel):
 
 @app.get("/info", response_model=Info)
 def index():
-    info = Info(model_type="entity", git_commit_hash="unknown")
+    git_commit_hash = os.getenv("GIT_COMMIT_HASH", default="unknown")
+    info = Info(model_type="entity", git_commit_hash=git_commit_hash)
     logger.info(f"Received request for {info=}")
     return info
 
@@ -130,11 +131,11 @@ def classify(request: ATLASRequest):
         tracks = [DataFrame(track) for track in request.tracks]
         results = classifier.run_pipeline(tracks)
         predictions = [result.serialize() for result in results]
-        return ATLASResponse(predictions=predictions)
+        return ATLASResponse(predictions=predictions).model_dump(mode="json")
     except Exception as e:
         logger.exception(f"Error while running inference: {e}")
         return {"error": "inference request failed"}, 500
 
 if __name__ == "__main__":
-    PORT = int(os.getenv("ATLAS_ENTITY_PORT", default=8001))
+    PORT = int(os.getenv("PORT", default=8080))
     uvicorn.run(app, host="0.0.0.0", port=PORT)
