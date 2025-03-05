@@ -18,9 +18,13 @@ from atlantes.inference.atlas_entity.postprocessor import (
     KnownShipTypeAndBuoyName,
 )
 from atlantes.inference.atlas_entity.preprocessor import AtlasEntityPreprocessor
-from atlantes.inference.common import AtlasInferenceError, ATLASRequest, ATLASResponse
+from atlantes.inference.common import (
+    AtlasInferenceError,
+    ATLASRequest,
+    ATLASResponse,
+)
 from atlantes.log_utils import get_logger
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pandera.errors import SchemaError
 from pandera.typing import DataFrame
 from pydantic import BaseModel
@@ -133,8 +137,8 @@ def classify(request: ATLASRequest):
         predictions = [result.serialize() for result in results]
         return ATLASResponse(predictions=predictions).model_dump(mode="json")
     except Exception as e:
-        logger.exception(f"Error while running inference: {e}")
-        return {"error": "inference request failed"}, 500
+        logger.exception("Error while running inference")
+        raise HTTPException(status_code=500, detail="inference request failed") from e
 
 if __name__ == "__main__":
     PORT = int(os.getenv("PORT", default=8080))
