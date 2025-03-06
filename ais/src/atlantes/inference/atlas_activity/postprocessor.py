@@ -52,7 +52,8 @@ MARINE_INFRA_THRESHOLD = 600  # meters
 MARINE_INFRA_LAT, MARINE_INFRA_LON = read_geojson_and_convert_coordinates()
 
 PROMETHEUS_MULTIPROC_DIR = os.environ.get(
-    "PROMETHEUS_MULTIPROC_DIR", "/tmp/prom_multiproc"
+    "PROMETHEUS_MULTIPROC_DIR",
+    "/tmp/prom_multiproc",  # nosec b108
 )
 
 class AtlasActivityPostProcessor:

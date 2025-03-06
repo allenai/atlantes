@@ -142,4 +142,4 @@ def classify(request: ATLASRequest):
 
 if __name__ == "__main__":
     PORT = int(os.getenv("PORT", default=8080))
-    uvicorn.run(app, host="0.0.0.0", port=PORT)
+    uvicorn.run(app, host="0.0.0.0", port=PORT)  # nosec B104

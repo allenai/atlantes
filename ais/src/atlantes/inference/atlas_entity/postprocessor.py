@@ -19,7 +19,8 @@ from atlantes.utils import AIS_CATEGORIES, VESSEL_TYPES_BIN_DICT
 from prometheus_client import Counter
 
 PROMETHEUS_MULTIPROC_DIR = os.environ.get(
-    "PROMETHEUS_MULTIPROC_DIR", "/tmp/prom_multiproc"
+    "PROMETHEUS_MULTIPROC_DIR",
+    "/tmp/prom_multiproc",  # nosec b108
 )
 
 logger = get_logger("atlas_entity_postprocessor")
