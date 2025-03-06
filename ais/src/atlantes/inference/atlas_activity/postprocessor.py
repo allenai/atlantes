@@ -31,7 +31,7 @@ from atlantes.utils import (
     get_nav_status,
     read_geojson_and_convert_coordinates,
 )
-from prometheus_client import CollectorRegistry, Counter
+from prometheus_client import Counter
 from shapely.geometry import Point, Polygon
 
 logger = get_logger("atlas_activity_postprocessor")
@@ -94,67 +94,54 @@ class AtlasActivityPostProcessor:
 
         prom_dir = Path(PROMETHEUS_MULTIPROC_DIR)
         prom_dir.mkdir(parents=True, exist_ok=True)
-        REGISTRY = CollectorRegistry(auto_describe=True)
 
         self.no_postprocessing_rule_applied = Counter(
             "activity_post_processed_no_rule_applied",
             "No postprocessing rule applied",
-            registry=REGISTRY,
         )
         self.transiting_post_processed_rule_applied = Counter(
             "activity_post_processed_high_mid_speed_transiting",
             "High or mid speed transiting",
-            registry=REGISTRY,
         )
         self.confidence_threshold_rule_applied = Counter(
             "activity_post_processed_confidence_threshold",
             "Confidence threshold applied",
-            registry=REGISTRY,
         )
         self.num_non_fishing_unknown_vessels_classified_as_fishing = Counter(
             "num_non_fishing_unknown_vessels_classified_as_fishing",
             "Non-fishing or unknown vessels classified as fishing",
-            registry=REGISTRY,
         )
         self.still_anchored_based_on_nav_and_sog_rule_applied = Counter(
             "num_anchored_vessels_classifed_as_fishing",
             "Anchored vessels classified as fishing",
-            registry=REGISTRY,
         )
         self.still_moored_based_on_nav_and_sog_rule_applied = Counter(
             "num_moored_vessels_classifed_as_fishing",
             "Moored vessels classified as fishing",
-            registry=REGISTRY,
         )
         self.is_stationary_rule_applied_nav_unknown = Counter(
             "is_stationary_rule_applied_nav_unknown",
             "Stationary rule applied",
-            registry=REGISTRY,
         )
         self.is_near_shore_threshold_applied = Counter(
             "is_near_shore_threshold_applied",
             "Near shore threshold applied",
-            registry=REGISTRY,
         )
         self.is_not_fishing_or_unknown_vessel_type = Counter(
             "is_not_fishing_or_unknown_vessel_type",
             "Not fishing or unknown vessel type",
-            registry=REGISTRY,
         )
         self.is_stationary_rule_applied_displacement = Counter(
             "is_stationary_rule_applied_displacement",
             "Stationary rule applied",
-            registry=REGISTRY,
         )
         self.is_traveling_straight_rule_applied = Counter(
             "is_traveling_straight_rule_applied",
             "Traveling straight rule applied",
-            registry=REGISTRY,
         )
         self.is_collision_avoidance_rule = Counter(
             "is_collision_avoidance_rule_applied",
             "Collision avoidance rule applied",
-            registry=REGISTRY,
         )
         self.is_near_high_traffic_port_rule_applied = Counter(
             "is_near_high_traffic_port",
@@ -163,12 +150,10 @@ class AtlasActivityPostProcessor:
         self.removed_detections_near_infra = Counter(
             "removed_detections_near_infra",
             "Removed detections near marine infrastructure",
-            registry=REGISTRY,
         )
         self.is_too_fast_for_anchored_moored_rule_applied = Counter(
             "is_too_fast_for_anchored_moored_rule_applied",
             "Too fast for anchored/moored rule applied",
-            registry=REGISTRY,
         )
 
     def determine_postprocessed_activity_class(
