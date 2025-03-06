@@ -4,7 +4,6 @@
 
 import os
 
-import pandas as pd
 import uvicorn
 from atlantes.atlas.atlas_utils import AtlasActivityLabelsTraining
 from atlantes.atlas.schemas import TrackfileDataModelTrain
