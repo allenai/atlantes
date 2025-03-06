@@ -53,7 +53,7 @@ class AtlasActivityClassifier:
         if not isinstance(preprocessed_data_stream, PreprocessedActivityData):
             raise ValueError(
                 f"The preprocessed_data_stream must be a PreprocessedActivityData, not a {type(preprocessed_data_stream)} \
-                    as batching is handled by Ray Serve and not supported here"
+                    as batching is not supported here"
             )
         return self.model.run_inference([preprocessed_data_stream])[0]
 

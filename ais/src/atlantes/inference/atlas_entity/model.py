@@ -94,7 +94,7 @@ class AtlasEntityModel:
         else:
             logger.info("No GPU detected, using CPU")
             device = torch.device("cpu")
-            logger.info("No GPUs available for ray serve.")
+            logger.info("No GPUs available for entity classification.")
         return device
 
     def _initialize_atlas_entity_model_inference(self) -> AtlasEntity:

@@ -29,7 +29,6 @@ The **Automatic Identification System (AIS)** is a tracking system used on ships
 - **Dask**: Parallel and Distributed dataprocessing
 - **Pandas**: Data manipulation, visualization, and analysis.
 - **Pandera**: Provides a schema-based approach to validate Dataframes
-- **Ray[Serve]**: Provides a scalable and fault-tolerant framework for deploying and serving machine learning models.
 - **Wandb**: Experiment tracking
 - **Beaker**: Ai2 experimentation Platform
 

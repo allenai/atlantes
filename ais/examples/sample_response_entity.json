@@ -1,1 +1,19 @@
-{"predictions": [["vessel", {"predicted_classification": "vessel", "model": "ATLAS-Buoy_no_git_hash_2024-08-20-23-16-27_epoch2.pt", "confidence": 0.9994407296180725, "outputs": [0.9994407296180725, 0.0005592250963672996], "postprocessed_classification": "vessel", "postprocess_rule_applied": false, "confidence_threshold": 0.5}], ["vessel", {"predicted_classification": "vessel", "model": "ATLAS-Buoy_no_git_hash_2024-08-20-23-16-27_epoch2.pt", "confidence": 0.9994407296180725, "outputs": [0.9994407296180725, 0.0005592245724983513], "postprocessed_classification": "vessel", "postprocess_rule_applied": false, "confidence_threshold": 0.5}], ["vessel", {"predicted_classification": "vessel", "model": "ATLAS-Buoy_no_git_hash_2024-08-20-23-16-27_epoch2.pt", "confidence": 0.9994407296180725, "outputs": [0.9994407296180725, 0.0005592250963672996], "postprocessed_classification": "vessel", "postprocess_rule_applied": false, "confidence_threshold": 0.5}], ["vessel", {"predicted_classification": "vessel", "model": "ATLAS-Buoy_no_git_hash_2024-08-20-23-16-27_epoch2.pt", "confidence": 0.9994407296180725, "outputs": [0.9994407296180725, 0.0005592245724983513], "postprocessed_classification": "vessel", "postprocess_rule_applied": false, "confidence_threshold": 0.5}], ["vessel", {"predicted_classification": "vessel", "model": "ATLAS-Buoy_no_git_hash_2024-08-20-23-16-27_epoch2.pt", "confidence": 0.9994407296180725, "outputs": [0.9994407296180725, 0.0005592248635366559], "postprocessed_classification": "vessel", "postprocess_rule_applied": false, "confidence_threshold": 0.5}]]}
+{
+  "predictions": [
+    [
+      "unknown",
+      {
+        "confidence": 0.9978117346763611,
+        "confidence_threshold": 0.5,
+        "model": "ATLAS-Buoy_no_git_hash_2024-08-20-23-16-27_epoch2.pt",
+        "outputs": [
+          0.9978117346763611,
+          0.002188334008678794
+        ],
+        "postprocess_rule_applied": true,
+        "postprocessed_classification": "unknown",
+        "predicted_classification": "vessel"
+      }
+    ]
+  ]
+}

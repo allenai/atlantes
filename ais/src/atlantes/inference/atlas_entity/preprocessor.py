@@ -1,4 +1,4 @@
-""" Entity preprocessor class and ray serve deployment
+"""Entity preprocessor class
 
 # TODO: Deal with the subpath at the end being removed or the last points so that we can
 provide the right classification for a given time
