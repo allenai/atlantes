@@ -5,7 +5,6 @@ import json
 import os
 import sys
 import time
-from cgitb import text
 from pathlib import Path
 
 import pandas as pd
@@ -48,7 +47,7 @@ def sample_request() -> None:
     }
 
     try:
-        print(f"Sending request to {ATLAS_ENDPOINT}")
+        logger.info(f"Sending request to {ATLAS_ENDPOINT}")
         response = requests.post(
             ATLAS_ENDPOINT, json=REQUEST_BODY, timeout=TIMEOUT_SECONDS
         )
