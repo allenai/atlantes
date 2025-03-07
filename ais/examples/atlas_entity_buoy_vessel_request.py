@@ -39,7 +39,7 @@ def sample_request() -> None:
     try:
         batch_size = int(sys.argv[1])
     except IndexError:
-        logger.warnaing("defaulting to batch size 1")
+        logger.warning("defaulting to batch size 1")
         batch_size = 1
 
     track = json.loads(EXAMPLE_TRACK_JSON)
