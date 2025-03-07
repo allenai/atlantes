@@ -19,3 +19,7 @@ class ATLASResponse(BaseModel):
 class AtlasInferenceError(Exception):
     """Raised when an error occurs during ATLAS inference."""
     pass
+
+class InfoResponse(BaseModel):
+    model_type: str
+    git_commit_hash: str

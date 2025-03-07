@@ -1,6 +1,4 @@
-"""Deployment Pipeline for the Atlas Activity Model
-# TODO: Make all steps have simple pydantic response objects
-"""
+"""API for the Atlas Activity Model"""
 
 import os
 
@@ -12,11 +10,11 @@ from atlantes.inference.atlas_activity.preprocessor import AtlasActivityPreproce
 from atlantes.inference.common import (
     ATLASRequest,
     ATLASResponse,
+    InfoResponse,
 )
 from atlantes.log_utils import get_logger
 from fastapi import FastAPI, HTTPException
 from pandera.typing import DataFrame
-from pydantic import BaseModel
 
 logger = get_logger("atlas_activity_api")
 
@@ -32,15 +30,10 @@ classifier = AtlasActivityClassifier(
 )
 
 
-class Info(BaseModel):
-    model_type: str
-    git_commit_hash: str
-
-
-@app.get("/info", response_model=Info)
-def index() -> Info:
+@app.get("/info", response_model=InfoResponse)
+def index() -> InfoResponse:
     git_commit_hash = os.getenv("GIT_COMMIT_HASH", default="unknown")
-    info = Info(model_type="entity", git_commit_hash=git_commit_hash)
+    info = InfoResponse(model_type="activity", git_commit_hash=git_commit_hash)
     logger.info(f"Received request for {info=}")
     return info
 

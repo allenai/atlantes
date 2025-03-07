@@ -23,9 +23,7 @@ class AtlasEntityClassifier:
     """Class for identifying the entity of a trajectory using the Atlantes system for AIS behavior classification
 
     The trajectory is passed through a pipeline of preprocessor, model, and postprocessor to identify the entity of the trajectory.
-    tHe entity will be either a vessel or equipment/buoy.
-
-    Note: This pipeline does not support batching
+    The entity will be either a vessel or equipment/buoy.
     """
 
     def __init__(

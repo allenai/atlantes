@@ -14,7 +14,7 @@ from atlantes.log_utils import get_logger
 
 logger = get_logger(__name__)
 
-PORT = os.getenv("ATLAS_PORT", default=8080)
+PORT = os.getenv("ATLAS_PORT", default=8000)
 ATLAS_ENDPOINT = f"http://0.0.0.0:{PORT}"
 TIMEOUT_SECONDS = 600
 
@@ -53,10 +53,14 @@ def sample_request() -> None:
     """Sample request for files stored locally"""
     start = time.time()
 
-    N = int(sys.argv[1])  # Number of records to classify
+    try:
+        batch_size = int(sys.argv[1])
+    except Exception:
+        logger.warning("defaulting to batch size 1")
+        batch_size = 1
     track = json.loads(EXAMPLE_TRACK_JSON)
     REQUEST_BODY = {
-        "tracks": [track] * N,  # Ensure proper JSON format
+        "tracks": [track] * batch_size,
     }
     try:
         response = requests.post(

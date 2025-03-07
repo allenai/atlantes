@@ -56,8 +56,5 @@ RUN mkdir -p /ais/src/atlantes/data && \
         --quiet && \
     python -m pip install --no-cache-dir .
 
-ENV PORT=8080
-EXPOSE ${PORT}
-
 # Set the default command to run your application
 CMD ["python", "src/main_activity.py"]

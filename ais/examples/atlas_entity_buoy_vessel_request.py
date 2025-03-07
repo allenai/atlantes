@@ -14,7 +14,7 @@ from atlantes.log_utils import get_logger
 logger = get_logger(__name__)
 
 PORT = os.getenv("ATLAS_PORT", default=8001)
-ATLAS_ENDPOINT = f"http://0.0.0.0:{PORT}/classify"
+ATLAS_ENDPOINT = f"http://0.0.0.0:{PORT}"
 TIMEOUT_SECONDS = 600
 
 # Read CSV file into a DataFrame and convert to JSON string
@@ -37,19 +37,20 @@ def sample_request() -> None:
     start = time.time()
 
     try:
-        num_records_to_classify = int(sys.argv[1])
+        batch_size = int(sys.argv[1])
     except IndexError:
-        num_records_to_classify = 1
+        logger.warnaing("defaulting to batch size 1")
+        batch_size = 1
 
     track = json.loads(EXAMPLE_TRACK_JSON)
     REQUEST_BODY = {
-        "tracks": [track] * num_records_to_classify,  # Ensure proper JSON format
+        "tracks": [track] * batch_size,
     }
 
     try:
-        logger.info(f"Sending request to {ATLAS_ENDPOINT}")
+        logger.info(f"Sending request to {ATLAS_ENDPOINT}/classify")
         response = requests.post(
-            ATLAS_ENDPOINT, json=REQUEST_BODY, timeout=TIMEOUT_SECONDS
+            ATLAS_ENDPOINT + "/classify", json=REQUEST_BODY, timeout=TIMEOUT_SECONDS
         )
         if not response.ok:
             logger.warning(f"Request failed with status code {response.status_code}")

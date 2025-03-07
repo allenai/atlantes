@@ -1,5 +1,4 @@
-"""ATLAS inference service Entity
-"""
+"""API for the Atlas Entity Model"""
 
 from __future__ import annotations
 
@@ -15,11 +14,11 @@ from atlantes.inference.atlas_entity.preprocessor import AtlasEntityPreprocessor
 from atlantes.inference.common import (
     ATLASRequest,
     ATLASResponse,
+    InfoResponse,
 )
 from atlantes.log_utils import get_logger
 from fastapi import FastAPI, HTTPException
 from pandera.typing import DataFrame
-from pydantic import BaseModel
 
 logger = get_logger("atlas_entity_api")
 
@@ -33,15 +32,11 @@ classifier = AtlasEntityClassifier(
     model=model,
     postprocessor=postprocessor,
 )
-class Info(BaseModel):
-    model_type: str
-    git_commit_hash: str
 
-
-@app.get("/info", response_model=Info)
-def index() -> Info:
+@app.get("/info", response_model=InfoResponse)
+def index() -> InfoResponse:
     git_commit_hash = os.getenv("GIT_COMMIT_HASH", default="unknown")
-    info = Info(model_type="entity", git_commit_hash=git_commit_hash)
+    info = InfoResponse(model_type="entity", git_commit_hash=git_commit_hash)
     logger.info(f"Received request for {info=}")
     return info
 
