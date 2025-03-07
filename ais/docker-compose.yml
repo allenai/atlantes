@@ -10,6 +10,8 @@ services:
     hostname: ais-test-activity
     build: *ais-image
     shm_size: '4.77gb'
+    environment:
+        - PORT=8000
     extra_hosts:
       - "host.docker.internal:host-gateway"
     stdin_open: true
@@ -32,6 +34,8 @@ services:
     hostname: ais-test-entity
     build: *ais-image
     shm_size: '4.77gb'
+    environment:
+        - PORT=8001
     extra_hosts:
       - "host.docker.internal:host-gateway"
     stdin_open: true
