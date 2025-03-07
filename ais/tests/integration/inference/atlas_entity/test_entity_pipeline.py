@@ -65,7 +65,7 @@ class TestEntityClassifier:
         entity_classifier_pipeline: AtlasEntityClassifier,
     ) -> None:
         """Test the entity pipeline."""
-        tracks = [in_memory_ais_track_df.to_dict(orient="records")]
+        tracks = [in_memory_ais_track_df]
         response = entity_classifier_pipeline.run_pipeline(tracks)
         predicted_class_name, predicted_class_details = response[0]
         inference_config = get_atlas_entity_inference_config()
@@ -88,7 +88,7 @@ class TestEntityClassifier:
         entity_classifier_pipeline: AtlasEntityClassifier,
     ) -> None:
         """Test the entity pipeline."""
-        tracks = [buoy_df.to_dict(orient="records")]
+        tracks = [buoy_df]
         response = entity_classifier_pipeline.run_pipeline(tracks)
         inference_config = get_atlas_entity_inference_config()
         model_id = inference_config["model"]["ATLAS_ENTITY_MODEL_ID"]
@@ -118,7 +118,7 @@ class TestEntityClassifier:
         # pretend that something with a buoy name is listed as a fishing vessel
         modified_buoy_df.loc[:, "category"] = [30] * len(modified_buoy_df)
         try:
-            tracks = [modified_buoy_df.to_dict(orient="records")]
+            tracks = [modified_buoy_df]
             entity_classifier_pipeline.run_pipeline(tracks)
         except Exception as e:
             assert isinstance(e, KnownShipTypeAndBuoyName)
@@ -130,7 +130,7 @@ class TestEntityClassifier:
     ) -> None:
         """Test the entity pipeline."""
         try:
-            tracks = [test_ais_df1.head(500).to_dict(orient="records")]
+            tracks = [test_ais_df1.head(500)]
             entity_classifier_pipeline.run_pipeline(tracks)
         except Exception as e:
             assert isinstance(e, SchemaError)
@@ -139,7 +139,7 @@ class TestEntityClassifier:
         test_ais_df1_inference = test_ais_df1.head(500).copy()
         test_ais_df1_inference.drop(columns=["lat"], inplace=True)
         try:
-            tracks = [test_ais_df1_inference.to_dict(orient="records")]
+            tracks = [test_ais_df1_inference]
             entity_classifier_pipeline.run_pipeline(tracks)
         except Exception as e:
             assert isinstance(e, SchemaError)
