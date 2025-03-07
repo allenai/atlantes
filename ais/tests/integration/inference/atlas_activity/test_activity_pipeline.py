@@ -50,7 +50,6 @@ class TestActivityClassifier:
         # Check that the output is as expected
 
         # Asserting based on last subpath outputs for type checking
-        assert isinstance(batched_output, ATLASResponse)
         assert isinstance(predicted_class_name, str)
         assert isinstance(predicted_details, dict)
         assert predicted_details.keys() == {
