@@ -69,7 +69,7 @@ class TestActivityClassifier:
         assert isinstance(predicted_details["outputs"], list)
         assert isinstance(
             predicted_details["confidence"], float
-        )  # SHould just be a float but would need to change contract
+        )  # Should just be a float but would need to change contract
         assert len(predicted_details["outputs"]) == 4  # num classes
 
         # Asserting for Real-time Simulated outputs

@@ -126,6 +126,7 @@ typing-inspect>=0.9,<1
 tzdata>=2023.4
 uc-micro-py>=1.0,<2
 urllib3>=1.26,<2
+uvicorn==0.34.0
 wandb>=0.16,<1
 webencodings>=0.5,<1
 wrapt>=1.16,<2
