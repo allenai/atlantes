@@ -49,7 +49,6 @@ jobs:
         run: |
           COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ais/docker-compose.yml build
       - name: Run unit and integration tests
-        if: false
         run: |
           docker compose -f ais/docker-compose.yml run \
             -e TEST_PROJECTS_FOLDER_PREFIX=${{ secrets.TEST_PROJECTS_FOLDER_PREFIX }} \
@@ -61,7 +60,6 @@ jobs:
             --ignore=tests/integration/inference/atlas_activity/ \
             -vv
       - name: Run Pipeline tests
-        if: false
         run: |
           docker compose -f ais/docker-compose.yml run \
             -e TEST_PROJECTS_FOLDER_PREFIX=${{ secrets.TEST_PROJECTS_FOLDER_PREFIX }} \
