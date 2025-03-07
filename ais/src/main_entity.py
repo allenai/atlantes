@@ -122,7 +122,7 @@ class Info(BaseModel):
 
 
 @app.get("/info", response_model=Info)
-def index():
+def index() -> Info:
     git_commit_hash = os.getenv("GIT_COMMIT_HASH", default="unknown")
     info = Info(model_type="entity", git_commit_hash=git_commit_hash)
     logger.info(f"Received request for {info=}")
@@ -130,7 +130,7 @@ def index():
 
 
 @app.post("/classify", response_model=ATLASResponse)
-def classify(request: ATLASRequest):
+def classify(request: ATLASRequest) -> dict:
     try:
         tracks = [DataFrame(track) for track in request.tracks]
         results = classifier.run_pipeline(tracks)

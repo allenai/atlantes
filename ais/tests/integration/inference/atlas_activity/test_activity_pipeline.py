@@ -11,8 +11,7 @@ from atlantes.inference.atlas_activity.postprocessor import AtlasActivityPostPro
 from atlantes.inference.atlas_activity.preprocessor import AtlasActivityPreprocessor
 from atlantes.inference.common import ATLASResponse
 from atlantes.log_utils import get_logger
-
-from ais.src.main_activity import AtlasActivityClassifier
+from main_activity import AtlasActivityClassifier
 
 logger = get_logger(__name__)
 
@@ -45,7 +44,9 @@ class TestActivityClassifier:
         """Test the activity pipeline."""
         tracks = [in_memory_ais_track_df.to_dict(orient="records")]
         batched_output = activity_classifier_pipeline.run_pipeline(tracks)
-        predicted_class_name, predicted_details = batched_output[0].predictions
+        assert batched_output and len(batched_output) == 1
+        predicted_class_name = batched_output[0][0]
+        predicted_details = batched_output[0][1]
         # Check that the output is as expected
 
         # Asserting based on last subpath outputs for type checking
@@ -125,7 +126,8 @@ class TestActivityClassifier:
         for i in range(0, len(df_list)):
             tracks = [df_list[i].to_dict(orient="records")]
             output = activity_classifier_pipeline.run_pipeline(tracks)
-            output_lst.append(output[0].predictions)
+            assert output
+            output_lst.append(output[0])
 
         predicted_class_names_lst = [
             predicted_class_name for predicted_class_name, _ in output_lst
