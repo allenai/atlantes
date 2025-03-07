@@ -42,7 +42,7 @@ class TestActivityClassifier:
         activity_classifier_pipeline: AtlasActivityClassifier,
     ) -> None:
         """Test the activity pipeline."""
-        tracks = [in_memory_ais_track_df.to_dict(orient="records")]
+        tracks = [in_memory_ais_track_df]
         batched_output = activity_classifier_pipeline.run_pipeline(tracks)
         assert batched_output and len(batched_output) == 1
         predicted_class_name = batched_output[0][0]
@@ -124,7 +124,7 @@ class TestActivityClassifier:
 
         output_lst = []
         for i in range(0, len(df_list)):
-            tracks = [df_list[i].to_dict(orient="records")]
+            tracks = [df_list[i]]
             output = activity_classifier_pipeline.run_pipeline(tracks)
             assert output
             output_lst.append(output[0])
