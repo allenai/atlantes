@@ -23,6 +23,7 @@ dask[distributed]>=2023.4,<2025
 datashader>=0.16,<1
 decorator>=5.1,<6
 docker-pycreds>=0.4,<1
+fastapi==0.115.11
 fastavro>=1.9,<2
 filelock>=3.13,<4
 fiona>=1.9,<2
