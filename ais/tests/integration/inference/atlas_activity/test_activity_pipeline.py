@@ -6,12 +6,12 @@ from atlantes.atlas.atlas_utils import (
     ATLAS_COLUMNS_WITH_META,
     get_atlas_activity_inference_config,
 )
+from atlantes.inference.atlas_activity.classifier import AtlasActivityClassifier
 from atlantes.inference.atlas_activity.model import AtlasActivityModel
 from atlantes.inference.atlas_activity.postprocessor import AtlasActivityPostProcessor
 from atlantes.inference.atlas_activity.preprocessor import AtlasActivityPreprocessor
 from atlantes.inference.common import ATLASResponse
 from atlantes.log_utils import get_logger
-from main_activity import AtlasActivityClassifier
 
 logger = get_logger(__name__)
 

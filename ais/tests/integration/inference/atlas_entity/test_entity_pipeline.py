@@ -7,6 +7,7 @@ from atlantes.atlas.atlas_utils import (
     ATLAS_COLUMNS_WITH_META,
     get_atlas_entity_inference_config,
 )
+from atlantes.inference.atlas_entity.classifier import AtlasEntityClassifier
 from atlantes.inference.atlas_entity.datamodels import EntityPostprocessorOutput
 from atlantes.inference.atlas_entity.model import AtlasEntityModel
 from atlantes.inference.atlas_entity.postprocessor import (
@@ -15,7 +16,6 @@ from atlantes.inference.atlas_entity.postprocessor import (
 )
 from atlantes.inference.atlas_entity.preprocessor import AtlasEntityPreprocessor
 from atlantes.log_utils import get_logger
-from main_entity import AtlasEntityClassifier
 from pandera.errors import SchemaError
 
 logger = get_logger(__name__)
