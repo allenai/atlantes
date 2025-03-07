@@ -58,5 +58,5 @@ def classify(request: ATLASRequest) -> dict:
         raise HTTPException(status_code=500, detail="inference request failed") from e
 
 if __name__ == "__main__":
-    PORT = int(os.getenv("PORT", default=8080))
+    PORT = int(os.getenv("PORT", default=8001))
     uvicorn.run(app, host="0.0.0.0", port=PORT)  # nosec B104

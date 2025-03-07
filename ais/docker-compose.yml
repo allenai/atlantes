@@ -14,7 +14,7 @@ services:
       - "host.docker.internal:host-gateway"
     stdin_open: true
     ports:
-      - "8000:8080"
+      - "8000:8000"
       - "6666:6666"
     volumes:
       - ${GOOGLE_APPLICATION_CREDENTIALS}:/mnt/gcloud/gcp_application_credentials.json
@@ -23,7 +23,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "nc -zv 127.0.0.1 8080"
+          "nc -zv 127.0.0.1 8000"
         ]
       interval: 1s
       timeout: 1s
@@ -36,7 +36,7 @@ services:
       - "host.docker.internal:host-gateway"
     stdin_open: true
     ports:
-      - "8001:8080"
+      - "8001:8001"
       - "6667:6667"
     volumes:
       - ${GOOGLE_APPLICATION_CREDENTIALS}:/mnt/gcloud/gcp_application_credentials.json
@@ -45,7 +45,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "nc -zv 127.0.0.1 8080"
+          "nc -zv 127.0.0.1 8001"
         ]
       interval: 1s
       timeout: 1s
