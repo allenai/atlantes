@@ -10,7 +10,6 @@ from atlantes.inference.atlas_activity.classifier import AtlasActivityClassifier
 from atlantes.inference.atlas_activity.model import AtlasActivityModel
 from atlantes.inference.atlas_activity.postprocessor import AtlasActivityPostProcessor
 from atlantes.inference.atlas_activity.preprocessor import AtlasActivityPreprocessor
-from atlantes.inference.common import ATLASResponse
 from atlantes.log_utils import get_logger
 
 logger = get_logger(__name__)
