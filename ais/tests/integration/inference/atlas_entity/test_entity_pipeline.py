@@ -121,7 +121,7 @@ class TestEntityClassifier:
             tracks = [modified_buoy_df]
             entity_classifier_pipeline.run_pipeline(tracks)
         except Exception as e:
-            assert isinstance(e, KnownShipTypeAndBuoyName)
+            assert isinstance(e.__cause__, KnownShipTypeAndBuoyName)
 
     def test_entity_pipeline_schema_error(
         self,
@@ -133,7 +133,7 @@ class TestEntityClassifier:
             tracks = [test_ais_df1.head(500)]
             entity_classifier_pipeline.run_pipeline(tracks)
         except Exception as e:
-            assert isinstance(e, SchemaError)
+            assert isinstance(e.__cause__, SchemaError)
 
         # remove lat column
         test_ais_df1_inference = test_ais_df1.head(500).copy()
@@ -142,4 +142,4 @@ class TestEntityClassifier:
             tracks = [test_ais_df1_inference]
             entity_classifier_pipeline.run_pipeline(tracks)
         except Exception as e:
-            assert isinstance(e, SchemaError)
+            assert isinstance(e.__cause__, SchemaError)
