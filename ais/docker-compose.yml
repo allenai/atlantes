@@ -23,11 +23,11 @@ services:
       test:
         [
           "CMD-SHELL",
-          "nc -zv 127.0.0.1 8000"
+          "nc -zv 127.0.0.1 8080"
         ]
-      interval: 2s
-      timeout: 2s
-      retries: 120
+      interval: 1s
+      timeout: 1s
+      retries: 30
   test_entity:
     hostname: ais-test-entity
     build: *ais-image
@@ -45,11 +45,11 @@ services:
       test:
         [
           "CMD-SHELL",
-          "nc -zv 127.0.0.1 8001"
+          "nc -zv 127.0.0.1 8080"
         ]
-      interval: 2s
-      timeout: 2s
-      retries: 120
+      interval: 1s
+      timeout: 1s
+      retries: 30
   test_cpd_grpc:
     hostname: ais-test-cpd-grpc
     build: *ais-image
