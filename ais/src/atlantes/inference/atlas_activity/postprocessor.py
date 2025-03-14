@@ -51,10 +51,6 @@ N_MESSAGES_FOR_COG_VARIANCE = 200
 MARINE_INFRA_THRESHOLD = 600  # meters
 MARINE_INFRA_LAT, MARINE_INFRA_LON = read_geojson_and_convert_coordinates()
 
-PROMETHEUS_MULTIPROC_DIR = os.environ.get(
-    "PROMETHEUS_MULTIPROC_DIR",
-    "/tmp/prom_multiproc",  # nosec b108
-)
 
 class AtlasActivityPostProcessor:
     """Class for postprocessing AIS trajectory activity classifications"""
@@ -87,14 +83,7 @@ class AtlasActivityPostProcessor:
         """Initialize the metrics for the postprocessor
 
         Always add a counter for each postprocessing rule
-
-        This container may be instantiated with env var: PROMETHEUS_MULTIPROC_DIR.
-        If set, this will write metrics to a file in that directory, which gets picked up
-        by the prometheus scrape handler in the worker container.
         """
-
-        prom_dir = Path(PROMETHEUS_MULTIPROC_DIR)
-        prom_dir.mkdir(parents=True, exist_ok=True)
 
         self.no_postprocessing_rule_applied = Counter(
             "activity_post_processed_no_rule_applied",

@@ -18,11 +18,6 @@ from atlantes.machine_annotation.buoy_vessel_annotate import is_buoy_based_on_na
 from atlantes.utils import AIS_CATEGORIES, VESSEL_TYPES_BIN_DICT
 from prometheus_client import Counter
 
-PROMETHEUS_MULTIPROC_DIR = os.environ.get(
-    "PROMETHEUS_MULTIPROC_DIR",
-    "/tmp/prom_multiproc",  # nosec b108
-)
-
 logger = get_logger("atlas_entity_postprocessor")
 
 
@@ -62,9 +57,6 @@ class AtlasEntityPostProcessor:
         """Initialize the metrics for the postprocessor
 
         Always add a counter for each postprocessing rule"""
-
-        prom_dir = Path(PROMETHEUS_MULTIPROC_DIR)
-        prom_dir.mkdir(parents=True, exist_ok=True)
 
         self.buoy_post_processed_rule_applied = Counter(
             "entity_post_processed_buoy_in_name",

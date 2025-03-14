@@ -17,8 +17,9 @@ from atlantes.inference.common import (
     InfoResponse,
 )
 from atlantes.log_utils import get_logger
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from pandera.typing import DataFrame
+from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
 logger = get_logger("atlas_entity_api")
 
@@ -51,6 +52,12 @@ def classify(request: ATLASRequest) -> dict:
     except Exception as e:
         logger.exception("Error while running inference")
         raise HTTPException(status_code=500, detail="inference request failed") from e
+
+@app.get("/metrics")
+def metrics():
+    """Expose Prometheus metrics"""
+    return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
 
 if __name__ == "__main__":
     PORT = int(os.getenv("PORT", default=8001))
