@@ -50,7 +50,7 @@ def classify(request: ATLASRequest) -> dict:
         raise HTTPException(status_code=500, detail="inference request failed") from e
 
 @app.get("/metrics")
-def metrics():
+def metrics() -> Response:
     """Expose Prometheus metrics"""
     return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
