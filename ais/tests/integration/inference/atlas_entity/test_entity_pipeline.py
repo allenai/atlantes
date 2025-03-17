@@ -56,7 +56,10 @@ class TestEntityClassifier:
     ) -> None:
         """Test the entity pipeline."""
         output = entity_classifier_pipeline.run_pipeline([in_memory_ais_track_df])
-        assert isinstance(output.predictions[0], EntityPostprocessorOutput)
+        assert len(output.predictions) == 1, f"expected 1 prediction, got {output=}"
+        assert isinstance(output.predictions[0], EntityPostprocessorOutput), (
+            f"not an EntityPostprocessorOutput: {output}"
+        )
 
     def test_entity_pipeline_vessel(
         self,
@@ -66,8 +69,10 @@ class TestEntityClassifier:
         """Test the entity pipeline."""
         tracks = [in_memory_ais_track_df]
         output = entity_classifier_pipeline.run_pipeline(tracks)
-        predicted_class_name = output.predictions[0].entity_class
-        predicted_class_details = output.predictions[0].entity_classification_details
+        assert len(output.predictions) == 1, f"expected 1 prediction, got {output=}"
+        prediction = output.predictions[0]
+        predicted_class_name = prediction.entity_class
+        predicted_class_details = prediction.entity_classification_details
         inference_config = get_atlas_entity_inference_config()
         model_id = inference_config["model"]["ATLAS_ENTITY_MODEL_ID"]
         assert isinstance(predicted_class_name, str)
@@ -90,10 +95,12 @@ class TestEntityClassifier:
         """Test the entity pipeline."""
         tracks = [buoy_df]
         output = entity_classifier_pipeline.run_pipeline(tracks)
+        assert len(output.predictions) == 1, f"expected 1 prediction, got {output=}"
         inference_config = get_atlas_entity_inference_config()
         model_id = inference_config["model"]["ATLAS_ENTITY_MODEL_ID"]
-        predicted_class_name = output.predictions[0].entity_class
-        predicted_class_details = output.predictions[0].entity_classification_details
+        prediction = output.predictions[0]
+        predicted_class_name = prediction.entity_class
+        predicted_class_details = prediction.entity_classification_details
         logger.info(predicted_class_name)
         logger.info(predicted_class_details)
         logger.info(np.array(predicted_class_details.outputs).shape)
