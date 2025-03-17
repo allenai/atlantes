@@ -1,6 +1,3 @@
-
-
-from atlantes.atlas.atlas_utils import AtlasActivityLabelsTraining
 from atlantes.atlas.schemas import TrackfileDataModelTrain
 from atlantes.inference.atlas_activity.model import AtlasActivityModel
 from atlantes.inference.atlas_activity.postprocessor import AtlasActivityPostProcessor
@@ -8,8 +5,10 @@ from atlantes.inference.atlas_activity.preprocessor import AtlasActivityPreproce
 from atlantes.inference.common import (
     AtlasInferenceError,
 )
-from pandera.errors import SchemaError
+from atlantes.log_utils import get_logger
 from pandera.typing import DataFrame
+
+logger = get_logger("atlas_activity_classifier")
 
 
 class AtlasActivityClassifier:
@@ -28,21 +27,6 @@ class AtlasActivityClassifier:
         self.model = model
         self.postprocessor = postprocessor
 
-    def _apply_postprocessing(
-        self,
-        activity_class_details_metadata_tuples: list[
-            tuple[AtlasActivityLabelsTraining, dict, dict]
-        ],
-    ) -> list[tuple[str, dict]]:
-        results = []
-        for (
-            activity_class_details_metadata_tuple
-        ) in activity_class_details_metadata_tuples:
-            results.append(
-                self.postprocessor.postprocess(activity_class_details_metadata_tuple)
-            )
-        return results
-
     def run_pipeline(
         self, track_data: list[DataFrame[TrackfileDataModelTrain]]
     ) -> list[tuple[str, dict]] | None:
@@ -59,18 +43,28 @@ class AtlasActivityClassifier:
             Returns a tuple of the predicted activity class and a dict of inference details e.g confidence, outputs
         """
         try:
-            preprocessed_data = [
-                self.preprocessor.preprocess(track) for track in track_data
-            ]
+            preprocessed_data = []
+            for track in track_data:
+                try:
+                    preprocessed = self.preprocessor.preprocess(track)
+                    preprocessed_data.append(preprocessed)
+                except Exception as e:
+                    logger.warning(f"Error preprocessing track: {e}")
+                    continue
 
+            if len(preprocessed_data) == 0:
+                logger.warning("No preprocessed data to run inference on")
+                return []
             classifications = self.model.run_inference(preprocessed_data)
-            if classifications is None:
-                return None
 
-            results = [
-                self.postprocessor.postprocess(classification)
-                for classification in classifications
-            ]
+            results = []
+            for classification in classifications:
+                try:
+                    result = self.postprocessor.postprocess(classification)
+                    results.append(result)
+                except Exception as e:
+                    logger.warning(f"Error postprocessing classification: {e}")
+                    continue
             return results
-        except SchemaError as e:
+        except Exception as e:
             raise AtlasInferenceError(f"Error while running inference: {e}") from e
