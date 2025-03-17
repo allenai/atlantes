@@ -21,6 +21,12 @@ def in_memory_ais_track_df(test_ais_df1: pd.DataFrame) -> pd.DataFrame:
     test_ais_df1_inference = test_ais_df1[ATLAS_COLUMNS_WITH_META].head(4000).copy()
     return test_ais_df1_inference
 
+@pytest.fixture(scope="class")
+def insufficient_trajectory_points(test_ais_df1: pd.DataFrame) -> pd.DataFrame:
+    """Build an in-memory AIS track stream with insufficient trajectory points."""
+    insufficient_points_df = test_ais_df1[ATLAS_COLUMNS_WITH_META].head(10).copy()
+    return insufficient_points_df
+
 
 @pytest.fixture(scope="class")
 def activity_classifier_pipeline() -> AtlasActivityClassifier:
@@ -42,10 +48,10 @@ class TestActivityClassifier:
     ) -> None:
         """Test the activity pipeline."""
         tracks = [in_memory_ais_track_df]
-        batched_output = activity_classifier_pipeline.run_pipeline(tracks)
-        assert batched_output and len(batched_output) == 1
-        predicted_class_name = batched_output[0][0]
-        predicted_details = batched_output[0][1]
+        output = activity_classifier_pipeline.run_pipeline(tracks)
+        assert output and len(output.predictions) == 1
+        predicted_class_name = output.predictions[0][0]
+        predicted_details = output.predictions[0][1]
         # Check that the output is as expected
 
         # Asserting based on last subpath outputs for type checking
@@ -125,7 +131,7 @@ class TestActivityClassifier:
             tracks = [df_list[i]]
             output = activity_classifier_pipeline.run_pipeline(tracks)
             assert output
-            output_lst.append(output[0])
+            output_lst.append(output.predictions[0])
 
         predicted_class_names_lst = [
             predicted_class_name for predicted_class_name, _ in output_lst
@@ -157,3 +163,15 @@ class TestActivityClassifier:
                 for predicted_class_details in predicted_class_details_lst
             ]
         )
+
+    def test_activity_pipeline_insufficient_trajectory_points(
+        self,
+        in_memory_ais_track_df: pd.DataFrame,
+        insufficient_trajectory_points: pd.DataFrame,
+        activity_classifier_pipeline: AtlasActivityClassifier,
+    ) -> None:
+        tracks = [in_memory_ais_track_df, insufficient_trajectory_points]
+        output = activity_classifier_pipeline.run_pipeline(tracks)
+        # assert len(batched_output) == 1 because insufficient_trajectory_points is dropped
+        assert len(output.predictions) == 1
+        assert output.num_failed_preprocessing == 1

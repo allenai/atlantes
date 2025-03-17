@@ -14,6 +14,8 @@ class ATLASResponse(BaseModel):
     """Request object for ATLAS"""
 
     predictions: list[tuple[str, dict]]
+    num_failed_preprocessing: int
+    num_failed_postprocessing: int
 
 
 class AtlasInferenceError(Exception):

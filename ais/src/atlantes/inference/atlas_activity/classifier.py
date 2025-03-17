@@ -7,9 +7,14 @@ from atlantes.inference.common import (
 )
 from atlantes.log_utils import get_logger
 from pandera.typing import DataFrame
+from pydantic import BaseModel, Field
 
 logger = get_logger("atlas_activity_classifier")
 
+class PipelineOutput(BaseModel):
+    predictions: list[tuple[str, dict]] = Field(default_factory=list)
+    num_failed_preprocessing: int = Field(default=0)
+    num_failed_postprocessing: int = Field(default=0)
 
 class AtlasActivityClassifier:
     """Class for classifying the activity of a trajectory using the Atlantes system for AIS behavior classification
@@ -29,7 +34,7 @@ class AtlasActivityClassifier:
 
     def run_pipeline(
         self, track_data: list[DataFrame[TrackfileDataModelTrain]]
-    ) -> list[tuple[str, dict]] | None:
+    ) -> PipelineOutput:
         """
         ATLAS activity requires data in TrackfileDataModelTrain format
         Pandera Validation occurs during preprocessing
@@ -43,6 +48,7 @@ class AtlasActivityClassifier:
             Returns a tuple of the predicted activity class and a dict of inference details e.g confidence, outputs
         """
         try:
+            pipeline_output = PipelineOutput()
             preprocessed_data = []
             for track in track_data:
                 try:
@@ -50,11 +56,12 @@ class AtlasActivityClassifier:
                     preprocessed_data.append(preprocessed)
                 except Exception as e:
                     logger.warning(f"Error preprocessing track: {e}")
+                    pipeline_output.num_failed_preprocessing += 1
                     continue
 
             if len(preprocessed_data) == 0:
                 logger.warning("No preprocessed data to run inference on")
-                return []
+                return pipeline_output
             classifications = self.model.run_inference(preprocessed_data)
 
             results = []
@@ -64,7 +71,8 @@ class AtlasActivityClassifier:
                     results.append(result)
                 except Exception as e:
                     logger.warning(f"Error postprocessing classification: {e}")
+                    pipeline_output.num_failed_postprocessing += 1
                     continue
-            return results
+            return pipeline_output
         except Exception as e:
             raise AtlasInferenceError(f"Error while running inference: {e}") from e

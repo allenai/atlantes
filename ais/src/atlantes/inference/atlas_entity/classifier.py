@@ -8,9 +8,14 @@ from atlantes.inference.atlas_entity.preprocessor import AtlasEntityPreprocessor
 from atlantes.inference.common import AtlasInferenceError
 from atlantes.log_utils import get_logger
 from pandera.typing import DataFrame
+from pydantic import BaseModel, Field
 
 logger = get_logger("atlas_entity_classifier")
 
+class PipelineOutput(BaseModel):
+    predictions: list[EntityPostprocessorOutput] = Field(default_factory=list)
+    num_failed_preprocessing: int = Field(default=0)
+    num_failed_postprocessing: int = Field(default=0)
 
 class AtlasEntityClassifier:
     """Class for identifying the entity of a trajectory using the Atlantes system for AIS behavior classification
@@ -32,7 +37,7 @@ class AtlasEntityClassifier:
 
     def run_pipeline(
         self, track_data: list[DataFrame[TrackfileDataModelTrain]]
-    ) -> list[EntityPostprocessorOutput]:
+    ) -> PipelineOutput:
         """
         ATLAS entity requires data in TrackfileDataModelTrain format
 
@@ -49,6 +54,7 @@ class AtlasEntityClassifier:
 
         """
         try:
+            pipeline_output = PipelineOutput()
             # Preprocessing
             preprocessed_data = []
             for track in track_data:
@@ -57,11 +63,12 @@ class AtlasEntityClassifier:
                     preprocessed_data.append(preprocessed)
                 except Exception as e:
                     logger.warning(f"Error preprocessing track: {e}")
+                    pipeline_output.num_failed_preprocessing += 1
                     continue
 
             if len(preprocessed_data) == 0:
                 logger.warning("No preprocessed data to run inference on")
-                return []
+                return pipeline_output
 
             # Model inference
             classifications = self.model.run_inference(preprocessed_data)
@@ -74,9 +81,10 @@ class AtlasEntityClassifier:
                     results.append(result)
                 except Exception as e:
                     logger.warning(f"Error postprocessing entity output: {e}")
+                    pipeline_output.num_failed_postprocessing += 1
                     continue
 
             # Return a list of the enum item name (lowered) and a dict of inference details
-            return results
+            return pipeline_output
         except Exception as e:
             raise AtlasInferenceError(f"Error while running inference: {e}") from e

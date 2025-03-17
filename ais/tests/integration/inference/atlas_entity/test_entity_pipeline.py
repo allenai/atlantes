@@ -55,9 +55,8 @@ class TestEntityClassifier:
         entity_classifier_pipeline: AtlasEntityClassifier,
     ) -> None:
         """Test the entity pipeline."""
-        response = entity_classifier_pipeline.run_pipeline([in_memory_ais_track_df])
-        output = response[0]
-        assert isinstance(output, EntityPostprocessorOutput)
+        output = entity_classifier_pipeline.run_pipeline([in_memory_ais_track_df])
+        assert isinstance(output.predictions[0], EntityPostprocessorOutput)
 
     def test_entity_pipeline_vessel(
         self,
@@ -66,8 +65,9 @@ class TestEntityClassifier:
     ) -> None:
         """Test the entity pipeline."""
         tracks = [in_memory_ais_track_df]
-        response = entity_classifier_pipeline.run_pipeline(tracks)
-        predicted_class_name, predicted_class_details = response[0]
+        output = entity_classifier_pipeline.run_pipeline(tracks)
+        predicted_class_name = output.predictions[0].entity_class
+        predicted_class_details = output.predictions[0].entity_classification_details
         inference_config = get_atlas_entity_inference_config()
         model_id = inference_config["model"]["ATLAS_ENTITY_MODEL_ID"]
         assert isinstance(predicted_class_name, str)
@@ -89,11 +89,11 @@ class TestEntityClassifier:
     ) -> None:
         """Test the entity pipeline."""
         tracks = [buoy_df]
-        response = entity_classifier_pipeline.run_pipeline(tracks)
+        output = entity_classifier_pipeline.run_pipeline(tracks)
         inference_config = get_atlas_entity_inference_config()
         model_id = inference_config["model"]["ATLAS_ENTITY_MODEL_ID"]
-        predicted_class_name = response[0].entity_class
-        predicted_class_details = response[0].entity_classification_details
+        predicted_class_name = output.predictions[0].entity_class
+        predicted_class_details = output.predictions[0].entity_classification_details
         logger.info(predicted_class_name)
         logger.info(predicted_class_details)
         logger.info(np.array(predicted_class_details.outputs).shape)

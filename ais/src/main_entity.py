@@ -46,9 +46,12 @@ def index() -> InfoResponse:
 def classify(request: ATLASRequest) -> dict:
     try:
         tracks = [DataFrame(track) for track in request.tracks]
-        results = classifier.run_pipeline(tracks)
-        predictions = [result.serialize() for result in results]
-        return ATLASResponse(predictions=predictions).model_dump(mode="json")
+        output = classifier.run_pipeline(tracks)
+        return ATLASResponse(
+            predictions=[pred.serialize() for pred in output.predictions],
+            num_failed_preprocessing=output.num_failed_preprocessing,
+            num_failed_postprocessing=output.num_failed_postprocessing,
+        ).model_dump(mode="json")
     except Exception as e:
         logger.exception("Error while running inference")
         raise HTTPException(status_code=500, detail="inference request failed") from e
