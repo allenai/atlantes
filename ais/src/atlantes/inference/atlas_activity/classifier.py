@@ -64,11 +64,10 @@ class AtlasActivityClassifier:
                 return pipeline_output
             classifications = self.model.run_inference(preprocessed_data)
 
-            results = []
             for classification in classifications:
                 try:
-                    result = self.postprocessor.postprocess(classification)
-                    results.append(result)
+                    postprocessed = self.postprocessor.postprocess(classification)
+                    pipeline_output.predictions.append(postprocessed)
                 except Exception as e:
                     logger.warning(f"Error postprocessing classification: {e}")
                     pipeline_output.num_failed_postprocessing += 1

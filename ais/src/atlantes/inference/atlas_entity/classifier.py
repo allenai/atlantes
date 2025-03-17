@@ -56,40 +56,28 @@ class AtlasEntityClassifier:
         try:
             pipeline_output = PipelineOutput()
             preprocessed_data = []
-            logger.error(f"A1 preprocessing {len(track_data)} tracks")
             for track in track_data:
                 try:
-                    logger.error("A2")
                     preprocessed = self.preprocessor.preprocess(track)
-                    logger.error("A3")
                     preprocessed_data.append(preprocessed)
                 except Exception as e:
-                    logger.error("A4")
                     logger.warning(f"Error preprocessing track: {e}")
                     pipeline_output.num_failed_preprocessing += 1
                     continue
-            logger.error("A5")
+
             if len(preprocessed_data) == 0:
-                logger.error("A6")
                 logger.warning("No preprocessed data to run inference on")
                 return pipeline_output
-            logger.error("A7")
             classifications = self.model.run_inference(preprocessed_data)
-            logger.error("A8")
-            results = []
+
             for classification in classifications:
                 try:
-                    logger.error("A9")
-                    result = self.postprocessor.postprocess(classification)
-                    logger.error("A10")
-                    results.append(result)
+                    postprocessed = self.postprocessor.postprocess(classification)
+                    pipeline_output.predictions.append(postprocessed)
                 except Exception as e:
-                    logger.error("A11")
                     logger.warning(f"Error postprocessing entity output: {e}")
                     pipeline_output.num_failed_postprocessing += 1
                     continue
-            logger.error("A12")
             return pipeline_output
         except Exception as e:
-            logger.error("A13")
             raise AtlasInferenceError(f"Error while running inference: {e}") from e
