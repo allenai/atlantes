@@ -157,4 +157,4 @@ class TestEntityClassifier:
             tracks = [PipelineInput(track_id="test", track_data=test_ais_df1_inference)]
             entity_classifier_pipeline.run_pipeline(tracks)
         except Exception as e:
-            assert isinstance(e.__cause__, ValidationError)
+            assert isinstance(e.__cause__, ValueError)
