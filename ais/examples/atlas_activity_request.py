@@ -60,7 +60,7 @@ def sample_request() -> None:
         batch_size = 1
     track = json.loads(EXAMPLE_TRACK_JSON)
     REQUEST_BODY = {
-        "track_data": [
+        "tracks": [
             {"track_id": f"test-{i}", "track_data": track} for i in range(batch_size)
         ],
     }

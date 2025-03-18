@@ -48,7 +48,7 @@ def index() -> InfoResponse:
 def classify(request: ATLASRequest) -> dict:
     try:
         # Create PipelineInput objects from request track_data
-        inputs = [PipelineInput.from_track_data(td) for td in request.track_data]
+        inputs = [PipelineInput.from_track_data(td) for td in request.tracks]
 
         output = classifier.run_pipeline(inputs)
 

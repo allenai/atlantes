@@ -4,7 +4,7 @@
 from pydantic import BaseModel
 
 
-class TrackData(BaseModel):
+class AtlasModelTrackInputs(BaseModel):
     track_id: str
     track_data: list[dict]
 
@@ -12,7 +12,7 @@ class TrackData(BaseModel):
 class ATLASRequest(BaseModel):
     """Request object for ATLAS"""
 
-    track_data: list[TrackData]
+    tracks: list[AtlasModelTrackInputs]
 
 
 class PreprocessFailure(BaseModel):

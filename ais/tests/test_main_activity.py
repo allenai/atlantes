@@ -33,7 +33,7 @@ class TestActivityFastApiEndpoint:
         batch_size = 4
         track_data = json.loads(json_track_request)
         request_body = {
-            "track_data": [
+            "tracks": [
                 {"track_id": f"test-{i}", "track_data": track_data}
                 for i in range(batch_size)
             ],
@@ -51,7 +51,7 @@ class TestActivityFastApiEndpoint:
         """Test the activity endpoint."""
         track_data = json.loads(json_track_request)
         REQUEST_BODY = {
-            "track_data": [{"track_id": "test", "track_data": track_data}],
+            "tracks": [{"track_id": "test", "track_data": track_data}],
         }
 
         classification_response = requests.post(

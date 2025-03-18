@@ -51,7 +51,7 @@ class TestEntityFastApiEndpoint:
         batch_size = 4
         track_data = json.loads(json_track_request)
         request_body = {
-            "track_data": [
+            "tracks": [
                 {"track_id": f"test-{i}", "track_data": track_data}
                 for i in range(batch_size)
             ],
@@ -69,7 +69,7 @@ class TestEntityFastApiEndpoint:
         """Test the entity endpoint."""
         track_data = json.loads(json_track_request)
         REQUEST_BODY = {
-            "track_data": [{"track_id": "test", "track_data": track_data}],
+            "tracks": [{"track_id": "test", "track_data": track_data}],
         }
 
         classification_response = requests.post(
@@ -93,7 +93,7 @@ class TestEntityFastApiEndpoint:
         """Test the entity endpoint with known ship type."""
         track_data = json.loads(json_track_request_with_known_binned_ship_type)
         REQUEST_BODY = {
-            "track_data": [{"track_id": "test", "track_data": track_data}],
+            "tracks": [{"track_id": "test", "track_data": track_data}],
         }
 
         classification_response = requests.post(
@@ -115,7 +115,7 @@ class TestEntityFastApiEndpoint:
             json_track_request_with_unknown_binned_ship_type_and_buoy_name
         )
         REQUEST_BODY = {
-            "track_data": [{"track_id": "test", "track_data": track_data}],
+            "tracks": [{"track_id": "test", "track_data": track_data}],
         }
 
         classification_response = requests.post(

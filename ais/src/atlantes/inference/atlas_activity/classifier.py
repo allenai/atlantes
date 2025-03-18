@@ -4,10 +4,10 @@ from atlantes.inference.atlas_activity.postprocessor import AtlasActivityPostPro
 from atlantes.inference.atlas_activity.preprocessor import AtlasActivityPreprocessor
 from atlantes.inference.common import (
     AtlasInferenceError,
+    AtlasModelTrackInputs,
     PostprocessFailure,
     Prediction,
     PreprocessFailure,
-    TrackData,
 )
 from atlantes.log_utils import get_logger
 from pandera.typing import DataFrame
@@ -21,7 +21,7 @@ class PipelineInput(BaseModel):
     track_data: DataFrame[TrackfileDataModelTrain]
 
     @staticmethod
-    def from_track_data(track_data: TrackData) -> "PipelineInput":
+    def from_track_data(track_data: AtlasModelTrackInputs) -> "PipelineInput":
         return PipelineInput(
             track_id=track_data.track_id,  # unique identifier for the track
             track_data=DataFrame(track_data.track_data),

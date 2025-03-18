@@ -43,7 +43,7 @@ def index() -> InfoResponse:
 @app.post("/classify", response_model=ATLASResponse)
 def classify(request: ATLASRequest) -> dict:
     try:
-        tracks = [PipelineInput.from_track_data(td) for td in request.track_data]
+        tracks = [PipelineInput.from_track_data(td) for td in request.tracks]
         output = classifier.run_pipeline(tracks)
         return ATLASResponse(
             predictions=output.predictions,
