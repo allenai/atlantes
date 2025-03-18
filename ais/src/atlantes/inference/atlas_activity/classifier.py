@@ -67,14 +67,16 @@ class AtlasActivityClassifier:
         try:
             pipeline_output = PipelineOutput()
             preprocessed_data = []
-            track_ids = []
+            valid_track_ids = []
 
             for input_data in inputs:
                 track_id = input_data.track_id
                 try:
                     preprocessed = self.preprocessor.preprocess(input_data.track_data)
                     preprocessed_data.append(preprocessed)
-                    track_ids.append(track_id)
+                    # preprocess() returns an error if the track_data is not valid.
+                    # this is necessary for the zip() below to work
+                    valid_track_ids.append(track_id)
                 except Exception as e:
                     logger.warning(f"Error preprocessing {input_data.track_id=}: {e}")
                     failure = PreprocessFailure(track_id=track_id, error=str(e))
@@ -83,7 +85,7 @@ class AtlasActivityClassifier:
 
             classifications = self.model.run_inference(preprocessed_data)
 
-            for classification, track_id in zip(classifications, track_ids):
+            for classification, track_id in zip(classifications, valid_track_ids):
                 try:
                     activity, details = self.postprocessor.postprocess(classification)
                     pipeline_output.predictions.append(

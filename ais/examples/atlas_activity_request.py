@@ -60,7 +60,9 @@ def sample_request() -> None:
         batch_size = 1
     track = json.loads(EXAMPLE_TRACK_JSON)
     REQUEST_BODY = {
-        "tracks": [track] * batch_size,
+        "track_data": [
+            {"track_id": f"test-{i}", "track_data": track} for i in range(batch_size)
+        ],
     }
     try:
         response = requests.post(
@@ -76,7 +78,9 @@ def sample_request() -> None:
 
         response_data = response.json()
 
-        classifications = [prediction[0] for prediction in response_data["predictions"]]
+        classifications = [
+            prediction["classification"] for prediction in response_data["predictions"]
+        ]
         classification_count = len(classifications)
         logger.info(f"Classification {classification_count=}, {classifications=}")
 
