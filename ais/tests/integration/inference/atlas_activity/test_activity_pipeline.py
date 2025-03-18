@@ -136,12 +136,8 @@ class TestActivityClassifier:
             assert output
             output_lst.append(output.predictions[0])
 
-        predicted_class_names_lst = [
-            predicted_class_name for predicted_class_name, _ in output_lst
-        ]
-        predicted_class_details_lst = [
-            predicted_class_details for _, predicted_class_details in output_lst
-        ]
+        predicted_class_names_lst = [pred.classification for pred in output_lst]
+        predicted_class_details_lst = [pred.details for pred in output_lst]
 
         logger.info(predicted_class_details_lst)
         logger.info(predicted_class_names_lst)
@@ -156,13 +152,13 @@ class TestActivityClassifier:
 
         assert all(
             [
-                "original_classification" in predicted_class_details.keys()
+                "original_classification" in predicted_class_details
                 for predicted_class_details in predicted_class_details_lst
             ]
         )
         assert all(
             [
-                "postprocessed_classification" in predicted_class_details.keys()
+                "postprocessed_classification" in predicted_class_details
                 for predicted_class_details in predicted_class_details_lst
             ]
         )

@@ -100,9 +100,9 @@ class EntityMetadata(NamedTuple):
 class EntityPostprocessorOutput(NamedTuple):
     """Output of the entity postprocessor"""
 
-    track_id: str
     entity_class: str
     entity_classification_details: EntityPostprocessorOutputDetails
+    track_id: str | None = None
 
     def serialize(self) -> tuple[str, dict, str]:
         postprocessed_classification_details = self.entity_classification_details
@@ -118,7 +118,7 @@ class EntityPostprocessorOutput(NamedTuple):
         return (
             self.entity_class,
             entity_classification_details,
-            self.track_id,
+            self.track_id or "",
         )
 
 
