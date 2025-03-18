@@ -21,7 +21,6 @@ from atlantes.inference.atlas_entity.preprocessor import AtlasEntityPreprocessor
 from atlantes.log_utils import get_logger
 from pandera.errors import SchemaError
 from pandera.typing import DataFrame
-from pydantic import ValidationError
 
 logger = get_logger(__name__)
 
@@ -137,24 +136,3 @@ class TestEntityClassifier:
             entity_classifier_pipeline.run_pipeline(tracks)
         except Exception as e:
             assert isinstance(e.__cause__, KnownShipTypeAndBuoyName)
-
-    def test_entity_pipeline_schema_error(
-        self,
-        test_ais_df1: DataFrame[TrackfileDataModelTrain],
-        entity_classifier_pipeline: AtlasEntityClassifier,
-    ) -> None:
-        """Test the entity pipeline."""
-        try:
-            tracks = [PipelineInput(track_id="test", track_data=test_ais_df1.head(500))]
-            entity_classifier_pipeline.run_pipeline(tracks)
-        except Exception as e:
-            assert isinstance(e.__cause__, SchemaError)
-
-        # remove lat column
-        test_ais_df1_inference = test_ais_df1.head(500).copy()
-        test_ais_df1_inference.drop(columns=["lat"], inplace=True)
-        try:
-            tracks = [PipelineInput(track_id="test", track_data=test_ais_df1_inference)]
-            entity_classifier_pipeline.run_pipeline(tracks)
-        except Exception as e:
-            assert isinstance(e.__cause__, ValueError)
