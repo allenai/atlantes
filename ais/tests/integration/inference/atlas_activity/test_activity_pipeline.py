@@ -6,11 +6,16 @@ from atlantes.atlas.atlas_utils import (
     ATLAS_COLUMNS_WITH_META,
     get_atlas_activity_inference_config,
 )
-from atlantes.inference.atlas_activity.classifier import AtlasActivityClassifier
+from atlantes.atlas.schemas import TrackfileDataModelTrain
+from atlantes.inference.atlas_activity.classifier import (
+    AtlasActivityClassifier,
+    PipelineInput,
+)
 from atlantes.inference.atlas_activity.model import AtlasActivityModel
 from atlantes.inference.atlas_activity.postprocessor import AtlasActivityPostProcessor
 from atlantes.inference.atlas_activity.preprocessor import AtlasActivityPreprocessor
 from atlantes.log_utils import get_logger
+from pandera.typing import DataFrame
 
 logger = get_logger(__name__)
 
@@ -19,12 +24,14 @@ logger = get_logger(__name__)
 def in_memory_ais_track_df(test_ais_df1: pd.DataFrame) -> pd.DataFrame:
     """Build an in-memory AIS track stream with CPD subpaths."""
     test_ais_df1_inference = test_ais_df1[ATLAS_COLUMNS_WITH_META].head(4000).copy()
+    assert isinstance(test_ais_df1_inference, pd.DataFrame)
     return test_ais_df1_inference
 
 @pytest.fixture(scope="class")
 def insufficient_trajectory_points(test_ais_df1: pd.DataFrame) -> pd.DataFrame:
     """Build an in-memory AIS track stream with insufficient trajectory points."""
     insufficient_points_df = test_ais_df1[ATLAS_COLUMNS_WITH_META].head(10).copy()
+    assert isinstance(insufficient_points_df, pd.DataFrame)
     return insufficient_points_df
 
 
@@ -43,20 +50,16 @@ class TestActivityClassifier:
 
     def test_activity_pipeline(
         self,
-        in_memory_ais_track_df: pd.DataFrame,
+        in_memory_ais_track_df: DataFrame[TrackfileDataModelTrain],
         activity_classifier_pipeline: AtlasActivityClassifier,
     ) -> None:
         """Test the activity pipeline."""
-        tracks = [in_memory_ais_track_df]
+        tracks = [PipelineInput(track_id="test", track_data=in_memory_ais_track_df)]
         output = activity_classifier_pipeline.run_pipeline(tracks)
-        assert output and len(output.predictions) == 1
-        predicted_class_name = output.predictions[0][0]
-        predicted_details = output.predictions[0][1]
-        # Check that the output is as expected
+        assert len(output.predictions) == 1
 
         # Asserting based on last subpath outputs for type checking
-        assert isinstance(predicted_class_name, str)
-        assert isinstance(predicted_details, dict)
+        predicted_details = output.predictions[0].details
         assert predicted_details.keys() == {
             "model",
             "confidence",
@@ -128,7 +131,7 @@ class TestActivityClassifier:
 
         output_lst = []
         for i in range(0, len(df_list)):
-            tracks = [df_list[i]]
+            tracks = [PipelineInput(track_id=f"test-{i}", track_data=df_list[i])]
             output = activity_classifier_pipeline.run_pipeline(tracks)
             assert output
             output_lst.append(output.predictions[0])
@@ -166,12 +169,17 @@ class TestActivityClassifier:
 
     def test_activity_pipeline_insufficient_trajectory_points(
         self,
-        in_memory_ais_track_df: pd.DataFrame,
-        insufficient_trajectory_points: pd.DataFrame,
+        in_memory_ais_track_df: DataFrame[TrackfileDataModelTrain],
+        insufficient_trajectory_points: DataFrame[TrackfileDataModelTrain],
         activity_classifier_pipeline: AtlasActivityClassifier,
     ) -> None:
-        tracks = [in_memory_ais_track_df, insufficient_trajectory_points]
+        tracks = [
+            PipelineInput(track_id="track1", track_data=in_memory_ais_track_df),
+            PipelineInput(track_id="track2", track_data=insufficient_trajectory_points),
+        ]
         output = activity_classifier_pipeline.run_pipeline(tracks)
-        # assert len(batched_output) == 1 because insufficient_trajectory_points is dropped
+
+        # there should be one successful prediction and one preprocess failure
         assert len(output.predictions) == 1
-        assert output.num_failed_preprocessing == 1
+        assert len(output.preprocess_failures) == 1
+        assert len(output.postprocess_failures) == 0

@@ -3,7 +3,10 @@
 import os
 
 import uvicorn
-from atlantes.inference.atlas_activity.classifier import AtlasActivityClassifier
+from atlantes.inference.atlas_activity.classifier import (
+    AtlasActivityClassifier,
+    PipelineInput,
+)
 from atlantes.inference.atlas_activity.model import AtlasActivityModel
 from atlantes.inference.atlas_activity.postprocessor import AtlasActivityPostProcessor
 from atlantes.inference.atlas_activity.preprocessor import AtlasActivityPreprocessor
@@ -38,16 +41,15 @@ def index() -> InfoResponse:
     logger.info(f"Received request for {info=}")
     return info
 
-
 @app.post("/classify", response_model=ATLASResponse)
 def classify(request: ATLASRequest) -> dict:
     try:
-        tracks = [DataFrame(track) for track in request.tracks]
+        tracks = [PipelineInput.from_track_data(td) for td in request.track_data]
         output = classifier.run_pipeline(tracks)
         return ATLASResponse(
             predictions=output.predictions,
-            num_failed_preprocessing=output.num_failed_preprocessing,
-            num_failed_postprocessing=output.num_failed_postprocessing,
+            preprocess_failures=output.preprocess_failures,
+            postprocess_failures=output.postprocess_failures,
         ).model_dump(mode="json")
     except Exception as e:
         logger.exception("Error while running inference")

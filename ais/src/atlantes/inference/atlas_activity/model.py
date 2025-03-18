@@ -154,6 +154,10 @@ class AtlasActivityModel:
         preprocessed_data_stream: list[PreprocessedActivityData],
     ) -> list[tuple[AtlasActivityLabelsTraining, dict, dict]]:
         """Run inference on the preprocessed data using the model"""
+        if len(preprocessed_data_stream) == 0:
+            logger.warning("No preprocessed data to run inference on")
+            return []
+
         logger.info("Running inference on the ATLAS activity model")
         preprocessed_data_dict_stream = [
             data.model_dump() for data in preprocessed_data_stream

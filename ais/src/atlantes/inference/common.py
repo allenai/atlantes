@@ -4,18 +4,38 @@
 from pydantic import BaseModel
 
 
+class TrackData(BaseModel):
+    track_id: str
+    track_data: list[dict]
+
+
 class ATLASRequest(BaseModel):
     """Request object for ATLAS"""
 
-    tracks: list[list[dict]]
+    track_data: list[TrackData]
 
+
+class PreprocessFailure(BaseModel):
+    track_id: str
+    error: str
+
+
+class PostprocessFailure(BaseModel):
+    track_id: str
+    classification: str
+    error: str
+
+class Prediction(BaseModel):
+    track_id: str
+    classification: str
+    details: dict
 
 class ATLASResponse(BaseModel):
     """Request object for ATLAS"""
 
-    predictions: list[tuple[str, dict]]
-    num_failed_preprocessing: int
-    num_failed_postprocessing: int
+    predictions: list[Prediction]
+    preprocess_failures: list[PreprocessFailure]
+    postprocess_failures: list[PostprocessFailure]
 
 
 class AtlasInferenceError(Exception):

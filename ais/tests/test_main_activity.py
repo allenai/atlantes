@@ -6,6 +6,7 @@ import json
 import pandas as pd
 import pytest
 import requests
+from atlantes.inference.common import ATLASResponse
 from atlantes.log_utils import get_logger
 
 logger = get_logger(__name__)
@@ -22,6 +23,7 @@ def json_track_request(test_ais_df1: pd.DataFrame) -> str:
     )
     logger.info(test_ais_df1_inference.columns)
     json_str = test_ais_df1_inference.to_json(orient="records")
+    assert json_str is not None
     return json_str
 
 
@@ -44,8 +46,9 @@ class TestActivityFastApiEndpoint:
 
     def test_activity_endpoint(self, json_track_request: str) -> None:
         """Test the activity endpoint."""
+        track_data = json.loads(json_track_request)
         REQUEST_BODY = {
-            "tracks": [json.loads(json_track_request)],  # Ensure proper JSON format
+            "tracks": [{"track_id": "test", "track_data": track_data}],
         }
 
         classification_response = requests.post(
@@ -56,20 +59,9 @@ class TestActivityFastApiEndpoint:
         logger.info(f"Response Headers: {classification_response.headers}")
 
         response_json = classification_response.json()
-        logger.info(f"Response JSON: {response_json}")
-        track_0_outputs = response_json["predictions"][0]
-        predictions_text = track_0_outputs[0]
-        full_predictions = track_0_outputs[1]
-        model_name = full_predictions["model"]
-        confidence = full_predictions["confidence"]
-        outputs = full_predictions["outputs"]
-        # should limit what we are sending back. In fact strings are probably not correct and we may want to use ints and probably just the raw array or the confidence scores.
-        assert isinstance(predictions_text, str)
-        assert isinstance(model_name, str)
-        assert isinstance(confidence, float)
-        assert len(outputs) == 4
-
-        try:
-            logger.info(f"Response JSON: {response_json}")
-        except requests.exceptions.JSONDecodeError as e:
-            logger.error(f"JSON Decode Error: {e}", exc_info=True)
+        output = ATLASResponse(**response_json)
+        logger.info(f"{output=}")
+        details = output.predictions[0].details
+        assert isinstance(details["model"], str)
+        assert isinstance(details["confidence"], float)
+        assert len(details["outputs"]) == 4
