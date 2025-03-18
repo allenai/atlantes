@@ -21,6 +21,7 @@ from atlantes.inference.atlas_entity.preprocessor import AtlasEntityPreprocessor
 from atlantes.log_utils import get_logger
 from pandera.errors import SchemaError
 from pandera.typing import DataFrame
+from pydantic import ValidationError
 
 logger = get_logger(__name__)
 
@@ -31,6 +32,7 @@ def in_memory_ais_track_df(
 ) -> DataFrame[TrackfileDataModelTrain]:
     """Build an in-memory AIS track stream with CPD subpaths."""
     test_ais_df1_inference = test_ais_df1[ATLAS_COLUMNS_WITH_META].head(4000).copy()
+    test_ais_df1_inference = DataFrame[TrackfileDataModelTrain](test_ais_df1_inference)
     assert isinstance(test_ais_df1_inference, DataFrame)
     return test_ais_df1_inference
 
@@ -39,6 +41,7 @@ def in_memory_ais_track_df(
 def buoy_df(test_buoy_df: pd.DataFrame) -> DataFrame[TrackfileDataModelTrain]:
     """Build an in-memory AIS track stream."""
     test_buoy_df_inference = test_buoy_df[ATLAS_COLUMNS_WITH_META].copy()
+    test_buoy_df_inference = DataFrame[TrackfileDataModelTrain](test_buoy_df_inference)
     assert isinstance(test_buoy_df_inference, DataFrame)
     return test_buoy_df_inference
 
@@ -154,4 +157,4 @@ class TestEntityClassifier:
             tracks = [PipelineInput(track_id="test", track_data=test_ais_df1_inference)]
             entity_classifier_pipeline.run_pipeline(tracks)
         except Exception as e:
-            assert isinstance(e.__cause__, SchemaError)
+            assert isinstance(e.__cause__, ValidationError)
