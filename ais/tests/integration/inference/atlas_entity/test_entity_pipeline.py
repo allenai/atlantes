@@ -7,8 +7,11 @@ from atlantes.atlas.atlas_utils import (
     ATLAS_COLUMNS_WITH_META,
     get_atlas_entity_inference_config,
 )
-from atlantes.inference.atlas_entity.classifier import AtlasEntityClassifier
-from atlantes.inference.atlas_entity.datamodels import EntityPostprocessorOutput
+from atlantes.atlas.schemas import TrackfileDataModelTrain
+from atlantes.inference.atlas_entity.classifier import (
+    AtlasEntityClassifier,
+    PipelineInput,
+)
 from atlantes.inference.atlas_entity.model import AtlasEntityModel
 from atlantes.inference.atlas_entity.postprocessor import (
     AtlasEntityPostProcessor,
@@ -17,22 +20,26 @@ from atlantes.inference.atlas_entity.postprocessor import (
 from atlantes.inference.atlas_entity.preprocessor import AtlasEntityPreprocessor
 from atlantes.log_utils import get_logger
 from pandera.errors import SchemaError
+from pandera.typing import DataFrame
 
 logger = get_logger(__name__)
 
 
 @pytest.fixture(scope="class")
-def in_memory_ais_track_df(test_ais_df1: pd.DataFrame) -> pd.DataFrame:
+def in_memory_ais_track_df(
+    test_ais_df1: pd.DataFrame,
+) -> DataFrame[TrackfileDataModelTrain]:
     """Build an in-memory AIS track stream with CPD subpaths."""
     test_ais_df1_inference = test_ais_df1[ATLAS_COLUMNS_WITH_META].head(4000).copy()
+    assert isinstance(test_ais_df1_inference, DataFrame)
     return test_ais_df1_inference
 
 
 @pytest.fixture(scope="class")
-def buoy_df(test_buoy_df: pd.DataFrame) -> list[pd.DataFrame]:
+def buoy_df(test_buoy_df: pd.DataFrame) -> DataFrame[TrackfileDataModelTrain]:
     """Build an in-memory AIS track stream."""
     test_buoy_df_inference = test_buoy_df[ATLAS_COLUMNS_WITH_META].copy()
-    # drop current subpath_num column
+    assert isinstance(test_buoy_df_inference, DataFrame)
     return test_buoy_df_inference
 
 
@@ -51,73 +58,71 @@ class TestEntityClassifier:
 
     def test_entity_pipeline(
         self,
-        in_memory_ais_track_df: pd.DataFrame,
+        in_memory_ais_track_df: DataFrame[TrackfileDataModelTrain],
         entity_classifier_pipeline: AtlasEntityClassifier,
     ) -> None:
         """Test the entity pipeline."""
-        output = entity_classifier_pipeline.run_pipeline([in_memory_ais_track_df])
+        tracks = [PipelineInput(track_id="test", track_data=in_memory_ais_track_df)]
+        output = entity_classifier_pipeline.run_pipeline(tracks)
         assert len(output.predictions) == 1, f"expected 1 prediction, got {output=}"
-        assert isinstance(output.predictions[0], EntityPostprocessorOutput), (
-            f"not an EntityPostprocessorOutput: {output}"
-        )
 
     def test_entity_pipeline_vessel(
         self,
-        in_memory_ais_track_df: pd.DataFrame,
+        in_memory_ais_track_df: DataFrame[TrackfileDataModelTrain],
         entity_classifier_pipeline: AtlasEntityClassifier,
     ) -> None:
         """Test the entity pipeline."""
-        tracks = [in_memory_ais_track_df]
+        tracks = [PipelineInput(track_id="test", track_data=in_memory_ais_track_df)]
         output = entity_classifier_pipeline.run_pipeline(tracks)
         assert len(output.predictions) == 1, f"expected 1 prediction, got {output=}"
         prediction = output.predictions[0]
-        predicted_class_name = prediction.entity_class
-        predicted_class_details = prediction.entity_classification_details
+        predicted_class_name = prediction.classification
+        predicted_class_details = prediction.details
         inference_config = get_atlas_entity_inference_config()
         model_id = inference_config["model"]["ATLAS_ENTITY_MODEL_ID"]
         assert isinstance(predicted_class_name, str)
         assert predicted_class_name == "vessel"  # Buoy or vessel
-        assert predicted_class_details.model == model_id
+        assert predicted_class_details["model"] == model_id
         assert (
-            predicted_class_details.confidence > 0.9
-            and predicted_class_details.confidence <= 1.0
+            predicted_class_details["confidence"] > 0.9
+            and predicted_class_details["confidence"] <= 1.0
         )
-        assert isinstance(predicted_class_details.outputs, list)
-        assert len(predicted_class_details.outputs) == 2
-        assert predicted_class_details.postprocessed_classification == "vessel"
-        assert predicted_class_details.postprocess_rule_applied is False
+        assert isinstance(predicted_class_details["outputs"], list)
+        assert len(predicted_class_details["outputs"]) == 2
+        assert predicted_class_details["postprocessed_classification"] == "vessel"
+        assert predicted_class_details["postprocess_rule_applied"] is False
 
     def test_entity_pipeline_buoy(
         self,
-        buoy_df: pd.DataFrame,
+        buoy_df: DataFrame[TrackfileDataModelTrain],
         entity_classifier_pipeline: AtlasEntityClassifier,
     ) -> None:
         """Test the entity pipeline."""
-        tracks = [buoy_df]
+        tracks = [PipelineInput(track_id="test", track_data=buoy_df)]
         output = entity_classifier_pipeline.run_pipeline(tracks)
         assert len(output.predictions) == 1, f"expected 1 prediction, got {output=}"
         inference_config = get_atlas_entity_inference_config()
         model_id = inference_config["model"]["ATLAS_ENTITY_MODEL_ID"]
         prediction = output.predictions[0]
-        predicted_class_name = prediction.entity_class
-        predicted_class_details = prediction.entity_classification_details
+        predicted_class_name = prediction.classification
+        predicted_class_details = prediction.details
         logger.info(predicted_class_name)
         logger.info(predicted_class_details)
-        logger.info(np.array(predicted_class_details.outputs).shape)
+        logger.info(np.array(predicted_class_details["outputs"]).shape)
         assert isinstance(predicted_class_name, str)
         assert predicted_class_name == "buoy"
-        assert predicted_class_details.model == model_id
+        assert predicted_class_details["model"] == model_id
         assert (
-            predicted_class_details.confidence > 0.7
-            and predicted_class_details.confidence <= 1.0
+            predicted_class_details["confidence"] > 0.7
+            and predicted_class_details["confidence"] <= 1.0
         )
-        assert isinstance(predicted_class_details.outputs, list)
-        assert predicted_class_details.postprocessed_classification == "buoy"
-        assert predicted_class_details.postprocess_rule_applied is True
+        assert isinstance(predicted_class_details["outputs"], list)
+        assert predicted_class_details["postprocessed_classification"] == "buoy"
+        assert predicted_class_details["postprocess_rule_applied"] is True
 
     def test_entity_postprocessor_error_handling(
         self,
-        buoy_df: pd.DataFrame,
+        buoy_df: DataFrame[TrackfileDataModelTrain],
         entity_classifier_pipeline: AtlasEntityClassifier,
     ) -> None:
         """Test the entity pipeline."""
@@ -125,19 +130,19 @@ class TestEntityClassifier:
         # pretend that something with a buoy name is listed as a fishing vessel
         modified_buoy_df.loc[:, "category"] = [30] * len(modified_buoy_df)
         try:
-            tracks = [modified_buoy_df]
+            tracks = [PipelineInput(track_id="test", track_data=modified_buoy_df)]
             entity_classifier_pipeline.run_pipeline(tracks)
         except Exception as e:
             assert isinstance(e.__cause__, KnownShipTypeAndBuoyName)
 
     def test_entity_pipeline_schema_error(
         self,
-        test_ais_df1: pd.DataFrame,
+        test_ais_df1: DataFrame[TrackfileDataModelTrain],
         entity_classifier_pipeline: AtlasEntityClassifier,
     ) -> None:
         """Test the entity pipeline."""
         try:
-            tracks = [test_ais_df1.head(500)]
+            tracks = [PipelineInput(track_id="test", track_data=test_ais_df1.head(500))]
             entity_classifier_pipeline.run_pipeline(tracks)
         except Exception as e:
             assert isinstance(e.__cause__, SchemaError)
@@ -146,7 +151,7 @@ class TestEntityClassifier:
         test_ais_df1_inference = test_ais_df1.head(500).copy()
         test_ais_df1_inference.drop(columns=["lat"], inplace=True)
         try:
-            tracks = [test_ais_df1_inference]
+            tracks = [PipelineInput(track_id="test", track_data=test_ais_df1_inference)]
             entity_classifier_pipeline.run_pipeline(tracks)
         except Exception as e:
             assert isinstance(e.__cause__, SchemaError)

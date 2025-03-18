@@ -17,7 +17,6 @@ from atlantes.inference.common import (
 )
 from atlantes.log_utils import get_logger
 from fastapi import FastAPI, HTTPException, Response
-from pandera.typing import DataFrame
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
 logger = get_logger("atlas_activity_api")

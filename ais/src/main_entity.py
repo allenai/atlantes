@@ -5,7 +5,10 @@ from __future__ import annotations
 import os
 
 import uvicorn
-from atlantes.inference.atlas_entity.classifier import AtlasEntityClassifier
+from atlantes.inference.atlas_entity.classifier import (
+    AtlasEntityClassifier,
+    PipelineInput,
+)
 from atlantes.inference.atlas_entity.model import AtlasEntityModel
 from atlantes.inference.atlas_entity.postprocessor import (
     AtlasEntityPostProcessor,
@@ -18,7 +21,6 @@ from atlantes.inference.common import (
 )
 from atlantes.log_utils import get_logger
 from fastapi import FastAPI, HTTPException, Response
-from pandera.typing import DataFrame
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
 logger = get_logger("atlas_entity_api")
@@ -45,12 +47,15 @@ def index() -> InfoResponse:
 @app.post("/classify", response_model=ATLASResponse)
 def classify(request: ATLASRequest) -> dict:
     try:
-        tracks = [DataFrame(track) for track in request.tracks]
-        output = classifier.run_pipeline(tracks)
+        # Create PipelineInput objects from request track_data
+        inputs = [PipelineInput.from_track_data(td) for td in request.track_data]
+
+        output = classifier.run_pipeline(inputs)
+
         return ATLASResponse(
-            predictions=[pred.serialize() for pred in output.predictions],
-            num_failed_preprocessing=output.num_failed_preprocessing,
-            num_failed_postprocessing=output.num_failed_postprocessing,
+            predictions=output.predictions,
+            preprocess_failures=output.preprocess_failures,
+            postprocess_failures=output.postprocess_failures,
         ).model_dump(mode="json")
     except Exception as e:
         logger.exception("Error while running inference")

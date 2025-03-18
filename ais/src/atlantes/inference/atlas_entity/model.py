@@ -146,6 +146,10 @@ class AtlasEntityModel:
         preprocessed_data_stream: list[PreprocessedEntityData],
     ) -> list[EntityPostprocessorInput]:
         """Run inference on the preprocessed data using the model"""
+        if len(preprocessed_data_stream) == 0:
+            logger.warning("No preprocessed data to run inference on")
+            return []
+
         # Move model to device
         preprocessed_data_dict_stream = [
             preprocessed_data.model_dump()

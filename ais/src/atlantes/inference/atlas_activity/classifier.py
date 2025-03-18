@@ -96,12 +96,12 @@ class AtlasActivityClassifier:
                 except Exception as e:
                     c = classification[0]
                     logger.warning(f"Error postprocessing {track_id=}, {c=}: {e}")
-                    failure = PostprocessFailure(
+                    postprocess_failure = PostprocessFailure(
                         track_id=track_id,
                         classification=c.name,
                         error=str(e),
                     )
-                    pipeline_output.postprocess_failures.append(failure)
+                    pipeline_output.postprocess_failures.append(postprocess_failure)
                     continue
             return pipeline_output
         except Exception as e:

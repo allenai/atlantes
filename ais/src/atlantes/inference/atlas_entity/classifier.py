@@ -1,21 +1,40 @@
 from __future__ import annotations
 
 from atlantes.atlas.schemas import TrackfileDataModelTrain
-from atlantes.inference.atlas_entity.datamodels import EntityPostprocessorOutput
 from atlantes.inference.atlas_entity.model import AtlasEntityModel
 from atlantes.inference.atlas_entity.postprocessor import AtlasEntityPostProcessor
 from atlantes.inference.atlas_entity.preprocessor import AtlasEntityPreprocessor
-from atlantes.inference.common import AtlasInferenceError
+from atlantes.inference.common import (
+    AtlasInferenceError,
+    PostprocessFailure,
+    Prediction,
+    PreprocessFailure,
+    TrackData,
+)
 from atlantes.log_utils import get_logger
 from pandera.typing import DataFrame
 from pydantic import BaseModel, Field
 
 logger = get_logger("atlas_entity_classifier")
 
+
+class PipelineInput(BaseModel):
+    track_id: str
+    track_data: DataFrame[TrackfileDataModelTrain]
+
+    @staticmethod
+    def from_track_data(track_data: TrackData) -> "PipelineInput":
+        return PipelineInput(
+            track_id=track_data.track_id,  # unique identifier for the track
+            track_data=DataFrame(track_data.track_data),
+        )
+
+
 class PipelineOutput(BaseModel):
-    predictions: list[EntityPostprocessorOutput] = Field(default_factory=list)
-    num_failed_preprocessing: int = Field(default=0)
-    num_failed_postprocessing: int = Field(default=0)
+    predictions: list[Prediction] = Field(default_factory=list)
+    preprocess_failures: list[PreprocessFailure] = Field(default_factory=list)
+    postprocess_failures: list[PostprocessFailure] = Field(default_factory=list)
+
 
 class AtlasEntityClassifier:
     """Class for identifying the entity of a trajectory using the Atlantes system for AIS behavior classification
@@ -35,9 +54,7 @@ class AtlasEntityClassifier:
         self.model: AtlasEntityModel = model
         self.postprocessor: AtlasEntityPostProcessor = postprocessor
 
-    def run_pipeline(
-        self, track_data: list[DataFrame[TrackfileDataModelTrain]]
-    ) -> PipelineOutput:
+    def run_pipeline(self, inputs: list[PipelineInput]) -> PipelineOutput:
         """
         ATLAS entity requires data in TrackfileDataModelTrain format
 
@@ -45,38 +62,54 @@ class AtlasEntityClassifier:
 
         Parameters
         ----------
-        track_data : DataFrame[TrackfileDataModelTrain]
-            see atlantes.atlas.schemas.TrackfileDataModelTrain for the required columns
+        inputs : list[PipelineInput]
+            List of inputs containing track_id and track_data
         Returns
         -------
-        list[EntityPostprocessorOutput]
-            Returns a list of EntityPostprocessorOutput objects
-
+        PipelineOutput
+            Contains predictions with entity class, inference details, and track_id
         """
         try:
             pipeline_output = PipelineOutput()
             preprocessed_data = []
-            for track in track_data:
+            track_ids = []
+
+            for input_data in inputs:
+                track_id = input_data.track_id
                 try:
-                    preprocessed = self.preprocessor.preprocess(track)
+                    preprocessed = self.preprocessor.preprocess(input_data.track_data)
                     preprocessed_data.append(preprocessed)
+                    track_ids.append(track_id)
                 except Exception as e:
-                    logger.warning(f"Error preprocessing track: {e}")
-                    pipeline_output.num_failed_preprocessing += 1
+                    logger.warning(f"Error preprocessing {input_data.track_id=}: {e}")
+                    preprocess_failure = PreprocessFailure(
+                        track_id=track_id, error=str(e)
+                    )
+                    pipeline_output.preprocess_failures.append(preprocess_failure)
                     continue
 
-            if len(preprocessed_data) == 0:
-                logger.warning("No preprocessed data to run inference on")
-                return pipeline_output
             classifications = self.model.run_inference(preprocessed_data)
 
-            for classification in classifications:
+            for classification, track_id in zip(classifications, track_ids):
                 try:
                     postprocessed = self.postprocessor.postprocess(classification)
-                    pipeline_output.predictions.append(postprocessed)
+                    pipeline_output.predictions.append(
+                        Prediction(
+                            track_id=track_id,
+                            classification=postprocessed.entity_class,
+                            details=postprocessed.entity_classification_details._asdict(),
+                        )
+                    )
                 except Exception as e:
-                    logger.warning(f"Error postprocessing entity output: {e}")
-                    pipeline_output.num_failed_postprocessing += 1
+                    logger.warning(
+                        f"Error postprocessing {track_id=}, {classification=}: {e}"
+                    )
+                    postprocess_failure = PostprocessFailure(
+                        track_id=track_id,
+                        classification=classification.predicted_class.name,
+                        error=str(e),
+                    )
+                    pipeline_output.postprocess_failures.append(postprocess_failure)
                     continue
             return pipeline_output
         except Exception as e:
