@@ -1,25 +1,21 @@
 """Integration tests for the activity pipeline."""
 
-from typing import Generator
-
 import pandas as pd
 import pytest
-import ray
-from atlantes.atlas.atlas_utils import (ATLAS_COLUMNS_WITH_META,
-                                        get_atlas_activity_inference_config)
-from atlantes.inference.atlas_activity.model import (
-    AtlasActivityModel, AtlasActivityModelDeployment)
-from atlantes.inference.atlas_activity.pipeline import (
-    AtlasActivityClassifier, AtlasActivityClassifierDeployment)
-from atlantes.inference.atlas_activity.postprocessor import (
-    AtlasActivityPostProcessor, AtlasActivityPostProcessorDeployment)
-from atlantes.inference.atlas_activity.preprocessor import (
-    AtlasActivityPreprocessor, AtlasActivityPreprocessorDeployment)
-from atlantes.inference.common import ATLASRequest, ATLASResponse
+from atlantes.atlas.atlas_utils import (
+    ATLAS_COLUMNS_WITH_META,
+    get_atlas_activity_inference_config,
+)
+from atlantes.atlas.schemas import TrackfileDataModelTrain
+from atlantes.inference.atlas_activity.classifier import (
+    AtlasActivityClassifier,
+    PipelineInput,
+)
+from atlantes.inference.atlas_activity.model import AtlasActivityModel
+from atlantes.inference.atlas_activity.postprocessor import AtlasActivityPostProcessor
+from atlantes.inference.atlas_activity.preprocessor import AtlasActivityPreprocessor
 from atlantes.log_utils import get_logger
-from ray import serve
-from ray.serve import Application
-from ray.serve.handle import DeploymentHandle
+from pandera.typing import DataFrame
 
 logger = get_logger(__name__)
 
@@ -28,22 +24,15 @@ logger = get_logger(__name__)
 def in_memory_ais_track_df(test_ais_df1: pd.DataFrame) -> pd.DataFrame:
     """Build an in-memory AIS track stream with CPD subpaths."""
     test_ais_df1_inference = test_ais_df1[ATLAS_COLUMNS_WITH_META].head(4000).copy()
+    assert isinstance(test_ais_df1_inference, pd.DataFrame)
     return test_ais_df1_inference
 
-
 @pytest.fixture(scope="class")
-def activity_classifier_pipeline_deployment() -> (
-    Generator[DeploymentHandle, None, None]
-):
-    """Return the activity classifier pipeline."""
-    activity_deplyoment: Application = AtlasActivityClassifierDeployment.bind(  # type: ignore
-        AtlasActivityPreprocessorDeployment.bind(),  # type: ignore
-        AtlasActivityModelDeployment.bind(),  # type: ignore
-        AtlasActivityPostProcessorDeployment.bind(),  # type: ignore
-    )
-    handle: DeploymentHandle = serve.run(activity_deplyoment)
-    yield handle
-    ray.shutdown()
+def insufficient_trajectory_points(test_ais_df1: pd.DataFrame) -> pd.DataFrame:
+    """Build an in-memory AIS track stream with insufficient trajectory points."""
+    insufficient_points_df = test_ais_df1[ATLAS_COLUMNS_WITH_META].head(10).copy()
+    assert isinstance(insufficient_points_df, pd.DataFrame)
+    return insufficient_points_df
 
 
 @pytest.fixture(scope="class")
@@ -61,59 +50,16 @@ class TestActivityClassifier:
 
     def test_activity_pipeline(
         self,
-        in_memory_ais_track_df: pd.DataFrame,
+        in_memory_ais_track_df: DataFrame[TrackfileDataModelTrain],
         activity_classifier_pipeline: AtlasActivityClassifier,
     ) -> None:
         """Test the activity pipeline."""
-        output = activity_classifier_pipeline.run_pipeline(in_memory_ais_track_df)
-        assert isinstance(output, tuple)
+        tracks = [PipelineInput(track_id="test", track_data=in_memory_ais_track_df)]
+        output = activity_classifier_pipeline.run_pipeline(tracks)
+        assert len(output.predictions) == 1
 
-
-class TestActivityClassifierDeployment:
-    """Tests for the pipelines."""
-
-    def test_pipeline_deployment_component_names_unchanged(self) -> None:
-        """Test that the deployment component names are not changed."""
-        assert (
-            AtlasActivityPreprocessorDeployment.name  # type: ignore
-            == "AtlasActivityPreprocessorDeployment"
-        ), "The deployment name should not be changed, if it Must be change it also must be changed in serve config"
-        assert (
-            AtlasActivityModelDeployment.name == "AtlasActivityModelDeployment"  # type: ignore
-        ), "The deployment name should not be changed, if it Must be change it also must be changed in serve config"
-        assert (
-            AtlasActivityPostProcessorDeployment.name  # type: ignore
-            == "AtlasActivityPostProcessorDeployment"
-        ), "The deployment name should not be changed, if it Must be change it also must be changed in serve config"
-
-    def test_deployment_name_unchanged(
-        self, activity_classifier_pipeline_deployment: DeploymentHandle
-    ) -> None:
-        """Test that the deployment name is not changed."""
-        assert (
-            activity_classifier_pipeline_deployment.deployment_name
-            == "AtlasActivityClassifierDeployment"
-        ), "The deployment name should not be changed, if it Must be change it also must be changed in serve config"
-
-    def test_activity_pipeline(
-        self,
-        in_memory_ais_track_df: pd.DataFrame,
-        activity_classifier_pipeline_deployment: DeploymentHandle,
-    ) -> None:
-        """Test the activity pipeline."""
-        request = ATLASRequest(track=in_memory_ais_track_df.to_dict(orient="records"))
-        batched_output = (
-            activity_classifier_pipeline_deployment.classify_track_activity.remote(
-                request
-            ).result()
-        )
-        predicted_class_name, predicted_details = batched_output.predictions
-        # Check that the output is as expected
-
-        # Assertign based on last subpath outputs for type checking
-        assert isinstance(batched_output, ATLASResponse)
-        assert isinstance(predicted_class_name, str)
-        assert isinstance(predicted_details, dict)
+        # Asserting based on last subpath outputs for type checking
+        predicted_details = output.predictions[0].details
         assert predicted_details.keys() == {
             "model",
             "confidence",
@@ -131,7 +77,7 @@ class TestActivityClassifierDeployment:
         assert isinstance(predicted_details["outputs"], list)
         assert isinstance(
             predicted_details["confidence"], float
-        )  # SHould just be a float but would need to change contract
+        )  # Should just be a float but would need to change contract
         assert len(predicted_details["outputs"]) == 4  # num classes
 
         # Asserting for Real-time Simulated outputs
@@ -170,7 +116,7 @@ class TestActivityClassifierDeployment:
     )
     def test_activity_pipeline_postprocessing(
         self,
-        activity_classifier_pipeline_deployment: DeploymentHandle,
+        activity_classifier_pipeline: AtlasActivityClassifier,
         request: pytest.FixtureRequest,
         df_list: list[pd.DataFrame],
         expected_label: str,
@@ -185,18 +131,13 @@ class TestActivityClassifierDeployment:
 
         output_lst = []
         for i in range(0, len(df_list)):
-            track_request = ATLASRequest(track=df_list[i].to_dict(orient="records"))
-            output = activity_classifier_pipeline_deployment.classify_track_activity.remote(  # type: ignore
-                track_request
-            ).result()
-            output_lst.append(output.predictions)
+            tracks = [PipelineInput(track_id=f"test-{i}", track_data=df_list[i])]
+            output = activity_classifier_pipeline.run_pipeline(tracks)
+            assert output
+            output_lst.append(output.predictions[0])
 
-        predicted_class_names_lst = [
-            predicted_class_name for predicted_class_name, _ in output_lst
-        ]
-        predicted_class_details_lst = [
-            predicted_class_details for _, predicted_class_details in output_lst
-        ]
+        predicted_class_names_lst = [pred.classification for pred in output_lst]
+        predicted_class_details_lst = [pred.details for pred in output_lst]
 
         logger.info(predicted_class_details_lst)
         logger.info(predicted_class_names_lst)
@@ -211,13 +152,30 @@ class TestActivityClassifierDeployment:
 
         assert all(
             [
-                "original_classification" in predicted_class_details.keys()
+                "original_classification" in predicted_class_details
                 for predicted_class_details in predicted_class_details_lst
             ]
         )
         assert all(
             [
-                "postprocessed_classification" in predicted_class_details.keys()
+                "postprocessed_classification" in predicted_class_details
                 for predicted_class_details in predicted_class_details_lst
             ]
         )
+
+    def test_activity_pipeline_insufficient_trajectory_points(
+        self,
+        in_memory_ais_track_df: DataFrame[TrackfileDataModelTrain],
+        insufficient_trajectory_points: DataFrame[TrackfileDataModelTrain],
+        activity_classifier_pipeline: AtlasActivityClassifier,
+    ) -> None:
+        tracks = [
+            PipelineInput(track_id="track1", track_data=in_memory_ais_track_df),
+            PipelineInput(track_id="track2", track_data=insufficient_trajectory_points),
+        ]
+        output = activity_classifier_pipeline.run_pipeline(tracks)
+
+        # there should be one successful prediction and one preprocess failure
+        assert len(output.predictions) == 1
+        assert len(output.preprocess_failures) == 1
+        assert len(output.postprocess_failures) == 0

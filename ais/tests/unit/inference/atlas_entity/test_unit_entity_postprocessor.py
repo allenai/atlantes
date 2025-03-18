@@ -102,9 +102,11 @@ class TestAtlasEntityPostProcessor:
                 flag_code="USA",
             ),
         )
-        entity_class, details = entity_postprocessor_class.postprocess(
+        output = entity_postprocessor_class.postprocess(
             entity_outputs_with_details_metadata_tuples
         )
+        entity_class = output.entity_class
+        details = output.entity_classification_details
         assert (
             entity_class == "vessel"
             and details.postprocessed_classification == "vessel"
@@ -198,10 +200,10 @@ class TestAtlasEntityPostProcessor:
                 flag_code="ARG",
             ),
         )
-        entity_class, details = entity_postprocessor_class.postprocess(
+        output = entity_postprocessor_class.postprocess(
             entity_outputs_with_details_metadata_tuples
         )
-        assert entity_class == "unknown"
+        assert output.entity_class == "unknown"
 
     def test_postprocess_buoyish_name_overrides_confidence_thresholding(
         self, entity_postprocessor_class: AtlasEntityPostProcessor, monkeypatch: Any
@@ -246,12 +248,14 @@ class TestAtlasEntityPostProcessor:
                 flag_code="USA",
             ),
         )
-        entity_class_1, details_1 = entity_postprocessor_class.postprocess(
+        output_1 = entity_postprocessor_class.postprocess(
             entity_outputs_with_details_metadata_tuples_1
         )
-        entity_class_2, details_2 = entity_postprocessor_class.postprocess(
+        entity_class_1 = output_1.entity_class
+        output_2 = entity_postprocessor_class.postprocess(
             entity_outputs_with_details_metadata_tuples_2
         )
+        entity_class_2 = output_2.entity_class
         assert entity_class_1 == "buoy" and entity_class_2 == "buoy"
 
     def test_postprocess_not_enough_messages_rule_applied(
@@ -274,10 +278,10 @@ class TestAtlasEntityPostProcessor:
                 flag_code="USA",
             ),
         )
-        entity_class, details = entity_postprocessor_class.postprocess(
+        output = entity_postprocessor_class.postprocess(
             entity_outputs_with_details_metadata_tuples
         )
-        assert entity_class == "unknown"
+        assert output.entity_class == "unknown"
 
     def test_buoyish_name_overrides_not_enough_messages(
         self, entity_postprocessor_class: AtlasEntityPostProcessor, monkeypatch: Any
@@ -299,10 +303,10 @@ class TestAtlasEntityPostProcessor:
                 flag_code="USA",
             ),
         )
-        entity_class, details = entity_postprocessor_class.postprocess(
+        output = entity_postprocessor_class.postprocess(
             entity_outputs_with_details_metadata_tuples_1
         )
-        assert entity_class == "buoy"
+        assert output.entity_class == "buoy"
 
     def test_buoy_puns_names_are_not_postprocessed(
         self, entity_postprocessor_class: AtlasEntityPostProcessor
@@ -325,12 +329,12 @@ class TestAtlasEntityPostProcessor:
                 flag_code="USA",
             ),
         )
-        entity_class_1, details_1 = entity_postprocessor_class.postprocess(
+        output = entity_postprocessor_class.postprocess(
             entity_outputs_with_details_metadata_tuples_1
         )
-        assert (
-            entity_class_1 == "vessel" and details_1.postprocess_rule_applied is False
-        )
+        entity_class = output.entity_class
+        details = output.entity_classification_details
+        assert entity_class == "vessel" and details.postprocess_rule_applied is False
 
     def test_postprocess_known_binned_ship_type_overrides_confidence_thresholding(
         self, entity_postprocessor_class: AtlasEntityPostProcessor, monkeypatch: Any
@@ -357,10 +361,10 @@ class TestAtlasEntityPostProcessor:
                 flag_code="USA",
             ),
         )
-        entity_class, details = entity_postprocessor_class.postprocess(
+        output = entity_postprocessor_class.postprocess(
             entity_outputs_with_details_metadata_tuples
         )
-        assert entity_class == "vessel"
+        assert output.entity_class == "vessel"
 
     def test_postprocess_rule_application_recorded_in_details(
         self, entity_postprocessor_class: AtlasEntityPostProcessor, monkeypatch: Any
@@ -419,18 +423,18 @@ class TestAtlasEntityPostProcessor:
                 ais_type=9999,
             ),
         )
-        entity_class_1, details_1 = entity_postprocessor_class.postprocess(
+        output_1 = entity_postprocessor_class.postprocess(
             entity_outputs_with_details_metadata_tuples_1
         )
-        entity_class_2, details_2 = entity_postprocessor_class.postprocess(
+        output_2 = entity_postprocessor_class.postprocess(
             entity_outputs_with_details_metadata_tuples_2
         )
-        entity_class_3, details_3 = entity_postprocessor_class.postprocess(
+        output_3 = entity_postprocessor_class.postprocess(
             entity_outputs_with_details_metadata_tuples_3
         )
-        assert details_1.postprocess_rule_applied
-        assert details_2.postprocess_rule_applied
-        assert details_3.postprocess_rule_applied
+        assert output_1.entity_classification_details.postprocess_rule_applied
+        assert output_2.entity_classification_details.postprocess_rule_applied
+        assert output_3.entity_classification_details.postprocess_rule_applied
 
     def test_postprocess_records_confidence_thresholding_in_details(
         self, entity_postprocessor_class: AtlasEntityPostProcessor, monkeypatch: Any
@@ -458,10 +462,13 @@ class TestAtlasEntityPostProcessor:
                 flag_code="USA",
             ),
         )
-        entity_class, details = entity_postprocessor_class.postprocess(
+        output = entity_postprocessor_class.postprocess(
             entity_outputs_with_details_metadata_tuples_1
         )
-        assert details.confidence_threshold == confidence_threshold
+        assert (
+            output.entity_classification_details.confidence_threshold
+            == confidence_threshold
+        )
 
     def test_postprocess_no_postprocessing_applied(
         self, entity_postprocessor_class: AtlasEntityPostProcessor
@@ -483,10 +490,11 @@ class TestAtlasEntityPostProcessor:
                 flag_code="USA",
             ),
         )
-        entity_class, details = entity_postprocessor_class.postprocess(
+        output = entity_postprocessor_class.postprocess(
             entity_outputs_with_details_metadata_tuples_1
         )
-        assert details.postprocess_rule_applied is False and entity_class == "vessel"
+        assert output.entity_classification_details.postprocess_rule_applied is False
+        assert output.entity_class == "vessel"
 
     def test_postprocess_raises_error_for_known_binned_ship_type_and_buoy_name(
         self, entity_postprocessor_class: AtlasEntityPostProcessor

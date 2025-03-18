@@ -7,10 +7,8 @@ from pathlib import Path
 import click
 from atlantes.inference.atlas_activity.model import AtlasActivityModel
 from atlantes.inference.atlas_activity.pipeline import AtlasActivityClassifier
-from atlantes.inference.atlas_activity.postprocessor import \
-    AtlasActivityPostProcessor
-from atlantes.inference.atlas_activity.preprocessor import \
-    AtlasActivityPreprocessor
+from atlantes.inference.atlas_activity.postprocessor import AtlasActivityPostProcessor
+from atlantes.inference.atlas_activity.preprocessor import AtlasActivityPreprocessor
 from atlantes.utils import read_df_file_type_handler
 from tqdm import tqdm
 
@@ -49,7 +47,7 @@ def write_results(tracks: list[str], output_file: str) -> None:
 def run_through_negatives(input_folder: str, output_file: str) -> None:
     """Apply the model to each track in a given folder and record the model outputs per class."""
 
-    logging.getLogger("ray.serve").setLevel(logging.ERROR)
+    logging.getLogger(__name__).setLevel(logging.ERROR)
 
     pipeline = setup_pipeline()
     tracks = [str(path) for path in Path(input_folder).rglob("*.parquet")]

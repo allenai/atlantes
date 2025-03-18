@@ -1,17 +1,17 @@
 {
   "predictions": [
     [
-      "vessel",
+      "unknown",
       {
-        "confidence": 0.9951587319374084,
+        "confidence": 0.9978117346763611,
         "confidence_threshold": 0.5,
-        "model": "ATLAS-Entity: AIS Transformer Learning with Active Subpaths",
+        "model": "ATLAS-Buoy_no_git_hash_2024-08-20-23-16-27_epoch2.pt",
         "outputs": [
-          0.9951587319374084,
-          0.00484120100736618
+          0.9978117346763611,
+          0.002188334008678794
         ],
-        "postprocess_rule_applied": false,
-        "postprocessed_classification": "vessel",
+        "postprocess_rule_applied": true,
+        "postprocessed_classification": "unknown",
         "predicted_classification": "vessel"
       }
     ]

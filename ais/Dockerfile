@@ -57,4 +57,4 @@ RUN mkdir -p /ais/src/atlantes/data && \
     python -m pip install --no-cache-dir .
 
 # Set the default command to run your application
-CMD ["python", "src/main.py"]
+CMD ["python", "src/main_activity.py"]

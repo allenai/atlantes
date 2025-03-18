@@ -1,4 +1,4 @@
-""" Entity postprocessor class and ray serve deployment"""
+"""Entity postprocessor class"""
 
 from typing import Optional
 
@@ -14,10 +14,9 @@ from atlantes.inference.atlas_entity.datamodels import (
 from atlantes.log_utils import get_logger
 from atlantes.machine_annotation.buoy_vessel_annotate import is_buoy_based_on_name
 from atlantes.utils import AIS_CATEGORIES, VESSEL_TYPES_BIN_DICT
-from ray import serve
-from ray.serve import metrics
+from prometheus_client import Counter
 
-logger = get_logger("ray.serve")
+logger = get_logger("atlas_entity_postprocessor")
 
 
 class KnownShipTypeAndBuoyName(ValueError):
@@ -56,18 +55,23 @@ class AtlasEntityPostProcessor:
         """Initialize the metrics for the postprocessor
 
         Always add a counter for each postprocessing rule"""
-        self.buoy_post_processed_rule_applied = metrics.Counter(
-            "entity_post_processed_buoy_in_name"
+
+        self.buoy_post_processed_rule_applied = Counter(
+            "entity_post_processed_buoy_in_name",
+            "Buoy in name",
         )
-        self.known_binned_ship_type_post_processed_rule_applied = metrics.Counter(
-            "entity_post_processed_known_binned_ship_type"
+        self.known_binned_ship_type_post_processed_rule_applied = Counter(
+            "entity_post_processed_known_binned_ship_type",
+            "Known binned ship type",
         )
-        self.confidence_threshold_rule_applied = metrics.Counter(
-            "entity_post_processed_confidence_threshold"
+        self.confidence_threshold_rule_applied = Counter(
+            "entity_post_processed_confidence_threshold",
+            "Confidence threshold",
         )
 
-        self.not_enough_messages_rule_applied = metrics.Counter(
-            "entity_post_processed_not_enough_messages"
+        self.not_enough_messages_rule_applied = Counter(
+            "entity_post_processed_not_enough_messages",
+            "Not enough messages",
         )
 
     def is_binned_ship_type_known(self, binned_ship_type: int) -> bool:
@@ -179,46 +183,4 @@ class AtlasEntityPostProcessor:
         return EntityPostprocessorOutput(
             entity_class=postprocessed_entity_class.name.lower(),
             entity_classification_details=output_details,
-        )
-
-
-@serve.deployment(
-    num_replicas=NUM_REPLICAS,
-    ray_actor_options={"num_cpus": NUM_CPUS, "num_gpus": NUM_GPUS},
-)
-class AtlasEntityPostProcessorDeployment(AtlasEntityPostProcessor):
-    """Class for deploying the postprocessor for AIS trajectory entity classification"""
-
-    def __init__(self) -> None:
-        super().__init__()
-
-    def reconfigure(self, user_config: dict) -> None:
-        """Reconfigure the postprocessor with a new user config
-
-        Is called and updated when the serve config is updated and application is redeployed
-
-        Parameters
-        ----------
-        user_config : dict
-            The user config
-        """
-        self.ENTITY_CLASS_CONFIDENCE_THRESHOLD = user_config["confidence_threshold"]
-
-    def convert_to_serializable_output(
-        self,
-        entity_postprocessor_output: EntityPostprocessorOutput,
-    ) -> tuple[str, dict]:
-        # Maybe this should be pydantic model instead
-        entity_classification_details = {
-            "predicted_classification": entity_postprocessor_output.entity_classification_details.predicted_classification,
-            "model": entity_postprocessor_output.entity_classification_details.model,
-            "confidence": entity_postprocessor_output.entity_classification_details.confidence,
-            "outputs": entity_postprocessor_output.entity_classification_details.outputs,
-            "postprocessed_classification": entity_postprocessor_output.entity_classification_details.postprocessed_classification,
-            "postprocess_rule_applied": entity_postprocessor_output.entity_classification_details.postprocess_rule_applied,
-            "confidence_threshold": entity_postprocessor_output.entity_classification_details.confidence_threshold,
-        }
-        return (
-            entity_postprocessor_output.entity_class,
-            entity_classification_details,
         )

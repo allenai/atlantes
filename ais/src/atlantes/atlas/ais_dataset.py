@@ -20,24 +20,30 @@ import numpy as np
 import pandas as pd
 import pandera as pa
 import torch
-from atlantes.atlas.atlas_utils import (ATLAS_ACTIVITY_COLUMNS_WITH_META,
-                                        ATLAS_COLUMNS_WITH_META,
-                                        AtlasActivityLabelsTraining,
-                                        AtlasEntityLabelsTraining,
-                                        compute_solar_altitude,
-                                        haversine_distance,
-                                        preprocess_trackfile,
-                                        read_trajectory_lengths_file)
-from atlantes.atlas.augmentations import \
-    augmentation_registry  # Probably should make this into a basic class so its better documented
-from atlantes.atlas.schemas import (ActivityEndOfSequenceLabelDataModel,
-                                    EntityClassLabelDataModel,
-                                    TrackfileDataModelTrain)
+from pandera.typing import DataFrame
+from torch.utils.data import Dataset
+
+from atlantes.atlas.atlas_utils import (
+    ATLAS_ACTIVITY_COLUMNS_WITH_META,
+    ATLAS_COLUMNS_WITH_META,
+    AtlasActivityLabelsTraining,
+    AtlasEntityLabelsTraining,
+    compute_solar_altitude,
+    haversine_distance,
+    preprocess_trackfile,
+    read_trajectory_lengths_file,
+)
+from atlantes.atlas.augmentations import (
+    augmentation_registry,  # Probably should make this into a basic class so its better documented
+)
+from atlantes.atlas.schemas import (
+    ActivityEndOfSequenceLabelDataModel,
+    EntityClassLabelDataModel,
+    TrackfileDataModelTrain,
+)
 from atlantes.datautils import DATE_FORMAT
 from atlantes.log_utils import get_logger
 from atlantes.utils import VESSEL_TYPES_BIN_DICT
-from pandera.typing import DataFrame
-from torch.utils.data import Dataset
 
 logger = get_logger(__name__)
 logging.getLogger("gcsfs").setLevel(logging.WARNING)
@@ -844,7 +850,9 @@ class ActivityDatasetEndOfSequence(AISTrajectoryBaseDataset):
             return {"enough_context": is_there_enough_context}
 
         if self.is_online and not is_there_enough_context:
-            raise ValueError("Not enough context for online inference")
+            raise ValueError(
+                f"Not enough context for online inference: {track_length=} < {self.min_ais_messages=}"
+            )
 
         if "amount_of_light" in self.dataset_config["MODEL_INPUT_COLUMNS_ACTIVITY"]:
             clipped_trajectory = self._add_amount_of_light_feature(clipped_trajectory)

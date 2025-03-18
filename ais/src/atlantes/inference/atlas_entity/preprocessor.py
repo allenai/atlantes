@@ -1,4 +1,4 @@
-""" Entity preprocessor class and ray serve deployment
+"""Entity preprocessor class
 
 # TODO: Deal with the subpath at the end being removed or the last points so that we can
 provide the right classification for a given time
@@ -12,9 +12,8 @@ from atlantes.atlas.schemas import TrackfileDataModelTrain
 from atlantes.inference.atlas_entity.datamodels import PreprocessedEntityData
 from atlantes.log_utils import get_logger
 from pandera.typing import DataFrame
-from ray import serve
 
-logger = get_logger("ray.serve")
+logger = get_logger("atlas_entity_preprocessor")
 
 
 # ONLY TAKE effect during Local deployment or Testing
@@ -58,13 +57,3 @@ class AtlasEntityPreprocessor:
         )
         preprocessed = entity_dataset[0]
         return PreprocessedEntityData(**preprocessed)
-
-
-@serve.deployment(
-    num_replicas=NUM_REPLICAS,
-    ray_actor_options={"num_cpus": NUM_CPUS, "num_gpus": NUM_GPUS},
-)
-class AtlasEntityPreprocessorDeployment(AtlasEntityPreprocessor):
-    """Class for deploying the preprocessor for AIS trajectory entity classification"""
-
-    pass
