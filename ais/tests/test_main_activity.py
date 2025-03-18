@@ -31,8 +31,12 @@ class TestActivityFastApiEndpoint:
     def test_activity_endpoint_batching(self, json_track_request: str) -> None:
         """Test the activity endpoint to ensure batching works."""
         batch_size = 4
+        track_data = json.loads(json_track_request)
         request_body = {
-            "tracks": [json.loads(json_track_request)] * batch_size,
+            "track_data": [
+                {"track_id": f"test-{i}", "track_data": track_data}
+                for i in range(batch_size)
+            ],
         }
         response = requests.post(
             ACTIVITY_CLASSIFICATION_ENDPOINT, json=request_body, timeout=1000
@@ -40,15 +44,14 @@ class TestActivityFastApiEndpoint:
         response.raise_for_status()
         outputs = response.json()["predictions"]
         assert len(outputs) == 4
-        assert all([len(outputs[i]) == 2 for i in range(4)])
-        assert all([isinstance(outputs[i][0], str) for i in range(4)])
-        assert all([isinstance(outputs[i][1], dict) for i in range(4)])
+        assert all([isinstance(output["classification"], str) for output in outputs])
+        assert all([isinstance(output["details"], dict) for output in outputs])
 
     def test_activity_endpoint(self, json_track_request: str) -> None:
         """Test the activity endpoint."""
         track_data = json.loads(json_track_request)
         REQUEST_BODY = {
-            "tracks": [{"track_id": "test", "track_data": track_data}],
+            "track_data": [{"track_id": "test", "track_data": track_data}],
         }
 
         classification_response = requests.post(

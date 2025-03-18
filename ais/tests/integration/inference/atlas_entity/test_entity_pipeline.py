@@ -19,7 +19,6 @@ from atlantes.inference.atlas_entity.postprocessor import (
 )
 from atlantes.inference.atlas_entity.preprocessor import AtlasEntityPreprocessor
 from atlantes.log_utils import get_logger
-from pandera.errors import SchemaError
 from pandera.typing import DataFrame
 
 logger = get_logger(__name__)
