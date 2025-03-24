@@ -31,6 +31,22 @@ Note that the code in ais repo will be required to pass these pre commits in ord
 
 Pre commit hooks can be executed on `git commit` after following the above two steps.
 
+## Running inference locally
+
+These steps describe how to stand up the Atlas Activity and Entity inference services locally, make requests to them,
+and view the responses.
+
+### Stand up the inference services
+* export GOOGLE_APPLICATION_CREDENTIALS to a path containing your gcp credentials
+* run `docker-compose up -d --wait --build` in the ais directory
+
+### Make requests
+* cd to `atlantes/ais/src/examples`
+* run `python atlas_activity_request.py` to do activity classification
+* run `python atlas_entity_request.py` to do entity classification
+
+These will save the responses to `sample_response_activity.json` and `sample_response_entity.json` respectively.
+These show the final classification and details for the inference run.
 
 ### VSCode Setup
 
@@ -41,7 +57,7 @@ Required Extensions:
 - black
 
 
-Reccomended:
+Recommended:
 - Copilot
 - Augment
 - Gitless
