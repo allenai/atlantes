@@ -4,11 +4,11 @@ Make sure you have an Elastic Search account and set the environment variables f
 1. Generate Monthly Fishing Traffic geotiffs using 'visualize_monthly_fishing_traffic.py'
 2. Upload the geotiffs to google drive in 'Marine Maps folder'
 3. Label AOIs via SMEs in qgis (manual)
-   a. This involves looking at the geotiffs and making boxes of areas that seem to have a lot of fishing activity throughout the year (labeling boxes per month to get seasonal distirbution) these geojsons should be in '{year}_{month}_{ais_category}_areas.geojson
+   a. This involves looking at the geotiffs and making boxes of areas that seem to have a lot of fishing activity throughout the year (labeling boxes per month to get seasonal distribution) these geojsons should be in '{year}_{month}_{ais_category}_areas.geojson'
 4. Download geojsons from google drive and add to 'fishing_areas' folder
 5. Stratified sample across month and ai with 'sample_from_fishing_regions.py'
    a. Or sample using sample_hard_negatives.py
-6. Generate data from a .txt of sampled tracks using  `create_downsampled_training_data.py``
+6. Generate data from a .txt of sampled tracks using  `create_downsampled_training_data.py`
 7.
    a. Delete the old parquets from within the output_dir 'find . -type f -name "*.parquet" -exec rm -f {} \;'
    b. Copy that data: https://console.cloud.google.com/storage/browser/skylight-data-sky-int-a-wxbc/annotations/new?project=skylight-int-a-r2d2 The data must be in the structure of `annotations/new/{project_name}/{trajectory_name}.csv`
@@ -25,10 +25,9 @@ Make sure you have an Elastic Search account and set the environment variables f
       -note: not all subpaths have activity labels after downsampling so see the upsample_human_annotations.py script for details
    - Optionally add machine annotate non fishing vessel tracks of known type
    - Exclude tracks in projects we have flagged in HA as needing to be excluded
-   - Advisised to run on a bigger machine
-   - The ouput will be placed on gcp in the 'ais-track-data' bucket in the {year}/labels:
+   - Advised to run on a bigger machine
+   - The output will be placed on gcp in the 'ais-track-data' bucket in the {year}/labels:
       - a csv to load an End of Sequence Activity Dataset
-
 
 _Note_: If prod-b is active, then you'll need to ask Hunter or Josh to copy the annotation projects from prod-a over to prod-b. Here's the command they need to run:
 
