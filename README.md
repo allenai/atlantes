@@ -81,7 +81,13 @@ Please ensure that your code follows the project's coding standards and includes
 Apache 2.0
 
 ## Acknowledgments
+
 This project was developed by the Allen Institute for Artificial Intelligence (Ai2).
+
+We appreciate the following organizations for their data contributions:
+
+- Spire for providing AIS data.
+- NOAA for their AIS dataset, available at [NOAA Digital Coast](https://coast.noaa.gov/digitalcoast/tools/ais.html).
 
 ## Contact
 patrickb@allenai.org
