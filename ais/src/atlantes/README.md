@@ -1,6 +1,6 @@
-#  Atlantes Architecture Overview
+# Atlantes Architecture Overview
 
-For specifics on different componenets, see the readmes in `ais/docs`.
+For specifics on different components, see the readmes in `ais/docs`.
 ## Model Development Pipeline
 
 The typical workflow for developing an AIS model is as follows:
@@ -13,22 +13,22 @@ The typical workflow for developing an AIS model is as follows:
         - `year/{dataset_name}/{ais_type}/{int}/{flag_code}/{trackId}/{{trackId}_{month}.parquet`
     - Another Copy of this data is in Weka for Training on Ai2 on-prem hardware
 
-    - ***Metadata*** is stored in GCS in a metadatap parquet to support easily findding files based on metadata
+    - ***Metadata*** is stored in GCS in a metadata parquet to support easily finding files based on metadata
 
 2. Generate Labels for the Specific Tasks
     - Human Annotated AIS data is stored in Elastic Search and then exported to a gcs bucket in csv format
-    - Machine Annotated AIS data (annotations based on metadata from static ais messages) is generated programattically
+    - Machine Annotated AIS data (annotations based on metadata from static ais messages) is generated programmatically
     based on the specific task.
     - Run a dataset creation script that creates a file that link the paths in gcs to the labels
 3. Train the model on the dataset
-    - Traning is launched via a script (gcp vm) or a beaker config file pointing to that script
+    - Training is launched via a script (gcp vm) or a beaker config file pointing to that script
     - The experiment is configured based on a yaml file for that experiment
     - Experiments and this configuration are tracked on wandb
 4. Deployment to Integration Environment
     - To push a new model to integration we must complete the following steps:
         - Update Inference config to match model configuration
         - Point to new model checkpoint in `pipeline.py`
-        - Merge to develop (Currently in flux as we are seprating dependencies from [skylight-subpath-service](https://github.com/VulcanSkylight/skylight-subpath-service))
+        - Merge to develop (Currently in flux as we are separating dependencies from [skylight-subpath-service](https://github.com/VulcanSkylight/skylight-subpath-service))
 
 ## Inference Pipeline
 
