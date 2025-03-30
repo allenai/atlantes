@@ -12,7 +12,7 @@ ENV GOOGLE_APPLICATION_CREDENTIALS=${MOUNTED_CREDENTIALS_PATH} \
     DEBIAN_FRONTEND=noninteractive \
     GIT_COMMIT_HASH=${GIT_COMMIT_HASH}
 
-# Install extra OS packages, add deadsnakes PPA, install Python 3.12, and set up Python environment
+# Install extra OS packages, add deadsnakes PPA, install Python 3.10, and set up Python environment
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
       wget \
@@ -21,14 +21,14 @@ RUN apt-get update && \
     add-apt-repository ppa:deadsnakes/ppa && \
     apt-get update && \
     apt-get install --no-install-recommends -y \
-      python3.12 \
-      python3.12-venv \
-      python3.12-dev && \
+      python3.10 \
+      python3.10-venv \
+      python3.10-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
-    # Set python3.12 as the default "python"
-    update-alternatives --install /usr/bin/python python /usr/bin/python3.12 1 && \
-    # Install pip for Python 3.12
+    # Set python3.10 as the default "python"
+    update-alternatives --install /usr/bin/python python /usr/bin/python3.10 1 && \
+    # Install pip for Python 3.10
     wget -q -O - https://bootstrap.pypa.io/get-pip.py | python && \
     # Upgrade pip to a specific version
     python -m pip install --no-cache-dir --upgrade pip==24.0.0 && \
@@ -42,7 +42,7 @@ RUN apt-get update && \
 # Set working directory
 WORKDIR /ais
 
-# Copy requirements and install Python dependencies using Python 3.12's pip
+# Copy requirements and install Python dependencies using Python 3.10's pip
 COPY ./requirements/requirements.txt /ais/requirements/requirements.txt
 RUN python -m pip install --no-cache-dir -r requirements/requirements.txt
 
