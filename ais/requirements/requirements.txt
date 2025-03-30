@@ -29,6 +29,8 @@ beaker-py==1.34.1
     # via -r ais/requirements/requirements.in
 cachetools==5.5.2
     # via google-auth
+cartopy==0.24.1
+    # via -r ais/requirements/requirements.in
 certifi==2025.1.31
     # via
     #   elastic-transport
@@ -197,6 +199,7 @@ markupsafe==3.0.2
 matplotlib==3.10.1
     # via
     #   -r ais/requirements/requirements.in
+    #   cartopy
     #   contextily
 mdurl==0.1.2
     # via markdown-it-py
@@ -226,6 +229,7 @@ numpy==1.26.4
     # via
     #   -r ais/requirements/requirements.in
     #   accelerate
+    #   cartopy
     #   cftime
     #   contourpy
     #   datashader
@@ -249,6 +253,7 @@ packaging==24.2
     # via
     #   accelerate
     #   beaker-py
+    #   cartopy
     #   dask
     #   datashader
     #   distributed
@@ -331,7 +336,10 @@ pyparsing==3.2.3
 pyproj==3.7.1
     # via
     #   -r ais/requirements/requirements.in
+    #   cartopy
     #   geopandas
+pyshp==2.3.1
+    # via cartopy
 pytest==8.3.5
     # via -r ais/requirements/requirements.in
 python-dateutil==2.9.0.post0
@@ -392,6 +400,7 @@ scipy==1.15.2
 shapely==2.0.7
     # via
     #   -r ais/requirements/requirements.in
+    #   cartopy
     #   geopandas
 six==1.17.0
     # via
