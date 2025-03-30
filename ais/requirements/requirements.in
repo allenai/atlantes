@@ -49,4 +49,7 @@ click>=8.1,<9
 tqdm>=4.66,<5
 pyyaml>=6.0,<7
 netCDF4>=1.6,<2
-gitpython>=3.1,<4 
+gitpython>=3.1,<4
+
+# Testing
+pytest>=8.0.0 

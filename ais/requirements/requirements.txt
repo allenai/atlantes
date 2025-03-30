@@ -92,7 +92,9 @@ elastic-transport==8.17.1
 elasticsearch==8.17.2
     # via -r ais/requirements/requirements.in
 exceptiongroup==1.2.2
-    # via anyio
+    # via
+    #   anyio
+    #   pytest
 fastapi==0.115.11
     # via -r ais/requirements/requirements.in
 filelock==3.18.0
@@ -170,6 +172,8 @@ idna==3.10
     #   yarl
 importlib-metadata==8.6.1
     # via dask
+iniconfig==2.1.0
+    # via pytest
 jinja2==3.1.6
     # via
     #   distributed
@@ -253,6 +257,7 @@ packaging==24.2
     #   matplotlib
     #   pandera
     #   peft
+    #   pytest
     #   transformers
     #   xarray
 pandas==2.2.3
@@ -279,6 +284,8 @@ pillow==11.1.0
     #   -r ais/requirements/requirements.in
     #   contextily
     #   matplotlib
+pluggy==1.5.0
+    # via pytest
 propcache==0.3.1
     # via
     #   aiohttp
@@ -325,6 +332,8 @@ pyproj==3.7.1
     # via
     #   -r ais/requirements/requirements.in
     #   geopandas
+pytest==8.3.5
+    # via -r ais/requirements/requirements.in
 python-dateutil==2.9.0.post0
     # via
     #   matplotlib
@@ -406,6 +415,8 @@ threadpoolctl==3.6.0
     # via scikit-learn
 tokenizers==0.21.1
     # via transformers
+tomli==2.2.1
+    # via pytest
 toolz==1.0.0
     # via
     #   dask
