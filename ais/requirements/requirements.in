@@ -8,6 +8,7 @@ scipy>=1.12,<2
 # Deep learning and ML utilities
 peft==0.6.0
 huggingface-hub>=0.20,<1
+wandb>=0.16,<1
 
 # Data processing and visualization
 dask>=2023.4,<2025
@@ -17,6 +18,7 @@ colorcet>=3.0,<4
 matplotlib>=3.8,<4
 rasterio>=1.3,<2
 Pillow>=9.5,<12
+holoviews>=1.18,<2
 
 # Geospatial
 geopandas>=0.14,<1
@@ -41,6 +43,8 @@ fastapi==0.115.11
 uvicorn==0.34.0
 requests>=2.31,<3
 elasticsearch>=8.0,<9
+grpcio>=1.60,<2
+protobuf>=4.25,<5
 
 # Experiment management
 beaker-py>=1.21,<2

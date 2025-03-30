@@ -27,6 +27,12 @@ attrs==25.3.0
     #   rasterio
 beaker-py==1.34.1
     # via -r ais/requirements/requirements.in
+bleach==6.2.0
+    # via panel
+bokeh==3.7.2
+    # via
+    #   holoviews
+    #   panel
 cachetools==5.5.2
     # via google-auth
 cartopy==0.24.1
@@ -39,6 +45,7 @@ certifi==2025.1.31
     #   pyproj
     #   rasterio
     #   requests
+    #   sentry-sdk
 cftime==1.6.4.post1
     # via netcdf4
 charset-normalizer==3.4.1
@@ -54,6 +61,7 @@ click==8.1.8
     #   mercantile
     #   rasterio
     #   uvicorn
+    #   wandb
 click-plugins==1.1.1
     # via
     #   fiona
@@ -70,10 +78,13 @@ colorcet==3.1.0
     # via
     #   -r ais/requirements/requirements.in
     #   datashader
+    #   holoviews
 contextily==1.6.2
     # via -r ais/requirements/requirements.in
 contourpy==1.3.1
-    # via matplotlib
+    # via
+    #   bokeh
+    #   matplotlib
 cycler==0.12.1
     # via matplotlib
 dask[distributed]==2024.12.1
@@ -89,6 +100,8 @@ distributed==2024.12.1
     # via dask
 docker==7.1.0
     # via beaker-py
+docker-pycreds==0.4.0
+    # via wandb
 elastic-transport==8.17.1
     # via elasticsearch
 elasticsearch==8.17.2
@@ -131,7 +144,9 @@ geopy==2.4.1
 gitdb==4.0.12
     # via gitpython
 gitpython==3.1.44
-    # via -r ais/requirements/requirements.in
+    # via
+    #   -r ais/requirements/requirements.in
+    #   wandb
 google-api-core==2.24.2
     # via
     #   google-cloud-core
@@ -159,8 +174,12 @@ google-resumable-media==2.7.2
     # via google-cloud-storage
 googleapis-common-protos==1.69.2
     # via google-api-core
+grpcio==1.71.0
+    # via -r ais/requirements/requirements.in
 h11==0.14.0
     # via uvicorn
+holoviews==1.20.2
+    # via -r ais/requirements/requirements.in
 huggingface-hub==0.29.3
     # via
     #   -r ais/requirements/requirements.in
@@ -178,6 +197,7 @@ iniconfig==2.1.0
     # via pytest
 jinja2==3.1.6
     # via
+    #   bokeh
     #   distributed
     #   torch
 joblib==1.4.2
@@ -186,14 +206,21 @@ joblib==1.4.2
     #   scikit-learn
 kiwisolver==1.4.8
     # via matplotlib
+linkify-it-py==2.0.3
+    # via panel
 llvmlite==0.44.0
     # via numba
 locket==1.0.0
     # via
     #   distributed
     #   partd
+markdown==3.7
+    # via panel
 markdown-it-py==3.0.0
-    # via rich
+    # via
+    #   mdit-py-plugins
+    #   panel
+    #   rich
 markupsafe==3.0.2
     # via jinja2
 matplotlib==3.10.1
@@ -201,6 +228,8 @@ matplotlib==3.10.1
     #   -r ais/requirements/requirements.in
     #   cartopy
     #   contextily
+mdit-py-plugins==0.4.2
+    # via panel
 mdurl==0.1.2
     # via markdown-it-py
 mercantile==1.2.1
@@ -217,6 +246,8 @@ multipledispatch==1.0.0
     # via datashader
 mypy-extensions==1.0.0
     # via typing-inspect
+narwhals==1.32.0
+    # via bokeh
 netcdf4==1.7.2
     # via -r ais/requirements/requirements.in
 networkx==3.4.2
@@ -229,11 +260,13 @@ numpy==1.26.4
     # via
     #   -r ais/requirements/requirements.in
     #   accelerate
+    #   bokeh
     #   cartopy
     #   cftime
     #   contourpy
     #   datashader
     #   geopandas
+    #   holoviews
     #   matplotlib
     #   netcdf4
     #   numba
@@ -253,14 +286,17 @@ packaging==24.2
     # via
     #   accelerate
     #   beaker-py
+    #   bokeh
     #   cartopy
     #   dask
     #   datashader
     #   distributed
     #   geopandas
+    #   holoviews
     #   huggingface-hub
     #   matplotlib
     #   pandera
+    #   panel
     #   peft
     #   pytest
     #   transformers
@@ -268,17 +304,25 @@ packaging==24.2
 pandas==2.2.3
     # via
     #   -r ais/requirements/requirements.in
+    #   bokeh
     #   datashader
     #   geopandas
+    #   holoviews
     #   pandera
+    #   panel
     #   spatialpandas
     #   xarray
 pandera==0.23.1
     # via -r ais/requirements/requirements.in
+panel==1.6.2
+    # via holoviews
 param==2.2.0
     # via
     #   datashader
+    #   holoviews
+    #   panel
     #   pyct
+    #   pyviz-comms
     #   spatialpandas
 partd==1.4.2
     # via dask
@@ -287,8 +331,11 @@ peft==0.6.0
 pillow==11.1.0
     # via
     #   -r ais/requirements/requirements.in
+    #   bokeh
     #   contextily
     #   matplotlib
+platformdirs==4.3.7
+    # via wandb
 pluggy==1.5.0
     # via pytest
 propcache==0.3.1
@@ -297,16 +344,19 @@ propcache==0.3.1
     #   yarl
 proto-plus==1.26.1
     # via google-api-core
-protobuf==6.30.2
+protobuf==4.25.6
     # via
+    #   -r ais/requirements/requirements.in
     #   google-api-core
     #   googleapis-common-protos
     #   proto-plus
+    #   wandb
 psutil==7.0.0
     # via
     #   accelerate
     #   distributed
     #   peft
+    #   wandb
 pyarrow==15.0.2
     # via
     #   -r ais/requirements/requirements.in
@@ -325,6 +375,7 @@ pydantic==2.11.1
     #   beaker-py
     #   fastapi
     #   pandera
+    #   wandb
 pydantic-core==2.33.0
     # via pydantic
 pygments==2.19.1
@@ -348,16 +399,22 @@ python-dateutil==2.9.0.post0
     #   pandas
 pytz==2025.2
     # via pandas
+pyviz-comms==3.0.4
+    # via
+    #   holoviews
+    #   panel
 pyyaml==6.0.2
     # via
     #   -r ais/requirements/requirements.in
     #   accelerate
     #   beaker-py
+    #   bokeh
     #   dask
     #   distributed
     #   huggingface-hub
     #   peft
     #   transformers
+    #   wandb
 rasterio==1.4.3
     # via
     #   -r ais/requirements/requirements.in
@@ -375,8 +432,10 @@ requests==2.32.3
     #   google-api-core
     #   google-cloud-storage
     #   huggingface-hub
+    #   panel
     #   requests-oauthlib
     #   transformers
+    #   wandb
 requests-oauthlib==2.0.0
     # via google-auth-oauthlib
 retrying==1.3.4
@@ -397,6 +456,10 @@ scipy==1.15.2
     #   -r ais/requirements/requirements.in
     #   datashader
     #   scikit-learn
+sentry-sdk==2.24.1
+    # via wandb
+setproctitle==1.3.5
+    # via wandb
 shapely==2.0.7
     # via
     #   -r ais/requirements/requirements.in
@@ -404,6 +467,7 @@ shapely==2.0.7
     #   geopandas
 six==1.17.0
     # via
+    #   docker-pycreds
     #   python-dateutil
     #   retrying
 smmap==5.0.2
@@ -438,11 +502,14 @@ torch==2.1.2
     #   accelerate
     #   peft
 tornado==6.4.2
-    # via distributed
+    # via
+    #   bokeh
+    #   distributed
 tqdm==4.67.1
     # via
     #   -r ais/requirements/requirements.in
     #   huggingface-hub
+    #   panel
     #   peft
     #   transformers
 transformers==4.50.3
@@ -455,6 +522,7 @@ typing-extensions==4.13.0
     #   fastapi
     #   huggingface-hub
     #   multidict
+    #   panel
     #   pydantic
     #   pydantic-core
     #   rich
@@ -463,27 +531,40 @@ typing-extensions==4.13.0
     #   typing-inspect
     #   typing-inspection
     #   uvicorn
+    #   wandb
 typing-inspect==0.9.0
     # via pandera
 typing-inspection==0.4.0
     # via pydantic
 tzdata==2025.2
     # via pandas
+uc-micro-py==1.0.3
+    # via linkify-it-py
 urllib3==2.3.0
     # via
     #   distributed
     #   docker
     #   elastic-transport
     #   requests
+    #   sentry-sdk
 uvicorn==0.34.0
     # via -r ais/requirements/requirements.in
+wandb==0.19.8
+    # via -r ais/requirements/requirements.in
+webencodings==0.5.1
+    # via bleach
 xarray==2025.3.0
     # via datashader
 xyzservices==2025.1.0
-    # via contextily
+    # via
+    #   bokeh
+    #   contextily
 yarl==1.18.3
     # via aiohttp
 zict==3.0.0
     # via distributed
 zipp==3.21.0
     # via importlib-metadata
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools
