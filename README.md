@@ -3,7 +3,7 @@
 # Atlantes
 
 
-This repository stores the ATLAS model alongside training, inference, and deployment libraries for real-time global-scale GPS trajectory modeling. The models were developed at Ai2 and are currently deployed in the [skylight](https://www.skylight.global/) maritime intelligence platform. Read more about the model on [arXiv](https://arxiv.org/abs/2504.19036v1). 
+This repository stores the ATLAS model alongside training, inference, and deployment libraries for real-time global-scale GPS trajectory modeling. The models were developed at Ai2 and are currently deployed in the [skylight](https://www.skylight.global/) maritime intelligence platform. Read more about the model on [arXiv](https://arxiv.org/abs/2504.19036v1).
 
 ## Repository Structure
 
