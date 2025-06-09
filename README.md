@@ -1,11 +1,7 @@
-<<<<<<< HEAD
-# Atlantes
-=======
 
 
 # Atlantes
 
->>>>>>> origin/main
 
 This repository stores the ATLAS model alongside training, inference, and deployment libraries for real-time global-scale GPS trajectory modeling. The models were developed at Ai2 and are currently deployed in the [skylight](https://www.skylight.global/) maritime intelligence platform. Read more about the model on [arXiv](https://arxiv.org/abs/2504.19036v1). 
 
@@ -59,12 +55,8 @@ In (add VSCode Settings), we have recommended settings for VSCode complete with 
 Required Extensions:
 - black
 
-<<<<<<< HEAD
 
 Recommended:
-=======
-Reccomended:
->>>>>>> origin/main
 - Copilot
 - Augment
 - Gitless
