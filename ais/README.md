@@ -10,7 +10,6 @@ The Atlantes package is a Python library for building and deploying machine lear
 The **Automatic Identification System (AIS)** is a tracking system used on ships and by vessel traffic services (VTS) to identify and locate vessels. AIS data is transmitted via VHF radio frequencies, allowing for real-time tracking of vessel movements. Each ship equipped with AIS automatically sends information such as its unique identification, position, course, and speed, which can be received by other vessels, shore stations, and satellites. For more information, visit the website of our data provider [Spire](https://documentation.spire.com/ais-fundamentals/different-classes-of-ais/ais-channel-access-methods/).
 
 
-
 ## Overview of Atlantes AIS Modeling Tasks
 
 
