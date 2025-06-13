@@ -3,7 +3,7 @@
 # Atlantes
 
 
-This repository stores the ATLAS model alongside training, inference, and deployment libraries for real-time global-scale GPS trajectory modeling. The models were developed at Ai2 and are currently deployed in the [skylight](https://www.skylight.global/) maritime intelligence platform. Read more about the model on [arXiv](https://arxiv.org/abs/2504.19036v1). 
+This repository stores the ATLAS model alongside training, inference, and deployment libraries for real-time global-scale GPS trajectory modeling. The models were developed at Ai2 and are currently deployed in the [skylight](https://www.skylight.global/) maritime intelligence platform. Read more about the model on [arXiv](https://arxiv.org/abs/2504.19036v1).
 
 ## Repository Structure
 
@@ -31,6 +31,22 @@ Note that the code in ais repo will be required to pass these pre commits in ord
 
 Pre commit hooks can be executed on `git commit` after following the above two steps.
 
+## Running inference locally
+
+These steps describe how to stand up the Atlas Activity and Entity inference services locally, make requests to them,
+and view the responses.
+
+### Stand up the inference services
+* export GOOGLE_APPLICATION_CREDENTIALS to a path containing your gcp credentials
+* run `docker-compose up -d --wait --build` in the ais directory
+
+### Make requests
+* cd to `atlantes/ais/src/examples`
+* run `python atlas_activity_request.py` to do activity classification
+* run `python atlas_entity_request.py` to do entity classification
+
+These will save the responses to `sample_response_activity.json` and `sample_response_entity.json` respectively.
+These show the final classification and details for the inference run.
 
 ### VSCode Setup
 
@@ -39,7 +55,8 @@ In (add VSCode Settings), we have recommended settings for VSCode complete with 
 Required Extensions:
 - black
 
-Reccomended:
+
+Recommended:
 - Copilot
 - Augment
 - Gitless
@@ -62,8 +79,14 @@ Please ensure that your code follows the project's coding standards and includes
 
 Apache 2.0
 
-## Acknowledgments
+## Acknowledgements
+
 This project was developed by the Allen Institute for Artificial Intelligence (Ai2).
+
+We appreciate the following organizations for their data contributions:
+
+- Spire for providing AIS data.
+- NOAA for their AIS dataset, available at [NOAA Digital Coast](https://coast.noaa.gov/digitalcoast/tools/ais.html).
 
 ## Contact
 patrickb@allenai.org

@@ -10,7 +10,6 @@ The Atlantes package is a Python library for building and deploying machine lear
 The **Automatic Identification System (AIS)** is a tracking system used on ships and by vessel traffic services (VTS) to identify and locate vessels. AIS data is transmitted via VHF radio frequencies, allowing for real-time tracking of vessel movements. Each ship equipped with AIS automatically sends information such as its unique identification, position, course, and speed, which can be received by other vessels, shore stations, and satellites. For more information, visit the website of our data provider [Spire](https://documentation.spire.com/ais-fundamentals/different-classes-of-ais/ais-channel-access-methods/).
 
 
-
 ## Overview of Atlantes AIS Modeling Tasks
 
 
@@ -42,7 +41,7 @@ The **Automatic Identification System (AIS)** is a tracking system used on ships
    Note that training models requires
    1. authentication to GCP (for reading AIS trajectories and metadata) and
    2. authentication to weights and biases (for logging experimental runs and data)
-   These can either be set programatically via the included secrets in this repo, via the
+   These can either be set programmatically via the included secrets in this repo, via the
    beaker configuration files (if training on AI2 hardware), or interactively (`gcloud auth application-default login` and `wandb login`) depending on your environment. Within CI, authentication occurs via stored secrets and the .github/workflows/
    <summary><b> Set up GCP credentials </b> </summary>
 
@@ -100,7 +99,7 @@ The **Automatic Identification System (AIS)** is a tracking system used on ships
    1. Run the following command to run all tests: \
    `pytest tests --ignore=tests/test_main.py -vv`
 
-   ### Local testing of Services wth docker
+   ### Local testing of Services with docker
 
    1. Save a path to gcp credentials in `GOOGLE_APPLICATION_CREDENTIALS`
    2. Navigate to eai/ais. Run `docker-compose up`
