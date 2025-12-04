@@ -8,7 +8,7 @@ MIN_MESSAGES = 5  # Minimum number of messages between changepoints
 PROB_THRESHOLD = 0.001  # Probability threshold for changepoint detection
 GCP_PREFIX = "gs://"  # Google Cloud Storage prefix
 MIN_TIME_GAP = timedelta(
-    hours=2
+    hours=6
 )  # Minimum time to say that there is a time gap between changepoints
 BASE_SAMPLE_SIZE_SOG = 5  # Number of messages to use to form distribution for SOG based changepoint detection
 MAX_DURATION = timedelta(hours=24)  # Maximum duration of a subpath
