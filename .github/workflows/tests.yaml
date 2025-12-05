@@ -26,7 +26,7 @@ jobs:
           git lfs install
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           lfs: true
 
