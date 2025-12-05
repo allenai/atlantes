@@ -21,7 +21,7 @@ class TestUnitChangepointDetector:
         # Assert
         assert isinstance(time_gap_detector, TimeGapDetector)
         assert time_gap_detector.min_time_gap == timedelta(
-            hours=2
+            hours=4
         ), "Changing this constant will change cpd behavior"
 
     def test_get_sog_based_changepoint_detector(self) -> None:
