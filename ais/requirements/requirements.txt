@@ -121,6 +121,7 @@ toolz>=0.12,<1
 torch==2.1.2
 tornado>=6.4,<7
 tqdm>=4.66,<5
+transformers>=4.35,<4.40
 typeguard>=4.1,<5
 typing-extensions>=4.9,<5
 typing-inspect>=0.9,<1
