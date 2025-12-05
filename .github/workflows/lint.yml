@@ -29,4 +29,5 @@ jobs:
       - name: Linting
         run: |
           pip install pre-commit interrogate
+          pre-commit clean
           pre-commit run --all-files
