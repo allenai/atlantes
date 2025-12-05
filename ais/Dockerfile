@@ -1,4 +1,4 @@
-FROM pytorch/pytorch:2.1.2-cuda12.1-cudnn8-runtime
+FROM --platform=linux/amd64 pytorch/pytorch:2.3.1-cuda12.1-cudnn8-runtime
 
 # Set shell options
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -17,7 +17,7 @@ RUN apt-get update && \
     apt-get install --no-install-recommends -y \
       wget \
       netcat \
-      software-properties-common && \
+      software-properties-common gpg-agent && \
     add-apt-repository ppa:deadsnakes/ppa && \
     apt-get update && \
     apt-get install --no-install-recommends -y \
