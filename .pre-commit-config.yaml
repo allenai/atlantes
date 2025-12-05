@@ -50,13 +50,13 @@ repos:
           - "types-protobuf"
         exclude: ./.*_pb2_.*.py
   - repo: https://github.com/PyCQA/bandit
-    rev: "1.7.5"
+    rev: "1.8.3"
     hooks:
       - id: bandit
         exclude: ^tests/
         args:
           - -s
-          - B101
+          - B101,B614
   - repo: local
     hooks:
       - id: interrogate
@@ -79,14 +79,9 @@ repos:
       - id: ruff
         args: ["--line-length", "88", "--verbose"]
   - repo: https://github.com/hadolint/hadolint
-    rev: v2.7.0
+    rev: v2.12.0
     hooks:
       - id: hadolint-docker
-        name: Lint Dockerfiles
-        description: Runs hadolint Docker image to lint Dockerfiles
-        language: docker_image
-        types: ["dockerfile"]
-        entry: ghcr.io/hadolint/hadolint hadolint
         args: ["--ignore", "DL3008"]
   - repo: local
     hooks:

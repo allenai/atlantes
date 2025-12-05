@@ -38,7 +38,7 @@ class TestCpdServeGrpc:
         """Run the client"""
         how_many = 100
         times = [datetime.now() + timedelta(minutes=i*10) for i in range(how_many)]
-        sogs = [random.random() for _ in range(how_many)] # nosec B330
+        sogs = [random.random() for _ in range(how_many)]  # nosec B311
 
         with grpc.insecure_channel(f'{CPD_ADDRESS}:{CPD_PORT}') as channel:
             stub = changepoint_pb2_grpc.ChangepointServiceStub(channel)
