@@ -1,0 +1,89 @@
+transition,count,metric,mean_diff,abs_mean_diff,median_diff,std_diff,direction
+fishing -> anchored,3,Avg Time Gap Seconds,270.82,270.82,293.29,376.43,int > prod
+fishing -> anchored,3,Num Messages,-172.0,172.0,39.0,418.5,prod > int
+fishing -> anchored,3,Cog Mean,-59.2,59.2,-61.55,5.44,prod > int
+fishing -> anchored,3,Cog Std,5.58,5.58,10.03,14.79,int > prod
+fishing -> anchored,3,Sog Mean,2.29,2.29,3.06,1.74,int > prod
+fishing -> anchored,3,Sog Max,0.97,0.97,0.7,1.22,int > prod
+fishing -> anchored,3,Sog Std,0.46,0.46,0.49,0.3,int > prod
+fishing -> anchored,3,Sog Min,0.0,0.0,0.0,0.0,prod > int
+fishing -> moored,92,Num Messages,311.24,311.24,111.5,1019.2,int > prod
+fishing -> moored,92,Avg Time Gap Seconds,-105.15,105.15,4.68,1925.84,prod > int
+fishing -> moored,92,Cog Std,-1.23,1.23,-0.36,9.14,prod > int
+fishing -> moored,92,Cog Mean,-1.06,1.06,-1.78,21.81,prod > int
+fishing -> moored,92,Sog Max,-0.39,0.39,0.1,18.41,prod > int
+fishing -> moored,92,Sog Mean,0.26,0.26,0.15,0.89,int > prod
+fishing -> moored,92,Sog Std,0.17,0.17,0.04,0.54,int > prod
+fishing -> moored,92,Sog Min,-0.0,0.0,0.0,0.03,prod > int
+fishing -> nan,3,Avg Time Gap Seconds,155.36,155.36,87.27,350.67,int > prod
+fishing -> nan,3,Num Messages,83.67,83.67,64.0,411.85,int > prod
+fishing -> nan,3,Sog Max,30.5,30.5,-0.2,53.26,int > prod
+fishing -> nan,3,Cog Std,-5.77,5.77,-3.54,9.44,prod > int
+fishing -> nan,3,Cog Mean,1.99,1.99,-0.69,7.42,int > prod
+fishing -> nan,3,Sog Mean,-0.34,0.34,-0.04,0.9,prod > int
+fishing -> nan,3,Sog Std,0.33,0.33,0.33,0.06,int > prod
+fishing -> nan,3,Sog Min,0.0,0.0,0.0,0.0,prod > int
+fishing -> transiting,159,Avg Time Gap Seconds,201.65,201.65,260.85,1401.92,int > prod
+fishing -> transiting,159,Num Messages,-5.19,5.19,-150.0,883.58,prod > int
+fishing -> transiting,159,Cog Mean,4.59,4.59,1.63,19.78,int > prod
+fishing -> transiting,159,Sog Max,1.27,1.27,0.0,18.66,int > prod
+fishing -> transiting,159,Cog Std,0.66,0.66,-0.06,12.04,int > prod
+fishing -> transiting,159,Sog Mean,0.17,0.17,0.08,0.89,int > prod
+fishing -> transiting,159,Sog Min,-0.07,0.07,0.0,0.56,prod > int
+fishing -> transiting,159,Sog Std,0.05,0.05,0.01,0.61,int > prod
+fishing -> unknown,18,Num Messages,267.0,267.0,262.0,1010.79,int > prod
+fishing -> unknown,18,Avg Time Gap Seconds,-106.42,106.42,209.33,1680.91,prod > int
+fishing -> unknown,18,Sog Max,8.1,8.1,0.1,22.77,int > prod
+fishing -> unknown,18,Cog Mean,3.61,3.61,7.98,30.27,int > prod
+fishing -> unknown,18,Cog Std,2.8,2.8,3.27,14.26,int > prod
+fishing -> unknown,18,Sog Mean,0.66,0.66,0.33,1.16,int > prod
+fishing -> unknown,18,Sog Std,0.35,0.35,0.04,0.89,int > prod
+fishing -> unknown,18,Sog Min,-0.02,0.02,0.0,0.12,prod > int
+moored -> fishing,5,Avg Time Gap Seconds,485.0,485.0,338.83,491.38,int > prod
+moored -> fishing,5,Num Messages,-167.2,167.2,-228.0,298.57,prod > int
+moored -> fishing,5,Cog Std,9.19,9.19,10.47,13.03,int > prod
+moored -> fishing,5,Cog Mean,-1.36,1.36,-6.98,14.35,prod > int
+moored -> fishing,5,Sog Mean,-0.75,0.75,-0.41,0.95,prod > int
+moored -> fishing,5,Sog Max,0.28,0.28,0.4,0.41,int > prod
+moored -> fishing,5,Sog Std,-0.04,0.04,-0.05,0.24,prod > int
+moored -> fishing,5,Sog Min,0.02,0.02,0.0,0.04,int > prod
+nan -> fishing,7,Avg Time Gap Seconds,832.42,832.42,696.49,1032.44,int > prod
+nan -> fishing,7,Num Messages,-779.86,779.86,-703.0,826.78,prod > int
+nan -> fishing,7,Cog Mean,7.94,7.94,11.16,7.41,int > prod
+nan -> fishing,7,Cog Std,0.88,0.88,0.5,3.21,int > prod
+nan -> fishing,7,Sog Max,-0.86,0.86,-0.1,2.5,prod > int
+nan -> fishing,7,Sog Mean,-0.69,0.69,-0.05,1.68,prod > int
+nan -> fishing,7,Sog Min,0.0,0.0,0.0,0.0,prod > int
+nan -> fishing,7,Sog Std,0.0,0.0,0.07,0.24,int > prod
+transiting -> fishing,41,Avg Time Gap Seconds,442.4,442.4,471.78,484.38,int > prod
+transiting -> fishing,41,Num Messages,-161.68,161.68,-155.0,565.37,prod > int
+transiting -> fishing,41,Cog Mean,1.51,1.51,-0.69,23.31,int > prod
+transiting -> fishing,41,Sog Max,1.29,1.29,0.1,6.42,int > prod
+transiting -> fishing,41,Cog Std,-1.19,1.19,-0.92,9.57,prod > int
+transiting -> fishing,41,Sog Mean,-0.44,0.44,-0.23,1.68,prod > int
+transiting -> fishing,41,Sog Std,0.04,0.04,0.1,0.79,int > prod
+transiting -> fishing,41,Sog Min,-0.0,0.0,0.0,0.03,prod > int
+transiting -> moored,3,Avg Time Gap Seconds,1857.65,1857.65,2529.74,1274.5,int > prod
+transiting -> moored,3,Num Messages,-665.67,665.67,-753.0,157.37,prod > int
+transiting -> moored,3,Cog Std,-0.86,0.86,-1.9,5.05,prod > int
+transiting -> moored,3,Sog Max,-0.27,0.27,-0.1,0.29,prod > int
+transiting -> moored,3,Cog Mean,-0.1,0.1,2.56,5.26,prod > int
+transiting -> moored,3,Sog Std,-0.08,0.08,-0.1,0.05,prod > int
+transiting -> moored,3,Sog Mean,-0.06,0.06,-0.06,0.04,prod > int
+transiting -> moored,3,Sog Min,0.0,0.0,0.0,0.0,prod > int
+unknown -> fishing,14,Avg Time Gap Seconds,361.19,361.19,248.67,256.21,int > prod
+unknown -> fishing,14,Num Messages,-206.71,206.71,-182.5,252.44,prod > int
+unknown -> fishing,14,Sog Max,6.77,6.77,0.15,25.07,int > prod
+unknown -> fishing,14,Cog Mean,3.37,3.37,-3.3,26.47,int > prod
+unknown -> fishing,14,Cog Std,0.73,0.73,-1.0,13.88,int > prod
+unknown -> fishing,14,Sog Mean,-0.2,0.2,-0.18,0.66,prod > int
+unknown -> fishing,14,Sog Std,0.19,0.19,0.13,0.48,int > prod
+unknown -> fishing,14,Sog Min,-0.01,0.01,0.0,0.03,prod > int
+unknown -> transiting,4,Num Messages,119.75,119.75,216.0,1268.07,int > prod
+unknown -> transiting,4,Avg Time Gap Seconds,-102.7,102.7,270.79,2418.5,prod > int
+unknown -> transiting,4,Cog Mean,-1.1,1.1,-1.38,10.43,prod > int
+unknown -> transiting,4,Cog Std,0.9,0.9,1.69,4.6,int > prod
+unknown -> transiting,4,Sog Mean,0.43,0.43,0.38,0.22,int > prod
+unknown -> transiting,4,Sog Max,0.22,0.22,0.3,0.3,int > prod
+unknown -> transiting,4,Sog Std,0.02,0.02,-0.02,0.11,int > prod
+unknown -> transiting,4,Sog Min,0.0,0.0,0.0,0.0,prod > int

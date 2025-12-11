@@ -1,0 +1,22 @@
+transition,count
+fishing -> transiting,159
+fishing -> moored,92
+fishing -> missing,55
+transiting -> fishing,41
+fishing -> unknown,18
+unknown -> fishing,14
+nan -> fishing,7
+transiting -> missing,6
+moored -> fishing,5
+unknown -> transiting,4
+unknown -> missing,3
+fishing -> nan,3
+transiting -> moored,3
+fishing -> anchored,3
+nan -> missing,2
+unknown -> moored,2
+nan -> moored,2
+nan -> transiting,2
+moored -> transiting,2
+transiting -> unknown,1
+unknown -> nan,1

@@ -1,0 +1,57 @@
+CLASSIFICATION DIFFERENCE SUMMARY
+==================================================
+
+Total rows: 1000
+Post-processing differences: 425 (42.5%)
+Pre-processing differences: 321 (32.1%)
+
+Int Post-Processing Distribution:
+int_post_postprocessing_class
+fishing       884
+transiting     66
+unknown        30
+NaN            13
+moored          7
+
+Prod Post-Processing Distribution:
+prod_post_postprocessing_class
+fishing       621
+transiting    182
+moored         99
+missing        66
+unknown        25
+NaN             4
+anchored        3
+
+Error Transitions (Int -> Prod):
+transition
+fishing -> transiting    159
+fishing -> moored         92
+fishing -> missing        55
+transiting -> fishing     41
+fishing -> unknown        18
+unknown -> fishing        14
+nan -> fishing             7
+transiting -> missing      6
+moored -> fishing          5
+unknown -> transiting      4
+unknown -> missing         3
+fishing -> nan             3
+transiting -> moored       3
+fishing -> anchored        3
+nan -> missing             2
+unknown -> moored          2
+nan -> moored              2
+nan -> transiting          2
+moored -> transiting       2
+transiting -> unknown      1
+unknown -> nan             1
+
+Confusion Matrix:
+prod_post_postprocessing_class  anchored  fishing  missing  moored  transiting  unknown  Total
+int_post_postprocessing_class
+fishing                                3        0       55      92         159       18    327
+moored                                 0        5        0       0           2        0      7
+transiting                             0       41        6       3           0        1     51
+unknown                                0       14        3       2           4        0     23
+Total                                  3       60       64      97         165       19    408
