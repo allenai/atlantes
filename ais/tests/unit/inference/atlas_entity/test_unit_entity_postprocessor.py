@@ -496,6 +496,41 @@ class TestAtlasEntityPostProcessor:
         assert output.entity_classification_details.postprocess_rule_applied is False
         assert output.entity_class == "vessel"
 
+    @pytest.mark.parametrize(
+        "entity_name",
+        [
+            "IMULA 0882 MTR NET 1",
+            "IMULA 2039 MTR NET 9",
+            "IMULA 2319 MTR NET 5",
+            "IMULA 2454 TLE NET D",
+        ],
+    )
+    def test_postprocess_net_space_identifier_classified_as_buoy(
+        self,
+        entity_name: str,
+        entity_postprocessor_class: AtlasEntityPostProcessor,
+    ) -> None:
+        """Test that names like 'NET 9' or 'NET D' are classified as buoys."""
+        input_data = EntityPostprocessorInput(
+            predicted_class=AtlasEntityLabelsTrainingWithUnknown.VESSEL,
+            entity_classification_details=EntityPostprocessorInputDetails(
+                model="test", confidence=0.9, outputs=[0.9, 0.1]
+            ),
+            metadata=EntityMetadata(
+                binned_ship_type=0,
+                ais_type=9999,
+                mmsi="123456789",
+                entity_name=entity_name,
+                track_length=800,
+                file_location=None,
+                trackId="A:123456789",
+                flag_code="LKA",
+            ),
+        )
+        output = entity_postprocessor_class.postprocess(input_data)
+        assert output.entity_class == "buoy"
+        assert output.entity_classification_details.postprocess_rule_applied is True
+
     def test_postprocess_raises_error_for_known_binned_ship_type_and_buoy_name(
         self, entity_postprocessor_class: AtlasEntityPostProcessor
     ) -> None:

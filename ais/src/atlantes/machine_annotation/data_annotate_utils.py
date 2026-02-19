@@ -88,6 +88,7 @@ ENGLISH_SPEAKING_MMSIS_CODES = [
 # Common ways of naming a buoy on AIS generalized from anecdotal observations
 NAME_PATTERNS_FOR_BUOYS = [
     "net\d+",
+    r"net\s+\w+",
     "fishing gear",
     "\d+%",
     "Net fish",
