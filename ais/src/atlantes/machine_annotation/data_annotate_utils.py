@@ -89,11 +89,12 @@ ENGLISH_SPEAKING_MMSIS_CODES = [
 #
 # These patterns are matched case-insensitively against entity names. They cover:
 #   - Net identifiers: "net\d+" (NET10), "net\s+\w+" (NET 1, NET D)
-#   - Chinese fishing gear suffixes: "\w+yu\d+-\d+" (MINPINGYU63036-1).
+#   - Chinese fishing gear suffixes: "yu\d+-\d+" (MINPINGYU63036-1, MIN DONG YU62646-5).
 #     Chinese fishing vessels use province+"YU"+registration (e.g. MINPINGYU63036).
 #     A -N suffix indicates individual nets/gear, not the vessel itself.
 #     Validated against VHS data: -N suffix names are GEAR 35-75% of the time
-#     with near-zero FISHING classification.
+#     with near-zero FISHING classification. Names may have spaces (MIN DONG YU)
+#     or be concatenated (MINDONGYU), so we match on "yu" followed by digits-dash-digits.
 #   - Battery/signal indicators: "\d+%" (90%), "\d+V\d+" (8V2 = 8.2V).
 #     The NVN voltage format is the second most common battery reporting convention
 #     in gear names (~18% of GEAR records in VHS).
@@ -111,7 +112,7 @@ ENGLISH_SPEAKING_MMSIS_CODES = [
 NAME_PATTERNS_FOR_BUOYS = [
     r"net\d+",
     r"net\s+\w+",
-    r"\w+yu\d+-\d+",
+    r"yu\d+-\d+",
     r"fishing gear",
     r"\d+%",
     r"\d+V\d+",
