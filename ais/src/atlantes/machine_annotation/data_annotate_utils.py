@@ -89,6 +89,7 @@ ENGLISH_SPEAKING_MMSIS_CODES = [
 NAME_PATTERNS_FOR_BUOYS = [
     "net\d+",
     r"net\s+\w+",
+    r"\w+yu\d+-\d+",
     "fishing gear",
     "\d+%",
     "Net fish",
