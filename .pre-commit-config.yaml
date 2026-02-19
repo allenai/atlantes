@@ -1,5 +1,4 @@
-exclude: ais/data/machine_annotations/tsr/standard_rendezvous.csv
-exclude_types: ["*.geojson"]
+exclude: (ais/data/machine_annotations/tsr/standard_rendezvous\.csv|\.geojson$)
 ci:
   autofix_prs: false
   autoupdate_branch: ""
@@ -21,7 +20,7 @@ repos:
       - id: check-case-conflict
       - id: check-docstring-first
       - id: check-added-large-files
-        exclude: wheels/*
+        exclude: ^wheels/
       - id: check-ast
       - id: check-byte-order-marker
       - id: check-executables-have-shebangs
