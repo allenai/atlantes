@@ -91,12 +91,10 @@ def get_track_id_from_event_id(event_id: str) -> tuple[str, str, str]:
     """
     try:
         es_client = get_es_client()
-        query = {
-            "query": {"term": {"event_id": {"value": event_id}}},
-            "_source": ["event_id", "vessels.vessel_0.track_id", "start", "end"],
-        }
         response = es_client.search(
-            index=SEARCH_HISTORY_INDEX, body=query
+            index=SEARCH_HISTORY_INDEX,
+            query={"term": {"event_id": {"value": event_id}}},
+            source=["event_id", "vessels.vessel_0.track_id", "start", "end"],
         )
         source_document = response["hits"]["hits"][0]["_source"]
         track_id = source_document["vessels"]["vessel_0"]["track_id"]
@@ -153,8 +151,9 @@ def get_subpath_information_from_trackId_sendtime(
         str: The subpath ID.
     """
     es_client = get_es_client()
-    query = {
-        "query": {
+    response = es_client.search(
+        index=SUBPATH_INDEX,
+        query={
             "bool": {
                 "must": [
                     {"term": {"track_id": track_id}},
@@ -162,9 +161,8 @@ def get_subpath_information_from_trackId_sendtime(
                     {"range": {"end_time": {"lte": event_end_time}}},
                 ]
             }
-        }
-    }
-    response = es_client.search(index=SUBPATH_INDEX, body=query)
+        },
+    )
     if (
         response["hits"]["hits"][0]["_source"]["start_time"]
         < "2024-08-01T09:51:32+00:00"

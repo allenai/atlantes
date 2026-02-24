@@ -34,7 +34,7 @@ def get_all_projects() -> list[str]:
         },
     }
     response = PRODUCTION_ES_SEARCH_CLIENT.search(
-        index=TRACK_ANNOTATION_INDEX, body=project_id_agg_query
+        index=TRACK_ANNOTATION_INDEX, **project_id_agg_query
     )
     response = response["aggregations"]["project_counts"]["buckets"]
     return [project["key"] for project in response]
@@ -53,7 +53,7 @@ def get_trajectories_for_project(project_id: str) -> list[str]:
             }
         },
     }
-    res = PRODUCTION_ES_SEARCH_CLIENT.search(index=TRACK_ANNOTATION_INDEX, body=query)
+    res = PRODUCTION_ES_SEARCH_CLIENT.search(index=TRACK_ANNOTATION_INDEX, **query)
     trajectories = [
         b["key"] for b in res["aggregations"]["unique_trajectory_ids"]["buckets"]
     ]
@@ -76,7 +76,7 @@ def is_trajectory_completed(project_id: str, trajectory_id: str) -> bool:
             }
         }
     }
-    res = PRODUCTION_ES_SEARCH_CLIENT.search(index=TRACK_ANNOTATION_INDEX, body=query)
+    res = PRODUCTION_ES_SEARCH_CLIENT.search(index=TRACK_ANNOTATION_INDEX, **query)
     return res["hits"]["total"]["value"] == 0
 
 
@@ -98,7 +98,7 @@ def get_num_trajectories_with_fishing_annotation() -> int:
         },
     }
 
-    res = PRODUCTION_ES_SEARCH_CLIENT.search(index=TRACK_ANNOTATION_INDEX, body=query)
+    res = PRODUCTION_ES_SEARCH_CLIENT.search(index=TRACK_ANNOTATION_INDEX, **query)
     return len(res["aggregations"]["unique_trajectory_ids"]["buckets"])
 
 
@@ -161,7 +161,7 @@ def how_many_tracks_are_completely_annotated() -> Tuple[list[str], list[str]]:
         },
     }
     response = PRODUCTION_ES_SEARCH_CLIENT.search(
-        index=TRACK_ANNOTATION_INDEX, body=project_id_agg_query
+        index=TRACK_ANNOTATION_INDEX, **project_id_agg_query
     )
     response = response["aggregations"]["all_trajectory_ids"]["buckets"]
     logger.info(f"Number of tracks: {len(response)}")
@@ -184,7 +184,7 @@ def how_many_tracks_are_completely_annotated() -> Tuple[list[str], list[str]]:
 
         response = PRODUCTION_ES_SEARCH_CLIENT.search(
             index=TRACK_ANNOTATION_INDEX,
-            body=are_any_points_in_trajectory_unannotated_query,
+            **are_any_points_in_trajectory_unannotated_query,
             size=1,
         )
         if response["hits"]["total"]["value"] > 0:
@@ -204,7 +204,7 @@ def how_many_annotated_points() -> int:
         "aggs": {"annotated_points": {"filter": {"exists": {"field": "annotated"}}}},
     }
     response = PRODUCTION_ES_SEARCH_CLIENT.search(
-        index=TRACK_ANNOTATION_INDEX, body=annotated_points_query
+        index=TRACK_ANNOTATION_INDEX, **annotated_points_query
     )
     response = response["aggregations"]["annotated_points"]["doc_count"]
     logger.info(f"Number of annotated points: {response}")
@@ -227,7 +227,7 @@ def get_all_projects_completely_labeled_as_fishing() -> list:
             },
         },
     }
-    res = PRODUCTION_ES_SEARCH_CLIENT.search(index=TRACK_ANNOTATION_INDEX, body=query)
+    res = PRODUCTION_ES_SEARCH_CLIENT.search(index=TRACK_ANNOTATION_INDEX, **query)
     all_fishing_tracks = [
         b["key"] for b in res["aggregations"]["unique_trajectory_ids"]["buckets"]
     ]
@@ -253,7 +253,7 @@ def get_all_projects_completely_labeled_as_fishing() -> list:
             },
         }
         res = PRODUCTION_ES_SEARCH_CLIENT.search(
-            index=TRACK_ANNOTATION_INDEX, body=query
+            index=TRACK_ANNOTATION_INDEX, **query
         )
         if len(res["aggregations"]["unique_trajectory_ids"]["buckets"]) == 0:
             only_fishing_tracks.append(trajectory_id)

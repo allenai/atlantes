@@ -72,7 +72,7 @@ def get_es_client(env: str = "integration") -> Any:
     try:
         return Elasticsearch(
             [{"host": ES_HOSTS[env], "port": ES_PORT, "scheme": "https"}],
-            http_auth=(SEARCH_USERNAME, SEARCH_PASSWORD),
+            basic_auth=(SEARCH_USERNAME, SEARCH_PASSWORD),
             request_timeout=30,
             max_retries=2,
             retry_on_timeout=True,

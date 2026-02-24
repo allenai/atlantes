@@ -124,7 +124,7 @@ def get_all_trajectory_infos_in_annotation_tool(
     }
 
     # Execute the query
-    response = es_client.search(index=TRACK_ANNOTATION_INDEX, body=query)
+    response = es_client.search(index=TRACK_ANNOTATION_INDEX, **query)
 
     # Trajectory Ids are the names of the files that contain the trajectories We also want to likely keep the track_id otherwise we should just query them directly
     trajectory_ids = [
@@ -147,7 +147,7 @@ def get_all_trajectory_infos_in_annotation_tool(
             },
         }
         response = es_client.search(
-            index=TRACK_ANNOTATION_INDEX, body=get_track_id_send_timestamp_query
+            index=TRACK_ANNOTATION_INDEX, **get_track_id_send_timestamp_query
         )
         doc = response["hits"]["hits"][0]
         track_id = doc["_source"]["track_id"]
@@ -513,7 +513,7 @@ def get_trajectory_id_project_id_pairs() -> list[tuple[str, str]]:
             }
         },
     }
-    res = es_client.search(index=TRACK_ANNOTATION_INDEX, body=query)
+    res = es_client.search(index=TRACK_ANNOTATION_INDEX, **query)
     project_id_trajectory_id_pairs = []
     for record in res["aggregations"]["unique_trajectory_ids"]["buckets"]:
         trajectory_id = record["key"]
@@ -540,7 +540,7 @@ def check_if_project_has_given_feedback_status(id: str, feedback_status: str) ->
         }
     }
     es_client = get_es_client("production")
-    res = es_client.search(index=TRACK_ANNOTATION_SUMMARY_INDEX, body=query)
+    res = es_client.search(index=TRACK_ANNOTATION_SUMMARY_INDEX, **query)
     status = res["hits"]["hits"][0]["_source"].get("status", None)
     logger.info(f"Status of project {id} is {status}")
     return status == feedback_status
@@ -561,7 +561,7 @@ def get_summary_id_from_project_id_trajectory_id_pair(
             }
         }
     }
-    res = es_client.search(index=TRACK_ANNOTATION_SUMMARY_INDEX, body=query)
+    res = es_client.search(index=TRACK_ANNOTATION_SUMMARY_INDEX, **query)
     return res["hits"]["hits"][0]["_id"]
 
 

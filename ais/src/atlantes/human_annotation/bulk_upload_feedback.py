@@ -50,7 +50,7 @@ def get_trajectory_project_pairs_all_labeled_fishing() -> list[tuple[str, str]]:
             },
         },
     }
-    res = es_client.search(index=TRACK_ANNOTATION_INDEX, body=query)
+    res = es_client.search(index=TRACK_ANNOTATION_INDEX, **query)
     project_id_trajectory_id_pairs = []
     for record in res["aggregations"]["unique_trajectory_ids"]["buckets"]:
         trajectory_id = record["key"]
@@ -86,7 +86,7 @@ def get_trajectory_project_pairs_all_labeled_fishing() -> list[tuple[str, str]]:
                 },
             },
         }
-        res = es_client.search(index=TRACK_ANNOTATION_INDEX, body=query)
+        res = es_client.search(index=TRACK_ANNOTATION_INDEX, **query)
         if len(res["aggregations"]["unique_trajectory_ids"]["buckets"]) == 0:
             logger.info(f"Trajectory {trajectory_id} has only fishing")
             project_id_trajectory_ids_no_transiting.append((trajectory_id, project_id))
@@ -112,7 +112,7 @@ def get_trajectory_project_pairs_all_labeled_fishing() -> list[tuple[str, str]]:
                 },
             },
         }
-        res2 = es_client.search(index=TRACK_ANNOTATION_INDEX, body=query)
+        res2 = es_client.search(index=TRACK_ANNOTATION_INDEX, **query)
         if len(res2["aggregations"]["unique_trajectory_ids"]["buckets"]) == 0:
             project_id_trajectory_id_pairs_only_fishing.append(
                 (trajectory_id, project_id)
@@ -215,7 +215,7 @@ def get_summary_id_from_project_id_trajectory_id_pair(
             }
         }
     }
-    res = es_client.search(index=TRACK_ANNOTATION_SUMMARY_INDEX, body=query)
+    res = es_client.search(index=TRACK_ANNOTATION_SUMMARY_INDEX, **query)
     logger.info(f"Number of summary ids: {len(res['hits']['hits'])}")
     return res["hits"]["hits"][0]["_id"]
 
@@ -244,7 +244,7 @@ def check_if_project_has_accepted_feedback(id: str) -> bool:
             }
         }
     }
-    res = es_client.search(index=TRACK_ANNOTATION_SUMMARY_INDEX, body=query)
+    res = es_client.search(index=TRACK_ANNOTATION_SUMMARY_INDEX, **query)
     return res["hits"]["hits"][0]["_source"].get("status", None) == accepted_status
 
 

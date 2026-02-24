@@ -73,7 +73,7 @@ def get_subpaths_ids_and_classifications(
         if last_sort_value:
             query["search_after"] = last_sort_value
         es_client = get_es_client()
-        response = es_client.search(index=SUBPATH_INDEX, body=query)
+        response = es_client.search(index=SUBPATH_INDEX, **query)
         response_hits = response["hits"]["hits"]
         if len(response_hits) > 0:
             last_sort_value = response_hits[-1]["sort"]

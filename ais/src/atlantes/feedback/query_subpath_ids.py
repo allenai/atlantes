@@ -24,7 +24,7 @@ FISHING_HIGH_SOG_QUERY = {
             ]
         }
     },
-    "_source": ["id"],
+    "source": ["id"],
 }
 
 
@@ -42,7 +42,7 @@ def query_subpath_ids(query: dict) -> pd.DataFrame:
     Query the subpath IDs from the elastic search index
     """
     es_client = get_es_client()
-    response = es_client.search(index=SUBPATH_INDEX, body=query)
+    response = es_client.search(index=SUBPATH_INDEX, **query)
     return pd.DataFrame([hit["_source"]["id"] for hit in response["hits"]["hits"]])
 
 
