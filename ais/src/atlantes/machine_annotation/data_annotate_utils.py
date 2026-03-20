@@ -99,6 +99,12 @@ ENGLISH_SPEAKING_MMSIS_CODES = [
 #     The NVN voltage format is the second most common battery reporting convention
 #     in gear names (~18% of GEAR records in VHS).
 #   - Explicit gear names: "fishing gear", "Net fish", "NetFish", "NET MARK"
+#   - Numeric gear IDs: "\d{5} \d+ \d+" (e.g. "02333 287 82", "78000 35 99").
+#     Five-digit ID followed by space-separated numeric fields (likely channel/signal
+#     and battery level without %). Observed in large clusters of stationary AIS-B
+#     transponders in the East China Sea. The \d{5} anchor on the first block keeps
+#     false-positive risk low — legitimate vessel names rarely start with exactly
+#     five digits followed by space-separated digit groups.
 #
 # Patterns investigated but intentionally NOT included:
 #   - Standalone voltage (entire name is "6V", "7V"): too short, risk of false
@@ -119,6 +125,7 @@ NAME_PATTERNS_FOR_BUOYS = [
     r"Net fish",
     r"NetFish",
     r"NET MARK",
+    r"\d{5} \d+ \d+",
 ]
 
 
