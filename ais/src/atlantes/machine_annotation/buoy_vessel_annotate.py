@@ -43,18 +43,16 @@ def is_buoy_based_on_name(mmsi: str, entity_name: str) -> bool:
     bool
         True if the track is a buoy, False otherwise
     """
-    is_buoy_in_name = "buoy" in entity_name.lower()
-    # Ensure not a pun boat name
+    name_lower = entity_name.lower()
     is_from_english_speaking_country = any(
-        [mmsi.startswith(code) for code in ENGLISH_SPEAKING_MMSIS_CODES]
+        mmsi.startswith(code) for code in ENGLISH_SPEAKING_MMSIS_CODES
     )
+    # "buoy" and "biao" (标, Chinese for buoy/marker) are excluded for
+    # English-speaking countries to avoid pun boat names like "Nauti Buoys".
+    is_buoy_in_name = ("buoy" in name_lower or "biao" in name_lower) and not is_from_english_speaking_country
     patterns_regex = re.compile("|".join(NAME_PATTERNS_FOR_BUOYS), re.IGNORECASE)
     does_name_match_known_buoy_patterns = bool(patterns_regex.search(entity_name))
-    is_buoy = bool(
-        is_buoy_in_name & ~is_from_english_speaking_country
-        | does_name_match_known_buoy_patterns
-    )
-    return is_buoy
+    return is_buoy_in_name or does_name_match_known_buoy_patterns
 
 
 def label_buoy_or_vessel(df: pd.DataFrame) -> int:

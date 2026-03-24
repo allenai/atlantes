@@ -89,22 +89,27 @@ ENGLISH_SPEAKING_MMSIS_CODES = [
 #
 # These patterns are matched case-insensitively against entity names. They cover:
 #   - Net identifiers: "net\d+" (NET10), "net\s+\w+" (NET 1, NET D)
-#   - Chinese fishing gear suffixes: "yu\d+-\d+" (MINPINGYU63036-1, MIN DONG YU62646-5).
+#   - Chinese fishing gear suffixes: "yu\s*\d+-\d+" (MINPINGYU63036-1, ZHE DAI YU 04455-44).
 #     Chinese fishing vessels use province+"YU"+registration (e.g. MINPINGYU63036).
 #     A -N suffix indicates individual nets/gear, not the vessel itself.
 #     Validated against VHS data: -N suffix names are GEAR 35-75% of the time
-#     with near-zero FISHING classification. Names may have spaces (MIN DONG YU)
-#     or be concatenated (MINDONGYU), so we match on "yu" followed by digits-dash-digits.
-#   - Battery/signal indicators: "\d+%" (90%), "\d+V\d+" (8V2 = 8.2V).
-#     The NVN voltage format is the second most common battery reporting convention
-#     in gear names (~18% of GEAR records in VHS).
+#     with near-zero FISHING classification. Names may have spaces (ZHE DAI YU 04455)
+#     or be concatenated (ZHEDAIYU04455), so we allow optional whitespace between
+#     "yu" and the digit block.
+#   - Battery/signal indicators: "\d+%" (90%), "\d+V\d+" (8V2 = 8.2V),
+#     "\d+\.\d+V" (7.7V, 8.2V). The NVN format is the second most common battery
+#     reporting convention in gear names (~18% of GEAR records in VHS). The decimal
+#     voltage format (e.g. [7.7V]) adds ~1,355 incremental catches at 45% GEAR
+#     and only 1% FISHING.
+#   - Double-dash separators: "\d+--\d+" (04001--2, 17002--41).
+#     Gear IDs frequently use double-dashes between numeric fields. Validated
+#     against VHS: 1,135 names not already caught by other patterns, of which
+#     50.5% are GFW GEAR and only 3% FISHING.
 #   - Explicit gear names: "fishing gear", "Net fish", "NetFish", "NET MARK"
-#   - Numeric gear IDs: "\d{5} \d+ \d+" (e.g. "02333 287 82", "78000 35 99").
-#     Five-digit ID followed by space-separated numeric fields (likely channel/signal
-#     and battery level without %). Observed in large clusters of stationary AIS-B
-#     transponders in the East China Sea. The \d{5} anchor on the first block keeps
-#     false-positive risk low — legitimate vessel names rarely start with exactly
-#     five digits followed by space-separated digit groups.
+#   - Numeric gear IDs: "\d{3,5} \d+ \d+" (e.g. "02333 287 82", "1638 48 90",
+#     "78000 35 99"). Three-to-five-digit ID followed by space-separated numeric
+#     fields (likely channel/signal and battery level without %). Observed in large
+#     clusters of stationary AIS-B transponders in the East China Sea.
 #
 # Patterns investigated but intentionally NOT included:
 #   - Standalone voltage (entire name is "6V", "7V"): too short, risk of false
@@ -118,14 +123,16 @@ ENGLISH_SPEAKING_MMSIS_CODES = [
 NAME_PATTERNS_FOR_BUOYS = [
     r"net\d+",
     r"net\s+\w+",
-    r"yu\d+-\d+",
+    r"yu\s*\d+-\d+",
     r"fishing gear",
     r"\d+%",
     r"\d+V\d+",
+    r"\d+\.\d+V",
+    r"\d+--\d+",
     r"Net fish",
     r"NetFish",
     r"NET MARK",
-    r"\d{5} \d+ \d+",
+    r"\d{3,5} \d+ \d+",
 ]
 
 
