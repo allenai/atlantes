@@ -101,6 +101,11 @@ ENGLISH_SPEAKING_MMSIS_CODES = [
 #     reporting convention in gear names (~18% of GEAR records in VHS). The decimal
 #     voltage format (e.g. [7.7V]) adds ~1,355 incremental catches at 45% GEAR
 #     and only 1% FISHING.
+#   - Bare trailing voltage: "\d\s+\d+V\b" (e.g. "368000010   9V"). Whole-number
+#     volts ("9V", "12V") reported as a separate token after an ID/digit block,
+#     with no trailing decimal digit (so not caught by "\d+V\d+"). The leading
+#     "\d\s+" anchor requires preceding numeric content, which keeps the standalone
+#     "6V"/"7V" garbled-AIS case excluded (see NOT-included note below).
 #   - Double-dash separators: "\d+--\d+" (04001--2, 17002--41).
 #     Gear IDs frequently use double-dashes between numeric fields. Validated
 #     against VHS: 1,135 names not already caught by other patterns, of which
@@ -128,6 +133,7 @@ NAME_PATTERNS_FOR_BUOYS = [
     r"\d+%",
     r"\d+V\d+",
     r"\d+\.\d+V",
+    r"\d\s+\d+V\b",
     r"\d+--\d+",
     r"Net fish",
     r"NetFish",

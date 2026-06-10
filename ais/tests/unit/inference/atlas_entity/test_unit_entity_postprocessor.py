@@ -716,6 +716,41 @@ class TestAtlasEntityPostProcessor:
         assert output.entity_class == "buoy"
         assert output.entity_classification_details.postprocess_rule_applied is True
 
+    @pytest.mark.parametrize(
+        "entity_name",
+        [
+            "368000010         9V",
+            "368000002         9V",
+            "BUOY 992-536     12V",
+        ],
+    )
+    def test_postprocess_bare_trailing_voltage_classified_as_buoy(
+        self,
+        entity_name: str,
+        entity_postprocessor_class: AtlasEntityPostProcessor,
+    ) -> None:
+        """Test that names with a bare trailing voltage token (e.g. "9V", no decimal
+        digit) following a digit block are classified as buoys, even for USA MMSIs."""
+        input_data = EntityPostprocessorInput(
+            predicted_class=AtlasEntityLabelsTrainingWithUnknown.VESSEL,
+            entity_classification_details=EntityPostprocessorInputDetails(
+                model="test", confidence=0.9, outputs=[0.9, 0.1]
+            ),
+            metadata=EntityMetadata(
+                binned_ship_type=0,
+                ais_type=9999,
+                mmsi="368000010",
+                entity_name=entity_name,
+                track_length=800,
+                file_location=None,
+                trackId="A:368000010",
+                flag_code="USA",
+            ),
+        )
+        output = entity_postprocessor_class.postprocess(input_data)
+        assert output.entity_class == "buoy"
+        assert output.entity_classification_details.postprocess_rule_applied is True
+
     def test_postprocess_raises_error_for_known_binned_ship_type_and_buoy_name(
         self, entity_postprocessor_class: AtlasEntityPostProcessor
     ) -> None:
