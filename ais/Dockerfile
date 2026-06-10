@@ -52,7 +52,7 @@ COPY ./ /ais
 # Download the external marine infrastructure file and install package
 RUN mkdir -p /ais/src/atlantes/data && \
     wget -O /ais/src/atlantes/data/latest_marine_infrastructure.geojson \
-        https://pub-956f3eb0f5974f37b9228e0a62f449bf.r2.dev/outputs/marine/latest.geojson \
+        https://storage.googleapis.com/satlas-explorer-public/outputs/marine/latest.geojson \
         --quiet && \
     python -m pip install --no-cache-dir .
 
