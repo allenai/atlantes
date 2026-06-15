@@ -534,6 +534,43 @@ class TestAtlasEntityPostProcessor:
     @pytest.mark.parametrize(
         "entity_name",
         [
+            "SIGNET ARCTURUS",
+            "GANNET S",
+            "PLANET OCEAN",
+            "GARNET STAR",
+            "MADINET BENI-SAF",
+            "JEANET MAARTJE",
+        ],
+    )
+    def test_postprocess_midword_net_not_classified_as_buoy(
+        self,
+        entity_name: str,
+        entity_postprocessor_class: AtlasEntityPostProcessor,
+    ) -> None:
+        """Real vessels with 'net' mid-word must not match the net buoy patterns."""
+        input_data = EntityPostprocessorInput(
+            predicted_class=AtlasEntityLabelsTrainingWithUnknown.VESSEL,
+            entity_classification_details=EntityPostprocessorInputDetails(
+                model="test", confidence=0.9, outputs=[0.9, 0.1]
+            ),
+            metadata=EntityMetadata(
+                binned_ship_type=0,
+                ais_type=9999,
+                mmsi="123456789",
+                entity_name=entity_name,
+                track_length=800,
+                file_location=None,
+                trackId="A:123456789",
+                flag_code="USA",
+            ),
+        )
+        output = entity_postprocessor_class.postprocess(input_data)
+        assert output.entity_class == "vessel"
+        assert output.entity_classification_details.postprocess_rule_applied is False
+
+    @pytest.mark.parametrize(
+        "entity_name",
+        [
             "MINPINGYU63036-1",
             "MINDONGYU62646-5",
             "LURONGYU60365-2",

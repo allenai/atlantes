@@ -88,7 +88,11 @@ ENGLISH_SPEAKING_MMSIS_CODES = [
 # Common ways of naming a buoy on AIS generalized from anecdotal observations.
 #
 # These patterns are matched case-insensitively against entity names. They cover:
-#   - Net identifiers: "net\d+" (NET10), "net\s+\w+" (NET 1, NET D)
+#   - Net identifiers: "\bnet\d+" (NET10), "\bnet\s+\w+" (NET 1, NET D).
+#     The leading "\b" requires "net" to start a word, so mid-word matches in real
+#     vessel names (SIGNET, GANNET, PLANET, GARNET, MADINET, JEANET...) are NOT
+#     treated as buoys. The same "\b" anchor is applied to the explicit gear names
+#     below for the same reason.
 #   - Chinese fishing gear suffixes: "yu\s*\d+-\d+" (MINPINGYU63036-1, ZHE DAI YU 04455-44).
 #     Chinese fishing vessels use province+"YU"+registration (e.g. MINPINGYU63036).
 #     A -N suffix indicates individual nets/gear, not the vessel itself.
@@ -110,7 +114,7 @@ ENGLISH_SPEAKING_MMSIS_CODES = [
 #     Gear IDs frequently use double-dashes between numeric fields. Validated
 #     against VHS: 1,135 names not already caught by other patterns, of which
 #     50.5% are GFW GEAR and only 3% FISHING.
-#   - Explicit gear names: "fishing gear", "Net fish", "NetFish", "NET MARK"
+#   - Explicit gear names: "fishing gear", "\bNet fish", "\bNetFish", "\bNET MARK"
 #   - Numeric gear IDs: "\d{3,5} \d+ \d+" (e.g. "02333 287 82", "1638 48 90",
 #     "78000 35 99"). Three-to-five-digit ID followed by space-separated numeric
 #     fields (likely channel/signal and battery level without %). Observed in large
@@ -126,8 +130,8 @@ ENGLISH_SPEAKING_MMSIS_CODES = [
 #   - Bracket voltage ("[8.0V]", "[7.1V]"): very rare in VHS data. Could revisit
 #     if more examples surface.
 NAME_PATTERNS_FOR_BUOYS = [
-    r"net\d+",
-    r"net\s+\w+",
+    r"\bnet\d+",
+    r"\bnet\s+\w+",
     r"yu\s*\d+-\d+",
     r"fishing gear",
     r"\d+%",
@@ -135,9 +139,9 @@ NAME_PATTERNS_FOR_BUOYS = [
     r"\d+\.\d+V",
     r"\d\s+\d+V\b",
     r"\d+--\d+",
-    r"Net fish",
-    r"NetFish",
-    r"NET MARK",
+    r"\bNet fish",
+    r"\bNetFish",
+    r"\bNET MARK",
     r"\d{3,5} \d+ \d+",
 ]
 
