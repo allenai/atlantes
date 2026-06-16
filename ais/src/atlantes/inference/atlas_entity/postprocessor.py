@@ -74,6 +74,11 @@ class AtlasEntityPostProcessor:
             "Not enough messages",
         )
 
+        self.fishing_buoy_name_allowed_rule_applied = Counter(
+            "entity_post_processed_fishing_buoy_name_allowed",
+            "Buoyish name with a Fishing ship type allowed through as a buoy",
+        )
+
     def is_binned_ship_type_known(self, binned_ship_type: int) -> bool:
         """Check if the ship type is known"""
         if binned_ship_type not in self.ais_categories["category"].values:
@@ -85,6 +90,20 @@ class AtlasEntityPostProcessor:
             ].iloc[0]
         )
         return binned_ship_type != unknown_category
+
+    def is_binned_ship_type_fishing(self, binned_ship_type: int) -> bool:
+        """Check if the binned ship type is Fishing.
+
+        A lot of fishing gear (buoys, nets, FADs) reports a Fishing ship type, so a
+        buoyish name paired with a Fishing ship type is expected rather than a conflict."""
+        if binned_ship_type not in self.ais_categories["category"].values:
+            raise ValueError(f"Unknown ship type {binned_ship_type=}")
+        fishing_category = int(
+            self.ais_categories[self.ais_categories["category_desc"] == "Fishing"][
+                "category"
+            ].iloc[0]
+        )
+        return binned_ship_type == fishing_category
 
     def check_confidence_threshold(
         self, confidence: float, predicted_class: AtlasEntityLabelsTrainingWithUnknown
@@ -126,19 +145,26 @@ class AtlasEntityPostProcessor:
             )
             binned_ship_type = int(metadata.binned_ship_type)
         is_buoy_name = is_buoy_based_on_name(metadata.mmsi, metadata.entity_name)
-        # TODO: Ask SME if Fishing reporting vessels can be buoys
         is_known_binned_ship_type = self.is_binned_ship_type_known(binned_ship_type)
+        # A lot of fishing gear reports a Fishing ship type, so a buoyish name with a
+        # Fishing ship type is allowed through and classified as a buoy rather than raising.
+        is_fishing_binned_ship_type = self.is_binned_ship_type_fishing(binned_ship_type)
         has_not_enough_messages = (
             metadata.track_length < self.data_config["MIN_AIS_MESSAGES"]
         )
 
         # Postprocessing Rules
-        if is_buoy_name and is_known_binned_ship_type:
+        if is_buoy_name and is_known_binned_ship_type and not is_fishing_binned_ship_type:
             logger.error(
                 f"known ship type and buoyish name {binned_ship_type=}, {metadata.entity_name=}"
             )
             raise KnownShipTypeAndBuoyName()
         elif was_post_processed := is_buoy_name:
+            if is_fishing_binned_ship_type and is_known_binned_ship_type:
+                logger.info(
+                    f"Fishing ship type with buoyish name allowed through as buoy {metadata.entity_name=}"
+                )
+                self.fishing_buoy_name_allowed_rule_applied.inc()
             logger.info(f"Buoyish name {metadata.entity_name=}")
             self.buoy_post_processed_rule_applied.inc()
             postprocessed_entity_class = AtlasEntityLabelsTrainingWithUnknown.BUOY
