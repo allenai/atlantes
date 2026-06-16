@@ -812,3 +812,68 @@ class TestAtlasEntityPostProcessor:
             entity_postprocessor_class.postprocess(
                 entity_outputs_with_details_metadata_tuples_1
             )
+
+    def test_is_binned_ship_type_fishing(
+        self, entity_postprocessor_class: AtlasEntityPostProcessor
+    ) -> None:
+        """The Fishing category (2) is fishing; other known categories are not."""
+        assert entity_postprocessor_class.is_binned_ship_type_fishing(2)
+        assert not entity_postprocessor_class.is_binned_ship_type_fishing(8)
+
+    def test_postprocess_fishing_ship_type_and_buoy_name_allowed_as_buoy(
+        self, entity_postprocessor_class: AtlasEntityPostProcessor
+    ) -> None:
+        """A Fishing ship type with a buoyish name is allowed through as a buoy.
+
+        A lot of fishing gear reports a Fishing ship type, so this pairing must not
+        raise KnownShipTypeAndBuoyName the way other known ship types do."""
+        fishing_binned_ship_type = 2
+        entity_outputs_with_details_metadata_tuples_1 = EntityPostprocessorInput(
+            predicted_class=AtlasEntityLabelsTrainingWithUnknown.VESSEL,
+            entity_classification_details=EntityPostprocessorInputDetails(
+                model="test", confidence=0.9, outputs=[0.9, 0.1]
+            ),
+            metadata=EntityMetadata(
+                binned_ship_type=fishing_binned_ship_type,
+                mmsi="123456789",
+                entity_name="Net-18%",
+                track_length=800,
+                file_location=None,
+                trackId="B:123456789",
+                flag_code="USA",
+                ais_type=30,
+            ),
+        )
+        output = entity_postprocessor_class.postprocess(
+            entity_outputs_with_details_metadata_tuples_1
+        )
+        assert output.entity_class == "buoy"
+        assert output.entity_classification_details.postprocess_rule_applied is True
+
+    def test_postprocess_fishing_ais_type_and_buoy_name_allowed_as_buoy(
+        self, entity_postprocessor_class: AtlasEntityPostProcessor
+    ) -> None:
+        """The Fishing exception also applies when the type is binned from ais_type=30.
+
+        Mirrors the production case (WIN 6+, ais_type 30) that previously raised."""
+        entity_outputs_with_details_metadata_tuples_1 = EntityPostprocessorInput(
+            predicted_class=AtlasEntityLabelsTrainingWithUnknown.VESSEL,
+            entity_classification_details=EntityPostprocessorInputDetails(
+                model="test", confidence=0.9, outputs=[0.9, 0.1]
+            ),
+            metadata=EntityMetadata(
+                binned_ship_type=None,
+                mmsi="674118012",
+                entity_name="Net-18%",
+                track_length=800,
+                file_location=None,
+                trackId="B:674118012",
+                flag_code="USA",
+                ais_type=30,
+            ),
+        )
+        output = entity_postprocessor_class.postprocess(
+            entity_outputs_with_details_metadata_tuples_1
+        )
+        assert output.entity_class == "buoy"
+        assert output.entity_classification_details.postprocess_rule_applied is True
