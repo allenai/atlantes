@@ -68,7 +68,9 @@ jobs:
             -vv
           docker compose -f ais/docker-compose.yml run \
             -e TEST_PROJECTS_FOLDER_PREFIX=${{ secrets.TEST_PROJECTS_FOLDER_PREFIX }} \
-            test_activity pytest tests/integration/inference/atlas_activity/ -vv
+            test_activity pytest tests/integration/inference/atlas_activity/ \
+            --ignore=tests/integration/inference/atlas_activity/grpc_serve/test_serve_grpc.py \
+            -vv
       - name: Run service tests
         run: |
           COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ais/docker-compose.yml up -d --wait || {
@@ -90,3 +92,6 @@ jobs:
           docker compose -f ais/docker-compose.yml exec -T \
             -e TEST_PROJECTS_FOLDER_PREFIX=${{ secrets.TEST_PROJECTS_FOLDER_PREFIX }} \
             test_entity_postprocessor_grpc pytest tests/integration/inference/atlas_entity/grpc_serve/test_serve_grpc.py -vv
+          docker compose -f ais/docker-compose.yml exec -T \
+            -e TEST_PROJECTS_FOLDER_PREFIX=${{ secrets.TEST_PROJECTS_FOLDER_PREFIX }} \
+            test_activity_postprocessor_grpc pytest tests/integration/inference/atlas_activity/grpc_serve/test_serve_grpc.py -vv
