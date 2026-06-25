@@ -98,3 +98,25 @@ services:
       interval: 2s
       timeout: 2s
       retries: 120
+  test_activity_postprocessor_grpc:
+    hostname: ais-test-activity-postprocessor-grpc
+    build: *ais-image
+    shm_size: '4.77gb'
+    environment:
+      - ACTIVITY_POSTPROCESSOR_GRPC_ADDRESS=0.0.0.0
+      - ACTIVITY_POSTPROCESSOR_GRPC_PORT=5208
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    stdin_open: true
+    ports:
+      - "5208:5208"
+    command: ["python3", "/ais/src/atlantes/inference/atlas_activity/grpc_serve/serve_grpc.py"]
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "nc -zv 127.0.0.1 5208"
+        ]
+      interval: 2s
+      timeout: 2s
+      retries: 120

@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package atlantesactivitypostprocessor;
+
+
+enum AtlasActivityLabelsTrainingWithUnknown {
+    FISHING = 0;
+    ANCHORED = 1;
+    MOORED = 2;
+    TRANSITING = 3;
+    UNKNOWN = -100;
+}
+
+// A single AIS trajectory message. These are the columns the activity
+// postprocessor reads off the `most_recent_data` DataFrame. `nav` and
+// `dist2coast` are optional: when unset on every message the server omits the
+// column entirely so the postprocessor's own defaults apply.
+message AisMessage {
+    float sog = 1;          // speed over ground (meters per second)
+    float rel_cog = 2;      // relative course over ground (degrees)
+    float cog = 3;          // course over ground (degrees)
+    float lat = 4;
+    float lon = 5;
+    string send = 6;        // message timestamp, parseable by pandas.to_datetime
+    optional int32 nav = 7; // navigation status code
+    optional float dist2coast = 8;
+}
+
+message ActivityMetadata {
+    repeated AisMessage most_recent_data = 1;
+    int32 binned_ship_type = 2;
+    optional string trackId = 3;
+}
+
+message ActivityPostprocessorInputDetails {
+    string model = 1;
+    float confidence = 2;
+    repeated float outputs = 3;
+}
+
+message ActivityPostprocessorOutputDetails {
+    string model = 1;
+    float confidence = 2;
+    repeated float outputs = 3;
+    string original_classification = 4;
+    string postprocessed_classification = 5;
+    string rule_applied = 6;
+}
+
+message ActivityPostprocessorInput {
+    // The model's predicted activity class (one of the four training labels).
+    AtlasActivityLabelsTrainingWithUnknown predicted_class = 1;
+    optional ActivityPostprocessorInputDetails activity_classification_details = 2;
+    ActivityMetadata metadata = 3;
+}
+
+message ActivityPostprocessorOutput {
+    AtlasActivityLabelsTrainingWithUnknown activity_class = 1;
+    ActivityPostprocessorOutputDetails activity_classification_details = 2;
+}
+
+service ActivityPostprocessorService {
+  rpc Postprocess(ActivityPostprocessorInput) returns (ActivityPostprocessorOutput) {}
+}
