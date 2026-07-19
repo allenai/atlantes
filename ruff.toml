@@ -1,5 +1,9 @@
-lint.extend-select = ["T201"]
-
 exclude = [
     "./**/*pb2*.py",
 ]
+
+[lint]
+extend-select = ["T201"]
+
+[lint.per-file-ignores]
+"ais/src/examples/**" = ["T201"]
