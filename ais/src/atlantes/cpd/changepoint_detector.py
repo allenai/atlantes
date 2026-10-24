@@ -244,3 +244,37 @@ class ChangepointDetector:
             is_changepoint=False,
             changepoint_reason=ChangepointReasons.NO_CHANGEPOINT,
         )
+
+    @classmethod
+    def first_changepoint(
+        cls, sogs: list[float], times: list[datetime], start_index: int = 1
+    ) -> tuple[int, ChangepointReasons] | None:
+        """Finds the first observation at which detect_changepoint reports a changepoint
+
+        Replays detect_changepoint over the prefixes sogs[: i + 1] and times[: i + 1]
+        for i = start_index, start_index + 1, ... and stops at the first changepoint.
+        This is what a caller gets by feeding the observations to detect_changepoint
+        one at a time, minus the cost of sending the whole buffer for every one.
+
+        Parameters
+        ----------
+        sogs : list[float]
+            List of speeds over ground, ordered from past to present
+        times : list[datetime]
+            List of times, ordered from past to present
+        start_index : int
+            The first observation to check. Earlier observations only form the
+            starting buffer. Values below 1 are treated as 1, because a single
+            observation cannot be a changepoint.
+
+        Returns
+        -------
+        tuple[int, ChangepointReasons] | None
+            The index of the observation that triggered the changepoint and the
+            reason, or None if no prefix has a changepoint
+        """
+        for index in range(max(start_index, 1), len(sogs)):
+            output = cls.detect_changepoint(sogs[: index + 1], times[: index + 1])
+            if output.is_changepoint:
+                return index, output.changepoint_reason
+        return None

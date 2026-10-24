@@ -23,6 +23,28 @@ message ChangepointOutput {
   ChangepointReasons changepoint_reason = 2;
 }
 
+message FirstChangepointInput {
+  repeated float sogs = 1;
+  repeated google.protobuf.Timestamp times = 2;
+  // The first observation index to check. Observations before it only form the
+  // starting subpath, as when a subpath already holds some positions. Values
+  // below 1 are treated as 1, since a single observation cannot be a changepoint.
+  int32 start_index = 3;
+}
+
+message FirstChangepointOutput {
+  // Index of the first observation i at which IsChangepoint over observations
+  // [0, i] would report a changepoint, or -1 if there is none.
+  int32 changepoint_index = 1;
+  // Only meaningful when changepoint_index >= 0.
+  ChangepointReasons changepoint_reason = 2;
+}
+
 service ChangepointService {
   rpc IsChangepoint(ChangepointInput) returns (ChangepointOutput) {}
+
+  // Replays IsChangepoint over every prefix of the trajectory in a single call
+  // and returns the first changepoint. A client replaying n stored positions
+  // sends one request instead of n requests that each carry the whole buffer.
+  rpc FirstChangepoint(FirstChangepointInput) returns (FirstChangepointOutput) {}
 }

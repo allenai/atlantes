@@ -45,6 +45,11 @@ class ChangepointServiceStub(object):
                 request_serializer=changepoint__pb2.ChangepointInput.SerializeToString,
                 response_deserializer=changepoint__pb2.ChangepointOutput.FromString,
                 _registered_method=True)
+        self.FirstChangepoint = channel.unary_unary(
+                '/atlanteschangepoint.ChangepointService/FirstChangepoint',
+                request_serializer=changepoint__pb2.FirstChangepointInput.SerializeToString,
+                response_deserializer=changepoint__pb2.FirstChangepointOutput.FromString,
+                _registered_method=True)
 
 
 class ChangepointServiceServicer(object):
@@ -56,6 +61,15 @@ class ChangepointServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def FirstChangepoint(self, request, context):
+        """Replays IsChangepoint over every prefix of the trajectory in a single call
+        and returns the first changepoint. A client replaying n stored positions
+        sends one request instead of n requests that each carry the whole buffer.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ChangepointServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -63,6 +77,11 @@ def add_ChangepointServiceServicer_to_server(servicer, server):
                     servicer.IsChangepoint,
                     request_deserializer=changepoint__pb2.ChangepointInput.FromString,
                     response_serializer=changepoint__pb2.ChangepointOutput.SerializeToString,
+            ),
+            'FirstChangepoint': grpc.unary_unary_rpc_method_handler(
+                    servicer.FirstChangepoint,
+                    request_deserializer=changepoint__pb2.FirstChangepointInput.FromString,
+                    response_serializer=changepoint__pb2.FirstChangepointOutput.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -92,6 +111,33 @@ class ChangepointService(object):
             '/atlanteschangepoint.ChangepointService/IsChangepoint',
             changepoint__pb2.ChangepointInput.SerializeToString,
             changepoint__pb2.ChangepointOutput.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def FirstChangepoint(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/atlanteschangepoint.ChangepointService/FirstChangepoint',
+            changepoint__pb2.FirstChangepointInput.SerializeToString,
+            changepoint__pb2.FirstChangepointOutput.FromString,
             options,
             channel_credentials,
             insecure,

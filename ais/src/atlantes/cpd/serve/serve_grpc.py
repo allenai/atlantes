@@ -8,7 +8,7 @@ from grpc_health.v1 import health_pb2_grpc
 from atlantes.cpd.serve import changepoint_pb2
 from atlantes.cpd.serve import changepoint_pb2_grpc
 from atlantes.cpd.changepoint_detector import ChangepointDetector
-from atlantes.cpd.constants import ChangepointOutput
+from atlantes.cpd.constants import ChangepointOutput, ChangepointReasons
 from atlantes.cpd.serve.config import CPD_ADDRESS, CPD_PORT
 from atlantes.log_utils import get_logger
 
@@ -32,6 +32,28 @@ class ChangepointServicer(changepoint_pb2_grpc.ChangepointServiceServicer):
         return changepoint_pb2.ChangepointOutput(  # type: ignore
             is_changepoint=cpd_output.is_changepoint,
             changepoint_reason=cpd_output.changepoint_reason.value
+        )
+
+    def FirstChangepoint(
+            self,
+            request: changepoint_pb2.FirstChangepointInput,  # type: ignore
+            context: grpc.ServicerContext
+    ) -> changepoint_pb2.FirstChangepointOutput:  # type: ignore
+        """Find the first changepoint when the observations are fed in one at a time."""
+        found = ChangepointDetector.first_changepoint(
+            list(request.sogs),
+            [t.ToDatetime() for t in request.times],
+            request.start_index
+        )
+        if found is None:
+            return changepoint_pb2.FirstChangepointOutput(  # type: ignore
+                changepoint_index=-1,
+                changepoint_reason=ChangepointReasons.NO_CHANGEPOINT.value
+            )
+        index, reason = found
+        return changepoint_pb2.FirstChangepointOutput(  # type: ignore
+            changepoint_index=index,
+            changepoint_reason=reason.value
         )
 
 

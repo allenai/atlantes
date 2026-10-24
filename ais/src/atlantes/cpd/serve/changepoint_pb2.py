@@ -16,19 +16,23 @@ _sym_db = _symbol_database.Default()
 from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11\x63hangepoint.proto\x12\x13\x61tlanteschangepoint\x1a\x1fgoogle/protobuf/timestamp.proto\"K\n\x10\x43hangepointInput\x12\x0c\n\x04sogs\x18\x01 \x03(\x02\x12)\n\x05times\x18\x02 \x03(\x0b\x32\x1a.google.protobuf.Timestamp\"p\n\x11\x43hangepointOutput\x12\x16\n\x0eis_changepoint\x18\x01 \x01(\x08\x12\x43\n\x12\x63hangepoint_reason\x18\x02 \x01(\x0e\x32\'.atlanteschangepoint.ChangepointReasons*\x8e\x01\n\x12\x43hangepointReasons\x12\x07\n\x03SOG\x10\x00\x12\x08\n\x04TIME\x10\x01\x12\x12\n\x0eNO_CHANGEPOINT\x10\x02\x12\x17\n\x13NOT_ENOUGH_MESSAGES\x10\x03\x12\x19\n\x15MAX_DURATION_EXCEEDED\x10\x04\x12\x1d\n\x19MAX_NUM_MESSAGES_EXCEEDED\x10\x05\x32v\n\x12\x43hangepointService\x12`\n\rIsChangepoint\x12%.atlanteschangepoint.ChangepointInput\x1a&.atlanteschangepoint.ChangepointOutput\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11\x63hangepoint.proto\x12\x13\x61tlanteschangepoint\x1a\x1fgoogle/protobuf/timestamp.proto\"K\n\x10\x43hangepointInput\x12\x0c\n\x04sogs\x18\x01 \x03(\x02\x12)\n\x05times\x18\x02 \x03(\x0b\x32\x1a.google.protobuf.Timestamp\"p\n\x11\x43hangepointOutput\x12\x16\n\x0eis_changepoint\x18\x01 \x01(\x08\x12\x43\n\x12\x63hangepoint_reason\x18\x02 \x01(\x0e\x32\'.atlanteschangepoint.ChangepointReasons\"e\n\x15\x46irstChangepointInput\x12\x0c\n\x04sogs\x18\x01 \x03(\x02\x12)\n\x05times\x18\x02 \x03(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x13\n\x0bstart_index\x18\x03 \x01(\x05\"x\n\x16\x46irstChangepointOutput\x12\x19\n\x11\x63hangepoint_index\x18\x01 \x01(\x05\x12\x43\n\x12\x63hangepoint_reason\x18\x02 \x01(\x0e\x32\'.atlanteschangepoint.ChangepointReasons*\x8e\x01\n\x12\x43hangepointReasons\x12\x07\n\x03SOG\x10\x00\x12\x08\n\x04TIME\x10\x01\x12\x12\n\x0eNO_CHANGEPOINT\x10\x02\x12\x17\n\x13NOT_ENOUGH_MESSAGES\x10\x03\x12\x19\n\x15MAX_DURATION_EXCEEDED\x10\x04\x12\x1d\n\x19MAX_NUM_MESSAGES_EXCEEDED\x10\x05\x32\xe5\x01\n\x12\x43hangepointService\x12`\n\rIsChangepoint\x12%.atlanteschangepoint.ChangepointInput\x1a&.atlanteschangepoint.ChangepointOutput\"\x00\x12m\n\x10\x46irstChangepoint\x12*.atlanteschangepoint.FirstChangepointInput\x1a+.atlanteschangepoint.FirstChangepointOutput\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'changepoint_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_CHANGEPOINTREASONS']._serialized_start=267
-  _globals['_CHANGEPOINTREASONS']._serialized_end=409
+  _globals['_CHANGEPOINTREASONS']._serialized_start=492
+  _globals['_CHANGEPOINTREASONS']._serialized_end=634
   _globals['_CHANGEPOINTINPUT']._serialized_start=75
   _globals['_CHANGEPOINTINPUT']._serialized_end=150
   _globals['_CHANGEPOINTOUTPUT']._serialized_start=152
   _globals['_CHANGEPOINTOUTPUT']._serialized_end=264
-  _globals['_CHANGEPOINTSERVICE']._serialized_start=411
-  _globals['_CHANGEPOINTSERVICE']._serialized_end=529
+  _globals['_FIRSTCHANGEPOINTINPUT']._serialized_start=266
+  _globals['_FIRSTCHANGEPOINTINPUT']._serialized_end=367
+  _globals['_FIRSTCHANGEPOINTOUTPUT']._serialized_start=369
+  _globals['_FIRSTCHANGEPOINTOUTPUT']._serialized_end=489
+  _globals['_CHANGEPOINTSERVICE']._serialized_start=637
+  _globals['_CHANGEPOINTSERVICE']._serialized_end=866
 # @@protoc_insertion_point(module_scope)
