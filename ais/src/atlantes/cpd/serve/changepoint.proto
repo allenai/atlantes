@@ -30,9 +30,10 @@ message FirstChangepointInput {
   // starting buffer, for callers that already hold some observations. Values
   // below 1 are treated as 1, since a single observation cannot be a changepoint.
   //
-  // A buffer of more than 500 observations is always a changepoint, so the server
-  // reads at most max(start_index, 500) + 1 observations and ignores the rest.
-  // Callers never need to send more than that in one request.
+  // A buffer of more than 500 observations is always a changepoint. If no other
+  // check fires sooner, the changepoint is at index 500 (the 501st observation),
+  // so the server reads at most max(start_index, 500) + 1 observations and ignores
+  // the rest. Callers never need to send more than that in one request.
   int32 start_index = 3;
 }
 

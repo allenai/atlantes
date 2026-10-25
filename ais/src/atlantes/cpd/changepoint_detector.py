@@ -249,9 +249,11 @@ class ChangepointDetector:
     def observations_needed(cls, start_index: int = 1) -> int:
         """How many leading observations first_changepoint can look at
 
-        A buffer of more than MAX_NUM_MESSAGES observations is always a changepoint, so the first
-        changepoint is at index max(start_index, 1, MAX_NUM_MESSAGES) at the latest. Observations
-        beyond that never affect the result.
+        A buffer of more than MAX_NUM_MESSAGES observations is always a changepoint. So if no other
+        check fires sooner, the changepoint is at index MAX_NUM_MESSAGES (the buffer then holds
+        MAX_NUM_MESSAGES + 1 observations), and the search never has to go past it. If start_index
+        is larger, the first index checked is already over the limit and is the answer. Observations
+        after that index never affect the result.
         """
         return max(start_index, 1, cls.MAX_NUM_MESSAGES) + 1
 
