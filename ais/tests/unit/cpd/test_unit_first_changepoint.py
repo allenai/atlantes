@@ -121,6 +121,65 @@ class TestFirstChangepoint:
         assert ChangepointDetector.first_changepoint([1.0], [START]) is None
 
 
+def _boundaries_one_at_a_time(
+    sogs: list[float], times: list[datetime], shared_boundary: bool
+) -> list[int]:
+    """What a caller feeding observations in real time does: check the buffer after each one and
+    start a new buffer at a changepoint (with the changepoint observation, or without it)."""
+    boundaries: list[int] = []
+    buffer_start = 0
+    for index in range(len(sogs)):
+        if index - buffer_start < 1:
+            continue
+        output = ChangepointDetector.detect_changepoint(sogs[buffer_start : index + 1], times[buffer_start : index + 1])
+        if output.is_changepoint:
+            boundaries.append(index)
+            buffer_start = index if shared_boundary else index + 1
+    return boundaries
+
+
+def _boundaries_with_first_changepoint(
+    sogs: list[float], times: list[datetime], shared_boundary: bool
+) -> list[int]:
+    """The documented loop: after a changepoint at i, send observations[i:] or observations[i + 1:]."""
+    boundaries: list[int] = []
+    start = 0
+    while start < len(sogs):
+        found = ChangepointDetector.first_changepoint(sogs[start:], times[start:])
+        if found is None:
+            break
+        index = start + found[0]
+        boundaries.append(index)
+        start = index if shared_boundary else index + 1
+    return boundaries
+
+
+class TestFirstChangepointLoop:
+    """Calling again from the right slice after each changepoint matches a real-time caller."""
+
+    @pytest.mark.parametrize("shared_boundary", [True, False])
+    @pytest.mark.parametrize("seed", range(30))
+    def test_the_documented_loop_finds_the_same_boundaries_as_feeding_one_at_a_time(
+        self, seed: int, shared_boundary: bool
+    ) -> None:
+        rng = random.Random(1000 + seed)  # nosec B311
+        length = rng.choice([30, 120, 600, 1500])
+        step = timedelta(minutes=rng.choice([1, 10, 30]))
+        sogs, times = _trajectory(rng, length, step, gap_at=rng.choice([None, length // 3]), jump_at=rng.choice([None, length // 2]))
+
+        assert _boundaries_with_first_changepoint(sogs, times, shared_boundary) == _boundaries_one_at_a_time(
+            sogs, times, shared_boundary
+        )
+
+    def test_the_loop_splits_a_long_steady_trajectory_at_the_message_limit(self) -> None:
+        sogs = [0.2] * 1200
+        times = [START + timedelta(seconds=30 * i) for i in range(1200)]
+
+        # The buffer [0, 500] is the first with more than 500 observations; the next starts at 500.
+        assert _boundaries_with_first_changepoint(sogs, times, shared_boundary=True) == [500, 1000]
+        assert _boundaries_with_first_changepoint(sogs, times, shared_boundary=False) == [500, 1001]
+
+
 class TestFirstChangepointFixedCases:
     """Expected results worked out by hand from the detector's rules, not from the code under test."""
 

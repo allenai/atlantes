@@ -39,6 +39,14 @@ message FirstChangepointInput {
 message FirstChangepointOutput {
   // Index of the first observation i at which IsChangepoint over observations
   // [0, i] would report a changepoint, or -1 if there is none.
+  //
+  // To find every changepoint, call again after each one. The detector's checks
+  // depend on where the buffer starts (the 24 hour limit uses the first time, the
+  // message limit uses the buffer length, and the speed baseline is the first five
+  // observations), so send a new request that begins where the next buffer begins:
+  // observations[i:] if the changepoint observation also starts the next segment,
+  // or observations[i + 1:] if it does not. Don't resend the whole list with a
+  // larger start_index, because that keeps the old buffer and its limits.
   int32 changepoint_index = 1;
   // Only meaningful when changepoint_index >= 0.
   ChangepointReasons changepoint_reason = 2;
