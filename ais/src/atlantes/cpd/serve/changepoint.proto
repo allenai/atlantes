@@ -27,8 +27,12 @@ message FirstChangepointInput {
   repeated float sogs = 1;
   repeated google.protobuf.Timestamp times = 2;
   // The first observation index to check. Observations before it only form the
-  // starting subpath, as when a subpath already holds some positions. Values
+  // starting buffer, for callers that already hold some observations. Values
   // below 1 are treated as 1, since a single observation cannot be a changepoint.
+  //
+  // A buffer of more than 500 observations is always a changepoint, so the server
+  // reads at most max(start_index, 500) + 1 observations and ignores the rest.
+  // Callers never need to send more than that in one request.
   int32 start_index = 3;
 }
 

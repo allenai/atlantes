@@ -246,6 +246,16 @@ class ChangepointDetector:
         )
 
     @classmethod
+    def observations_needed(cls, start_index: int = 1) -> int:
+        """How many leading observations first_changepoint can look at
+
+        A buffer of more than MAX_NUM_MESSAGES observations is always a changepoint, so the first
+        changepoint is at index max(start_index, 1, MAX_NUM_MESSAGES) at the latest. Observations
+        beyond that never affect the result.
+        """
+        return max(start_index, 1, cls.MAX_NUM_MESSAGES) + 1
+
+    @classmethod
     def first_changepoint(
         cls, sogs: list[float], times: list[datetime], start_index: int = 1
     ) -> tuple[int, ChangepointReasons] | None:
