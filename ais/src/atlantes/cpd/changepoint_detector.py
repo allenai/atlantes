@@ -246,7 +246,7 @@ class ChangepointDetector:
         )
 
     @classmethod
-    def observations_needed(cls, start_index: int = 1) -> int:
+    def max_relevant_observations(cls, start_index: int = 1) -> int:
         """How many leading observations first_changepoint can look at
 
         A buffer of more than MAX_NUM_MESSAGES observations is always a changepoint. So if no other

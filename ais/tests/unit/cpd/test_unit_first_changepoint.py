@@ -297,10 +297,10 @@ class TestFirstChangepointService:
 
         assert response.changepoint_index == -1
 
-    def test_observations_needed_covers_the_first_possible_changepoint(self) -> None:
-        assert ChangepointDetector.observations_needed() == ChangepointDetector.MAX_NUM_MESSAGES + 1
-        assert ChangepointDetector.observations_needed(0) == ChangepointDetector.MAX_NUM_MESSAGES + 1
-        assert ChangepointDetector.observations_needed(700) == 701
+    def test_max_relevant_observations_covers_the_first_possible_changepoint(self) -> None:
+        assert ChangepointDetector.max_relevant_observations() == ChangepointDetector.MAX_NUM_MESSAGES + 1
+        assert ChangepointDetector.max_relevant_observations(0) == ChangepointDetector.MAX_NUM_MESSAGES + 1
+        assert ChangepointDetector.max_relevant_observations(700) == 701
 
     @pytest.mark.parametrize("start_index, expected_index", [(0, 500), (1, 500), (499, 500), (500, 500), (700, 700)])
     def test_a_long_request_gives_the_same_answer_as_its_leading_observations(
@@ -309,11 +309,11 @@ class TestFirstChangepointService:
         count = 5000
         sogs = [0.2] * count
         times = [START + timedelta(seconds=30 * i) for i in range(count)]
-        needed = ChangepointDetector.observations_needed(start_index)
+        limit = ChangepointDetector.max_relevant_observations(start_index)
 
         full = ChangepointServicer().FirstChangepoint(_request(sogs, times, start_index), None)  # type: ignore[arg-type]
         cut = ChangepointServicer().FirstChangepoint(  # type: ignore[arg-type]
-            _request(sogs[:needed], times[:needed], start_index), None
+            _request(sogs[:limit], times[:limit], start_index), None
         )
 
         assert full.changepoint_index == cut.changepoint_index == expected_index

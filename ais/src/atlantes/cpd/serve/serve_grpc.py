@@ -46,10 +46,10 @@ class ChangepointServicer(changepoint_pb2_grpc.ChangepointServiceServicer):
                 f"sogs ({len(request.sogs)}) and times ({len(request.times)}) must be the same length"
             )
         # Observations past this point cannot change the answer, so don't convert them.
-        needed = ChangepointDetector.observations_needed(request.start_index)
+        limit = ChangepointDetector.max_relevant_observations(request.start_index)
         found = ChangepointDetector.first_changepoint(
-            list(request.sogs[:needed]),
-            [t.ToDatetime() for t in request.times[:needed]],
+            list(request.sogs[:limit]),
+            [t.ToDatetime() for t in request.times[:limit]],
             request.start_index
         )
         if found is None:
