@@ -121,6 +121,50 @@ class TestFirstChangepoint:
         assert ChangepointDetector.first_changepoint([1.0], [START]) is None
 
 
+class TestFirstChangepointFixedCases:
+    """Expected results worked out by hand from the detector's rules, not from the code under test."""
+
+    @staticmethod
+    def _times(count: int, step: timedelta) -> list[datetime]:
+        return [START + step * i for i in range(count)]
+
+    def test_the_24_hour_duration_limit(self) -> None:
+        # 55 minute steps never make a 2 hour gap. Index 26 spans 26 * 55 min = 23h50m, and
+        # index 27 spans 27 * 55 min = 24h45m, the first past the 24 hour limit.
+        sogs = [0.2] * 30
+        times = self._times(30, timedelta(minutes=55))
+
+        assert ChangepointDetector.first_changepoint(sogs, times) == (27, ChangepointReasons.MAX_DURATION_EXCEEDED)
+
+    def test_a_speed_jump_after_a_steady_start(self) -> None:
+        # Five identical speeds give the baseline a standard deviation of zero, so the first
+        # observation that differs from it is a speed changepoint. That is index 5.
+        sogs = [0.2] * 5 + [12.0] * 5
+        times = self._times(10, timedelta(minutes=10))
+
+        assert ChangepointDetector.first_changepoint(sogs, times) == (5, ChangepointReasons.SOG)
+
+    def test_a_time_gap_is_found_even_with_fewer_than_the_minimum_messages(self) -> None:
+        sogs = [0.2] * 4
+        times = [START, START + timedelta(minutes=10), START + timedelta(hours=3), START + timedelta(hours=3, minutes=10)]
+
+        assert ChangepointDetector.first_changepoint(sogs, times) == (2, ChangepointReasons.TIME)
+
+    @pytest.mark.parametrize("start_index", [10, 11, 50])
+    def test_a_start_index_at_or_past_the_end_finds_nothing(self, start_index: int) -> None:
+        sogs = [0.2] * 10
+        times = self._times(10, timedelta(minutes=10))
+
+        assert ChangepointDetector.first_changepoint(sogs, times, start_index) is None
+
+    def test_a_start_index_past_the_message_limit_is_a_changepoint_at_that_index(self) -> None:
+        # With 701 observations in the buffer, the one at index 700 is past the 500 message limit.
+        sogs = [0.2] * 800
+        times = self._times(800, timedelta(seconds=30))
+
+        assert ChangepointDetector.first_changepoint(sogs, times, 700) == (700, ChangepointReasons.MAX_NUM_MESSAGES_EXCEEDED)
+
+
 class TestFirstChangepointService:
     """The servicer wiring and the generated gRPC code."""
 
