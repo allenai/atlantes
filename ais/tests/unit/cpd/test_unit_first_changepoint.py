@@ -318,4 +318,3 @@ class TestFirstChangepointService:
 
         assert full.changepoint_index == cut.changepoint_index == expected_index
         assert full.changepoint_reason == ChangepointReasons.MAX_NUM_MESSAGES_EXCEEDED.value
-
