@@ -169,3 +169,28 @@ class TestFirstChangepointService:
         assert not before.is_changepoint
         assert at.is_changepoint
         assert at.changepoint_reason == first.changepoint_reason
+
+    @pytest.mark.parametrize("sogs_count, times_count", [(5, 4), (4, 5), (3, 0), (0, 3)])
+    def test_rejects_sogs_and_times_of_different_lengths(self, sogs_count: int, times_count: int) -> None:
+        sogs = [0.2] * sogs_count
+        times = [START + timedelta(minutes=10 * i) for i in range(times_count)]
+        server = grpc.server(futures.ThreadPoolExecutor(max_workers=2))
+        changepoint_pb2_grpc.add_ChangepointServiceServicer_to_server(ChangepointServicer(), server)
+        port = server.add_insecure_port("127.0.0.1:0")
+        server.start()
+        try:
+            with grpc.insecure_channel(f"127.0.0.1:{port}") as channel:
+                stub = changepoint_pb2_grpc.ChangepointServiceStub(channel)
+                with pytest.raises(grpc.RpcError) as error:
+                    stub.FirstChangepoint(_request(sogs, times))
+        finally:
+            server.stop(grace=None)
+
+        assert error.value.code() == grpc.StatusCode.INVALID_ARGUMENT
+        assert "same length" in error.value.details()
+
+    def test_empty_request_has_no_changepoint(self) -> None:
+        response = ChangepointServicer().FirstChangepoint(_request([], []), None)  # type: ignore[arg-type]
+
+        assert response.changepoint_index == -1
+

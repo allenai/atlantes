@@ -40,6 +40,11 @@ class ChangepointServicer(changepoint_pb2_grpc.ChangepointServiceServicer):
             context: grpc.ServicerContext
     ) -> changepoint_pb2.FirstChangepointOutput:  # type: ignore
         """Find the first changepoint when the observations are fed in one at a time."""
+        if len(request.sogs) != len(request.times):
+            context.abort(
+                grpc.StatusCode.INVALID_ARGUMENT,
+                f"sogs ({len(request.sogs)}) and times ({len(request.times)}) must be the same length"
+            )
         found = ChangepointDetector.first_changepoint(
             list(request.sogs),
             [t.ToDatetime() for t in request.times],
