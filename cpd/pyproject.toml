@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Online changepoint detection for AIS tracks, served over gRPC"
 authors = [{name = "Skylight Team", email = "skylight@skylight.global"}]
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 dependencies = [
     "grpcio>1.65.1,<2",
     "grpcio-health-checking>=1,<2",
