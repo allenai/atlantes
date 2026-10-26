@@ -15,33 +15,25 @@ ENV GOOGLE_APPLICATION_CREDENTIALS=${MOUNTED_CREDENTIALS_PATH} \
     GIT_COMMIT_HASH=${GIT_COMMIT_HASH} \
     UV_SYSTEM_PYTHON=1
 
-# Install extra OS packages, add deadsnakes PPA, install Python 3.12, and set up Python environment
+# Install extra OS packages
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
       wget \
-      netcat \
-      software-properties-common gpg-agent && \
-    add-apt-repository ppa:deadsnakes/ppa && \
-    apt-get update && \
-    apt-get install --no-install-recommends -y \
-      python3.12 \
-      python3.12-venv \
-      python3.12-dev && \
+      netcat && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    # Set python3.12 as the default "python"
-    update-alternatives --install /usr/bin/python python /usr/bin/python3.12 1 && \
-    # Install PyTorch ecosystem with specific versions
-    uv pip install --no-cache \
+    rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /ais
+
+# Install PyTorch ecosystem with specific versions
+RUN uv pip install --no-cache \
         torch==2.1.2 \
         torchvision==0.16.2 \
         torchaudio==2.1.2 \
         --index-url https://download.pytorch.org/whl/cu121
 
-# Set working directory
-WORKDIR /ais
-
-# Copy requirements and install Python dependencies using Python 3.12's pip
+# Copy requirements and install Python dependencies with uv
 COPY ./requirements/requirements.txt /ais/requirements/requirements.txt
 RUN uv pip install --no-cache -r requirements/requirements.txt
 
