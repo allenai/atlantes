@@ -1,5 +1,0 @@
-lint.extend-select = ["T201"]
-
-exclude = [
-    "./**/*pb2*.py",
-]
