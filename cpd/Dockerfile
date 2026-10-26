@@ -13,10 +13,9 @@ WORKDIR /cpd
 
 COPY pyproject.toml README.md ./
 COPY src ./src
-RUN python -m pip install .
-
-RUN useradd --system --no-create-home cpd
-USER cpd
+RUN python -m pip install . && \
+    useradd --system --uid 10001 --no-create-home cpd
+USER 10001
 
 EXPOSE 5206
 
