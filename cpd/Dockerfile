@@ -5,15 +5,17 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG GIT_COMMIT_HASH
 ENV GIT_COMMIT_HASH=${GIT_COMMIT_HASH} \
     PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1 \
+    UV_COMPILE_BYTECODE=1 \
     CPD_ADDRESS=0.0.0.0 \
     CPD_PORT=5206
+
+COPY --from=ghcr.io/astral-sh/uv:0.9 /uv /usr/local/bin/uv
 
 WORKDIR /cpd
 
 COPY pyproject.toml README.md ./
 COPY src ./src
-RUN python -m pip install . && \
+RUN uv pip install --system --no-cache . && \
     useradd --system --uid 10001 --no-create-home cpd
 USER 10001
 
