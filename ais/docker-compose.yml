@@ -54,28 +54,6 @@ services:
       interval: 1s
       timeout: 1s
       retries: 30
-  test_cpd_grpc:
-    hostname: ais-test-cpd-grpc
-    build: *ais-image
-    shm_size: '4.77gb'
-    environment:
-        - CPD_ADDRESS=0.0.0.0
-        - CPD_PORT=5206
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    stdin_open: true
-    ports:
-      - "5206:5206"
-    command: ["python3", "/ais/src/atlantes/cpd/serve/serve_grpc.py"]
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "nc -zv 127.0.0.1 5206"
-        ]
-      interval: 2s
-      timeout: 2s
-      retries: 120
   test_entity_postprocessor_grpc:
     hostname: ais-test-entity-postprocessor-grpc
     build: *ais-image

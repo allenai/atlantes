@@ -5,12 +5,12 @@ from grpc_health.v1 import health
 from grpc_health.v1 import health_pb2
 from grpc_health.v1 import health_pb2_grpc
 
-from atlantes.cpd.serve import changepoint_pb2
-from atlantes.cpd.serve import changepoint_pb2_grpc
-from atlantes.cpd.changepoint_detector import ChangepointDetector
-from atlantes.cpd.constants import ChangepointOutput
-from atlantes.cpd.serve.config import CPD_ADDRESS, CPD_PORT
-from atlantes.log_utils import get_logger
+from atlantes_cpd.serve import changepoint_pb2
+from atlantes_cpd.serve import changepoint_pb2_grpc
+from atlantes_cpd.changepoint_detector import ChangepointDetector
+from atlantes_cpd.constants import ChangepointOutput
+from atlantes_cpd.serve.config import CPD_ADDRESS, CPD_PORT
+from atlantes_cpd.log_utils import get_logger
 
 _THREAD_POOL_SIZE = 256
 

@@ -16,6 +16,7 @@ The repository is organized into the following top-level directories and subdire
     - `data`: Stores various ais related data files used throughout the project in a non-production environment.
     - `tests`: Contains unit tests and integration tests for the Atlantes system.
     - `test-data`: Contains test data for the Atlantes system.
+- `cpd`: The changepoint detection service (`atlantes_cpd`), packaged, tested, built, and released independently of `ais`. See `cpd/README.md`.
 
 
 ## Getting Started

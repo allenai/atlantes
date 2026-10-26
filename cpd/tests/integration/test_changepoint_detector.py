@@ -4,10 +4,11 @@ from datetime import datetime
 from typing import Generator
 
 import pandas as pd
-from atlantes.cpd.changepoint_detector import ChangepointDetector as CPD
-from atlantes.cpd.changepoint_detector import ChangepointOutput
-from atlantes.cpd.constants import ChangepointReasons
-from atlantes.datautils import DATE_FORMAT
+from atlantes_cpd.changepoint_detector import ChangepointDetector as CPD
+from atlantes_cpd.changepoint_detector import ChangepointOutput
+from atlantes_cpd.constants import ChangepointReasons
+
+DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"  # date format used in the AIS data
 
 # Make changes to them to cover each of the different cases we need to test
 

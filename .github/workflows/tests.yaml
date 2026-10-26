@@ -55,7 +55,6 @@ jobs:
             test_activity pytest -n auto \
             --ignore=tests/test_main_activity.py \
             --ignore=tests/test_main_entity.py \
-            --ignore=tests/integration/cpd/serve/test_serve_grpc.py \
             --ignore=tests/integration/inference/atlas_entity/ \
             --ignore=tests/integration/inference/atlas_activity/ \
             -vv
@@ -86,9 +85,6 @@ jobs:
           docker compose -f ais/docker-compose.yml exec -T \
             -e TEST_PROJECTS_FOLDER_PREFIX=${{ secrets.TEST_PROJECTS_FOLDER_PREFIX }} \
             test_entity pytest tests/test_main_entity.py -vv
-          docker compose -f ais/docker-compose.yml exec -T \
-            -e TEST_PROJECTS_FOLDER_PREFIX=${{ secrets.TEST_PROJECTS_FOLDER_PREFIX }} \
-            test_cpd_grpc pytest tests/integration/cpd/serve/test_serve_grpc.py -vv
           docker compose -f ais/docker-compose.yml exec -T \
             -e TEST_PROJECTS_FOLDER_PREFIX=${{ secrets.TEST_PROJECTS_FOLDER_PREFIX }} \
             test_entity_postprocessor_grpc pytest tests/integration/inference/atlas_entity/grpc_serve/test_serve_grpc.py -vv

@@ -6,7 +6,7 @@ The precision and recall of fishing event detection can be fine-tuned through se
 
 Increasing subpath creation frequency enhances the number of messages processed for inference. This likely improves recall but has an indeterminate effect on precision across distinct events.
 
-Adjustment can be made via constants in `cpd/constants.py`.
+Adjustment can be made via constants in `cpd/src/atlantes_cpd/constants.py`.
 
 ## 2. Subpath Service Data Request Parameters
 

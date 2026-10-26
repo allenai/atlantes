@@ -70,6 +70,7 @@ repos:
             -p,
             -vv,
             ais,
+            cpd,
             --fail-under=80,
           ]
   - repo: https://github.com/astral-sh/ruff-pre-commit

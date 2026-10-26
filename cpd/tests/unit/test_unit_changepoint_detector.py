@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 import numpy as np
 import pytest
-from atlantes.cpd.changepoint_detector import (ChangepointDetector,
+from atlantes_cpd.changepoint_detector import (ChangepointDetector,
                                                SpeedChangeDetector,
                                                TimeGapDetector)
 

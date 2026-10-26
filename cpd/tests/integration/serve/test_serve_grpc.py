@@ -2,10 +2,10 @@ import random
 from datetime import datetime, timedelta
 
 import grpc
-from atlantes.cpd.constants import ChangepointReasons
-from atlantes.cpd.serve import changepoint_pb2, changepoint_pb2_grpc
-from atlantes.cpd.serve.config import CPD_ADDRESS, CPD_PORT
-from atlantes.log_utils import get_logger
+from atlantes_cpd.constants import ChangepointReasons
+from atlantes_cpd.serve import changepoint_pb2, changepoint_pb2_grpc
+from atlantes_cpd.serve.config import CPD_ADDRESS, CPD_PORT
+from atlantes_cpd.log_utils import get_logger
 from google.protobuf.timestamp_pb2 import Timestamp
 
 logger = get_logger(__name__)

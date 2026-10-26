@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "atlantes-cpd"
+version = "0.1.0"
+description = "Online changepoint detection for AIS tracks, served over gRPC"
+authors = [{name = "Skylight Team", email = "skylight@skylight.global"}]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "grpcio>1.65.1,<2",
+    "grpcio-health-checking>=1,<2",
+    "numpy>=1.26,<2",
+    "protobuf>=4.25,<5",
+    "scipy>=1.12,<2",
+]
+
+[project.optional-dependencies]
+validate = [
+    "click>=8.1,<9",
+    "matplotlib>=3.8,<4",
+    "pandas>=2.2,<3",
+]
+dev = [
+    "atlantes-cpd[validate]",
+    "pytest>7,<9",
+    "pytest-xdist",
+]
+
+[project.scripts]
+atlantes-cpd-serve = "atlantes_cpd.serve.serve_grpc:serve"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
