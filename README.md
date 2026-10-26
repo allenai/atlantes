@@ -26,7 +26,7 @@ For all projects, please ensure that you follow the initial steps to setup the e
 Run:
 
 1.  `$ pip install pre-commit`
-2.  `$ pre-commit install`
+2.  `$ pre-commit install -c ais/.pre-commit-config.yaml` (each project has its own config; use `cpd/.pre-commit-config.yaml` when working in `cpd`)
 
 Note that the code in ais repo will be required to pass these pre commits in order to be merged. In particular that means, besides the typical linting requirement, there are additional requirements on 100% static type annotations (which is enforced via mypy) and at least 90% documentation coverage for including both modules and functions (enforced via interrogate). Note that either setting can be bypassed for a particular directory or file by adding that file/directory to the excluded list of the corresponding module in the .pre-commit-config.yaml file. In other words these checks are opt-out rather than opt-in.
 

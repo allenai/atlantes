@@ -1,3 +1,5 @@
+# Lint only the ais project; cpd has its own config. Hooks run from the repo root.
+files: ^ais/
 exclude: (ais/data/machine_annotations/tsr/standard_rendezvous\.csv|\.geojson$)
 ci:
   autofix_prs: false
