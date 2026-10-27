@@ -6,14 +6,12 @@ on:
       - "main"
     paths:
       - "ais/**"
-      - "convert_List_to_list.py"
       - ".github/workflows/build_lint_test_ais.yaml"
   pull_request:
     branches:
       - "main"
     paths:
       - "ais/**"
-      - "convert_List_to_list.py"
       - ".github/workflows/build_lint_test_ais.yaml"
 
 env:

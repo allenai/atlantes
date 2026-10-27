@@ -7,14 +7,12 @@ on:
     paths:
       - "cpd/**"
       - ".github/workflows/cpd.yml"
-      - "convert_List_to_list.py"
   pull_request:
     branches:
       - "main"
     paths:
       - "cpd/**"
       - ".github/workflows/cpd.yml"
-      - "convert_List_to_list.py"
 
 env:
   REGISTRY: ghcr.io
