@@ -4,7 +4,7 @@
 from datetime import datetime, timedelta
 
 import numpy as np
-from atlantes.cpd.constants import (
+from atlantes_cpd.constants import (
     BASE_SAMPLE_SIZE_SOG,
     MAX_DURATION,
     MAX_NUM_MESSAGES,

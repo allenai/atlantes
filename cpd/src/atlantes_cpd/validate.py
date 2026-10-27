@@ -38,7 +38,7 @@ import click
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from atlantes.log_utils import get_logger
+from atlantes_cpd.log_utils import get_logger
 
 logger = get_logger(__name__)
 

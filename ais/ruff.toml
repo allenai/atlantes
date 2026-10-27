@@ -1,0 +1,7 @@
+target-version = "py310"
+exclude = [
+    "**/*pb2*.py",
+]
+
+[lint]
+extend-select = ["T201"]

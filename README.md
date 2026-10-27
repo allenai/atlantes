@@ -16,6 +16,7 @@ The repository is organized into the following top-level directories and subdire
     - `data`: Stores various ais related data files used throughout the project in a non-production environment.
     - `tests`: Contains unit tests and integration tests for the Atlantes system.
     - `test-data`: Contains test data for the Atlantes system.
+- `cpd`: The changepoint detection service (`atlantes_cpd`), packaged, tested, built, and released independently of `ais`. See `cpd/README.md`.
 
 
 ## Getting Started
@@ -25,7 +26,7 @@ For all projects, please ensure that you follow the initial steps to setup the e
 Run:
 
 1.  `$ pip install pre-commit`
-2.  `$ pre-commit install`
+2.  `$ pre-commit install -c ais/.pre-commit-config.yaml` (each project has its own config; use `cpd/.pre-commit-config.yaml` when working in `cpd`)
 
 Note that the code in ais repo will be required to pass these pre commits in order to be merged. In particular that means, besides the typical linting requirement, there are additional requirements on 100% static type annotations (which is enforced via mypy) and at least 90% documentation coverage for including both modules and functions (enforced via interrogate). Note that either setting can be bypassed for a particular directory or file by adding that file/directory to the excluded list of the corresponding module in the .pre-commit-config.yaml file. In other words these checks are opt-out rather than opt-in.
 

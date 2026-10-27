@@ -4,7 +4,7 @@
 import grpc
 import warnings
 
-from atlantes.cpd.serve import changepoint_pb2 as changepoint__pb2
+from atlantes_cpd.serve import changepoint_pb2 as changepoint__pb2
 
 GRPC_GENERATED_VERSION = '1.64.1'
 GRPC_VERSION = grpc.__version__

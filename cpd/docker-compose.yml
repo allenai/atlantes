@@ -1,0 +1,10 @@
+services:
+  cpd:
+    build:
+      context: .
+    image: atlantes-cpd
+    ports:
+      - "5206:5206"
+    environment:
+      - CPD_ADDRESS=0.0.0.0
+      - CPD_PORT=5206

@@ -1,0 +1,149 @@
+name: CPD
+
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - "cpd/**"
+      - ".github/workflows/cpd.yml"
+  pull_request:
+    branches:
+      - "main"
+    paths:
+      - "cpd/**"
+      - ".github/workflows/cpd.yml"
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}-cpd
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linting:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pre-commit environments
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-cpd-${{ matrix.python-version }}-${{ hashFiles('cpd/.pre-commit-config.yaml') }}
+
+      - name: Linting
+        run: |
+          pip install pre-commit interrogate
+          pre-commit run --all-files -c cpd/.pre-commit-config.yaml
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    defaults:
+      run:
+        working-directory: cpd
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.3.2
+        with:
+          enable-cache: true
+          cache-dependency-glob: cpd/pyproject.toml
+
+      - name: Install
+        run: uv pip install --system -e '.[dev]'
+
+      - name: Unit and integration tests
+        run: pytest tests --ignore=tests/integration/serve -vv
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Get short SHA
+        run: echo "GIT_COMMIT_HASH=$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
+
+      - name: Build image
+        run: docker build --build-arg GIT_COMMIT_HASH="$GIT_COMMIT_HASH" -t atlantes-cpd cpd
+
+      - name: Start service and wait for it to be healthy
+        run: |
+          docker run -d --name cpd -p 5206:5206 atlantes-cpd
+          for _ in $(seq 1 60); do
+            status=$(docker inspect --format '{{.State.Health.Status}}' cpd)
+            [ "$status" = "healthy" ] && exit 0
+            sleep 2
+          done
+          echo "Service did not become healthy"
+          docker logs cpd
+          exit 1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.3.2
+
+      - name: gRPC service test
+        working-directory: cpd
+        run: |
+          uv pip install --system -e '.[dev]'
+          CPD_ADDRESS=127.0.0.1 pytest tests/integration/serve -vv
+
+      - name: Log in to the Container registry
+        if: github.event_name == 'push'
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        if: github.event_name == 'push'
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,format=long
+            type=sha,format=short
+            type=raw,value=latest
+
+      - name: Push image
+        if: github.event_name == 'push'
+        uses: docker/build-push-action@v7
+        with:
+          context: cpd
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            GIT_COMMIT_HASH=${{ env.GIT_COMMIT_HASH }}

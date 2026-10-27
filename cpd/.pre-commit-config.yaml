@@ -1,10 +1,5 @@
-exclude: (ais/data/machine_annotations/tsr/standard_rendezvous\.csv|\.geojson$)
-ci:
-  autofix_prs: false
-  autoupdate_branch: ""
-  autoupdate_commit_msg: "[pre-commit.ci] pre-commit autoupdate"
-  autoupdate_schedule: weekly
-  skip: [end-of-file-fixer, equirements-txt-fixer]
+# Lint only the cpd project; ais has its own config. Hooks run from the repo root.
+files: ^cpd/
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
@@ -32,7 +27,7 @@ repos:
       - id: detect-private-key
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.1.1
+    rev: v2.4.0
     hooks:
       - id: mypy
         args: [
@@ -69,7 +64,7 @@ repos:
             --ignore-init-module,
             -p,
             -vv,
-            ais,
+            cpd,
             --fail-under=80,
           ]
   - repo: https://github.com/astral-sh/ruff-pre-commit
