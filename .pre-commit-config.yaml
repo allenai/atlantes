@@ -82,11 +82,3 @@ repos:
     hooks:
       - id: hadolint-docker
         args: ["--ignore", "DL3008"]
-  - repo: local
-    hooks:
-      - id: convert-list
-        name: Convert List to list (note case)
-        entry: python3 convert_List_to_list.py
-        language: system
-        types: [python] # Ensures it only runs on Python files
-        files: \.py$ # Ensures it only runs on files with a .py extension
