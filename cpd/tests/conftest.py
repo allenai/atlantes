@@ -21,10 +21,13 @@ def set_random_seed() -> None:
 
 
 def _load_track(file_name: str) -> pd.DataFrame:
-    """Load an AIS track CSV, skipping the test if the file is not available."""
+    """Load an AIS track CSV; a missing file fails under CI and skips locally."""
     path = TEST_DATA_DIR / file_name
     if not path.exists():
-        pytest.skip(f"Test track {path} not found")
+        message = f"Test track {path} not found"
+        if os.environ.get("CI"):
+            pytest.fail(message)
+        pytest.skip(message)
     return pd.read_csv(path)
 
 
