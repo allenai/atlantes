@@ -13,8 +13,9 @@ COPY --from=ghcr.io/astral-sh/uv:0.9 /uv /usr/local/bin/uv
 
 WORKDIR /cpd
 
-COPY pyproject.toml README.md LICENSE ./
-COPY src ./src
+COPY VERSION ./VERSION
+COPY cpd/pyproject.toml cpd/README.md cpd/LICENSE ./
+COPY cpd/src ./src
 RUN uv pip install --system --no-cache . && \
     useradd --system --uid 10001 --no-create-home cpd
 USER 10001

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "atlantes-cpd"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Online changepoint detection for AIS tracks, served over gRPC"
 authors = [{name = "Skylight Team", email = "skylight@skylight.global"}]
 readme = "README.md"
@@ -48,6 +48,9 @@ dev = [
 
 [project.scripts]
 atlantes-cpd-serve = "atlantes_cpd.serve.serve_grpc:serve"
+
+[tool.setuptools.dynamic]
+version = { file = "VERSION" }
 
 [tool.setuptools.packages.find]
 where = ["src"]

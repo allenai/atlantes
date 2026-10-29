@@ -1,0 +1,9 @@
+# The build context is the repo root; send only what the image needs.
+*
+!VERSION
+!cpd/pyproject.toml
+!cpd/README.md
+!cpd/LICENSE
+!cpd/src
+**/__pycache__
+**/*.egg-info

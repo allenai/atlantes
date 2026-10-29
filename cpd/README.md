@@ -47,6 +47,8 @@ See `src/atlantes_cpd/serve/README.md`.
 
 The package publishes to PyPI as `atlantes-cpd` through trusted publishing; no API token is involved.
 
-1. Bump `version` in `pyproject.toml` and merge it.
-2. Create a GitHub release with the tag `cpd-v<version>` (for example `cpd-v0.1.0`) and publish it. Drafts and pre-releases don't trigger the workflow.
-3. `.github/workflows/publish_cpd.yml` checks that the tag matches `version`, builds the sdist and wheel, and uploads them from the `pypi` environment.
+The repo has a single version, in the `VERSION` file at the repo root. `cpd/VERSION` is a symlink to it, and `pyproject.toml` reads it. A `v<version>` tag releases the whole repo, and `atlantes-cpd` is one of the artifacts.
+
+1. Set `VERSION` and merge it.
+2. Create a GitHub release with the tag `v<version>` (for example `v1.1.0`) and publish it. Drafts and pre-releases don't trigger the workflow.
+3. `.github/workflows/publish_cpd.yml` checks that the tag matches `VERSION`, builds the sdist and wheel, and uploads them from the `pypi` environment.
