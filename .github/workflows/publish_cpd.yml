@@ -1,0 +1,60 @@
+name: Publish atlantes-cpd
+
+# Publish by creating a GitHub release whose tag is `cpd-v<version>`, where
+# <version> matches `version` in cpd/pyproject.toml.
+on:
+  release:
+    types:
+      - released
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-dist:
+    if: startsWith(github.event.release.tag_name, 'cpd-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10.3.2
+
+      - name: Validate that the release tag matches the package version
+        run: |
+          RELEASE_VERSION="${GITHUB_REF_NAME#cpd-v}"
+          TOML_VERSION=$(python3 -c "import tomllib; print(tomllib.load(open('cpd/pyproject.toml', 'rb'))['project']['version'])")
+          if [ "$RELEASE_VERSION" != "$TOML_VERSION" ]; then
+            echo "Release version ($RELEASE_VERSION) does not match cpd/pyproject.toml version ($TOML_VERSION)"
+            exit 1
+          fi
+          echo "Version validation passed: $RELEASE_VERSION"
+
+      - name: Build sdist and wheel
+        working-directory: cpd
+        run: uv build
+
+      - name: Check the distributions
+        working-directory: cpd
+        run: uvx twine check dist/*
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: cpd/dist/
+
+  pypi-publish:
+    needs: build-dist
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+
+      - uses: pypa/gh-action-pypi-publish@release/v1

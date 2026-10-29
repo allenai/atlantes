@@ -42,3 +42,11 @@ Detection thresholds live in `src/atlantes_cpd/constants.py`.
 ## Regenerating the gRPC code
 
 See `src/atlantes_cpd/serve/README.md`.
+
+## Release to PyPI
+
+The package publishes to PyPI as `atlantes-cpd` through trusted publishing; no API token is involved.
+
+1. Bump `version` in `pyproject.toml` and merge it.
+2. Create a GitHub release with the tag `cpd-v<version>` (for example `cpd-v0.1.0`) and publish it. Drafts and pre-releases don't trigger the workflow.
+3. `.github/workflows/publish_cpd.yml` checks that the tag matches `version`, builds the sdist and wheel, and uploads them from the `pypi` environment.
