@@ -73,6 +73,12 @@ jobs:
           enable-cache: true
           cache-dependency-glob: cpd/pyproject.toml
 
+      - name: Core install works without the serve extra
+        run: |
+          uv venv "$RUNNER_TEMP/core-venv"
+          uv pip install --python "$RUNNER_TEMP/core-venv/bin/python" .
+          "$RUNNER_TEMP/core-venv/bin/python" -c "from atlantes_cpd.changepoint_detector import ChangepointDetector"
+
       - name: Install
         run: uv pip install --system -e '.[dev]'
 

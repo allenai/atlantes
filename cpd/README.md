@@ -5,6 +5,8 @@ should be split into a new subpath, which lets downstream inference run only
 when a vessel's behavior may have changed. The detector is served over gRPC as
 `atlanteschangepoint.ChangepointService`.
 
+The detector (`atlantes_cpd.changepoint_detector`) can also be called in-process: `pip install atlantes-cpd` installs only numpy and scipy. The gRPC service needs the `serve` extra (`pip install 'atlantes-cpd[serve]'`), and `validate.py` needs the `validate` extra.
+
 This is a standalone package. It does not import `atlantes` and has its own
 dependencies, tests, Dockerfile, and CI workflow (`.github/workflows/cpd.yml`).
 
