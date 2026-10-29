@@ -6,12 +6,14 @@ on:
       - "main"
     paths:
       - "cpd/**"
+      - "VERSION"
       - ".github/workflows/cpd.yml"
   pull_request:
     branches:
       - "main"
     paths:
       - "cpd/**"
+      - "VERSION"
       - ".github/workflows/cpd.yml"
 
 env:
@@ -103,7 +105,8 @@ jobs:
         id: build
         uses: docker/build-push-action@v7
         with:
-          context: cpd
+          context: .
+          file: cpd/Dockerfile
           load: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

@@ -1,7 +1,8 @@
 services:
   cpd:
     build:
-      context: .
+      context: ..
+      dockerfile: cpd/Dockerfile
     image: atlantes-cpd
     ports:
       - "5206:5206"
