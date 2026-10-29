@@ -16,7 +16,7 @@ WORKDIR /cpd
 COPY VERSION ./VERSION
 COPY cpd/pyproject.toml cpd/README.md cpd/LICENSE ./
 COPY cpd/src ./src
-RUN uv pip install --system --no-cache . && \
+RUN uv pip install --system --no-cache ".[serve]" && \
     useradd --system --uid 10001 --no-create-home cpd
 USER 10001
 
