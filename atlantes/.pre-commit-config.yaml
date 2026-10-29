@@ -1,6 +1,6 @@
-# Lint only the ais project; cpd has its own config. Hooks run from the repo root.
-files: ^ais/
-exclude: (ais/data/machine_annotations/tsr/standard_rendezvous\.csv|\.geojson$)
+# Lint only the atlantes project; cpd has its own config. Hooks run from the repo root.
+files: ^atlantes/
+exclude: (atlantes/data/machine_annotations/tsr/standard_rendezvous\.csv|\.geojson$)
 ci:
   autofix_prs: false
   autoupdate_branch: ""
@@ -71,7 +71,7 @@ repos:
             --ignore-init-module,
             -p,
             -vv,
-            ais,
+            atlantes,
             --fail-under=80,
           ]
   - repo: https://github.com/astral-sh/ruff-pre-commit

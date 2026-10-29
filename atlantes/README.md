@@ -102,7 +102,7 @@ The **Automatic Identification System (AIS)** is a tracking system used on ships
    ### Local testing of Services with docker
 
    1. Save a path to gcp credentials in `GOOGLE_APPLICATION_CREDENTIALS`
-   2. Navigate to eai/ais. Run `docker-compose up`
+   2. Navigate to the atlantes directory. Run `docker-compose up`
    3. Example request: `python examples/atlas_activity_request.py`
 
 

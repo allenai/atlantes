@@ -1,4 +1,4 @@
-# Lint only the cpd project; ais has its own config. Hooks run from the repo root.
+# Lint only the cpd project; atlantes has its own config. Hooks run from the repo root.
 files: ^cpd/
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks

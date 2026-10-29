@@ -10,13 +10,13 @@ This repository stores the ATLAS model alongside training, inference, and deploy
 The repository is organized into the following top-level directories and subdirectories:
 
 
-- `ais`: Contains scripts and modules for loading, cleaning, and preprocessing AIS data.
+- `atlantes`: Contains scripts and modules for loading, cleaning, and preprocessing AIS data, and the Atlantes models.
     - `src/atlantes`: Holds the core logic for the Atlantes system, including data processing, model training, and deployment.
     - `requirements.txt`: Specifies the required Python packages for running the Atlantes system as well as the dev requirements for development.
     - `data`: Stores various ais related data files used throughout the project in a non-production environment.
     - `tests`: Contains unit tests and integration tests for the Atlantes system.
     - `test-data`: Contains test data for the Atlantes system.
-- `cpd`: The changepoint detection service (`atlantes_cpd`), packaged, tested, built, and released independently of `ais`. See `cpd/README.md`.
+- `cpd`: The changepoint detection service (`atlantes_cpd`), packaged, tested, built, and released independently of `atlantes`. See `cpd/README.md`.
 
 
 ## Getting Started
@@ -26,9 +26,9 @@ For all projects, please ensure that you follow the initial steps to setup the e
 Run:
 
 1.  `$ pip install pre-commit`
-2.  `$ pre-commit install -c ais/.pre-commit-config.yaml` (each project has its own config; use `cpd/.pre-commit-config.yaml` when working in `cpd`)
+2.  `$ pre-commit install -c atlantes/.pre-commit-config.yaml` (each project has its own config; use `cpd/.pre-commit-config.yaml` when working in `cpd`)
 
-Note that the code in ais repo will be required to pass these pre commits in order to be merged. In particular that means, besides the typical linting requirement, there are additional requirements on 100% static type annotations (which is enforced via mypy) and at least 90% documentation coverage for including both modules and functions (enforced via interrogate). Note that either setting can be bypassed for a particular directory or file by adding that file/directory to the excluded list of the corresponding module in the .pre-commit-config.yaml file. In other words these checks are opt-out rather than opt-in.
+Note that the code in the atlantes directory will be required to pass these pre commits in order to be merged. In particular that means, besides the typical linting requirement, there are additional requirements on 100% static type annotations (which is enforced via mypy) and at least 90% documentation coverage for including both modules and functions (enforced via interrogate). Note that either setting can be bypassed for a particular directory or file by adding that file/directory to the excluded list of the corresponding module in the .pre-commit-config.yaml file. In other words these checks are opt-out rather than opt-in.
 
 Pre commit hooks can be executed on `git commit` after following the above two steps.
 
@@ -39,10 +39,10 @@ and view the responses.
 
 ### Stand up the inference services
 * export GOOGLE_APPLICATION_CREDENTIALS to a path containing your gcp credentials
-* run `docker-compose up -d --wait --build` in the ais directory
+* run `docker-compose up -d --wait --build` in the atlantes directory
 
 ### Make requests
-* cd to `atlantes/ais/src/examples`
+* cd to `atlantes/src/examples`
 * run `python atlas_activity_request.py` to do activity classification
 * run `python atlas_entity_request.py` to do entity classification
 

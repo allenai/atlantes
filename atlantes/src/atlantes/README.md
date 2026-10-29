@@ -1,6 +1,6 @@
 # Atlantes Architecture Overview
 
-For specifics on different components, see the readmes in `ais/docs`.
+For specifics on different components, see the readmes in `atlantes/docs`.
 ## Model Development Pipeline
 
 The typical workflow for developing an AIS model is as follows:
