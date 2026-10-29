@@ -1,25 +1,25 @@
 *.parquet
 # AIS directory
-ais/src/ais_transformer/training_data/**
-ais/src/ais_transformer/wandb/**
-ais/src/track-incremental**
-ais/data/cleaned_raw
-ais/data/raw
+atlantes/src/ais_transformer/training_data/**
+atlantes/src/ais_transformer/wandb/**
+atlantes/src/track-incremental**
+atlantes/data/cleaned_raw
+atlantes/data/raw
 **/wandb**
-ais/gfw/**
+atlantes/gfw/**
 **/ipynb_checkpoints
 **/*ipynb*
-ais/EDA/notebooks
-ais/EDA/notebooks
-ais/data/gebco_2022_sub_ice_topo/*.nc
+atlantes/EDA/notebooks
+atlantes/EDA/notebooks
+atlantes/data/gebco_2022_sub_ice_topo/*.nc
 trajectory_lengths.csv
-ais/data/sample_events/sentinel2/iceberg_detection_dataset.csv
+atlantes/data/sample_events/sentinel2/iceberg_detection_dataset.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-ais/src/ais_transformer/training_data/**
+atlantes/src/ais_transformer/training_data/**
 # C extensions
 *.so
 **.png

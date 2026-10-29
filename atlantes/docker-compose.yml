@@ -1,5 +1,5 @@
 # Define a common build configuration
-x-common-build: &ais-image
+x-common-build: &atlantes-image
   context: .
   dockerfile: Dockerfile
   args:
@@ -7,8 +7,8 @@ x-common-build: &ais-image
 
 services:
   test_activity:
-    hostname: ais-test-activity
-    build: *ais-image
+    hostname: atlantes-test-activity
+    build: *atlantes-image
     shm_size: '4.77gb'
     environment:
         - PORT=8000
@@ -31,8 +31,8 @@ services:
       timeout: 1s
       retries: 30
   test_entity:
-    hostname: ais-test-entity
-    build: *ais-image
+    hostname: atlantes-test-entity
+    build: *atlantes-image
     shm_size: '4.77gb'
     environment:
         - PORT=8001
@@ -55,8 +55,8 @@ services:
       timeout: 1s
       retries: 30
   test_entity_postprocessor_grpc:
-    hostname: ais-test-entity-postprocessor-grpc
-    build: *ais-image
+    hostname: atlantes-test-entity-postprocessor-grpc
+    build: *atlantes-image
     shm_size: '4.77gb'
     environment:
       - ENTITY_POSTPROCESSOR_GRPC_ADDRESS=0.0.0.0
@@ -77,8 +77,8 @@ services:
       timeout: 2s
       retries: 120
   test_activity_postprocessor_grpc:
-    hostname: ais-test-activity-postprocessor-grpc
-    build: *ais-image
+    hostname: atlantes-test-activity-postprocessor-grpc
+    build: *atlantes-image
     shm_size: '4.77gb'
     environment:
       - ACTIVITY_POSTPROCESSOR_GRPC_ADDRESS=0.0.0.0

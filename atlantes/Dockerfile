@@ -23,7 +23,8 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Set working directory
+# Set working directory. The image keeps its code at /ais (the repo directory is atlantes/) because
+# deployments run the sidecars with commands and PYTHONPATH under /ais/src.
 WORKDIR /ais
 
 # Install PyTorch ecosystem with specific versions

@@ -1,6 +1,6 @@
 .git
-ais/build/**
-ais/data/**
-ais/src/skylight/ml/ais/data/**
-ais/docs/**
+atlantes/build/**
+atlantes/data/**
+atlantes/src/skylight/ml/ais/data/**
+atlantes/docs/**
 .vscode/

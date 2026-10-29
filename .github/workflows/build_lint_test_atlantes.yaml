@@ -1,18 +1,18 @@
-name: Build, lint, and test ais
+name: Build, lint, and test atlantes
 
 on:
   push:
     branches:
       - "main"
     paths:
-      - "ais/**"
-      - ".github/workflows/build_lint_test_ais.yaml"
+      - "atlantes/**"
+      - ".github/workflows/build_lint_test_atlantes.yaml"
   pull_request:
     branches:
       - "main"
     paths:
-      - "ais/**"
-      - ".github/workflows/build_lint_test_ais.yaml"
+      - "atlantes/**"
+      - ".github/workflows/build_lint_test_atlantes.yaml"
 
 env:
   REGISTRY: ghcr.io
@@ -45,12 +45,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pre-commit
-          key: pre-commit-ais-${{ matrix.python-version }}-${{ hashFiles('ais/.pre-commit-config.yaml') }}
+          key: pre-commit-atlantes-${{ matrix.python-version }}-${{ hashFiles('atlantes/.pre-commit-config.yaml') }}
 
       - name: Linting
         run: |
           pip install pre-commit interrogate
-          pre-commit run --all-files -c ais/.pre-commit-config.yaml
+          pre-commit run --all-files -c atlantes/.pre-commit-config.yaml
 
   tests:
     runs-on: GPU-Enabled-Runner
@@ -86,10 +86,10 @@ jobs:
 
       - name: Build docker images
         run: |
-          COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ais/docker-compose.yml build
+          COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f atlantes/docker-compose.yml build
       - name: Run unit and integration tests
         run: |
-          docker compose -f ais/docker-compose.yml run \
+          docker compose -f atlantes/docker-compose.yml run \
             -e TEST_PROJECTS_FOLDER_PREFIX=${{ secrets.TEST_PROJECTS_FOLDER_PREFIX }} \
             test_activity pytest -n auto \
             --ignore=tests/test_main_activity.py \
@@ -99,35 +99,35 @@ jobs:
             -vv
       - name: Run Pipeline tests
         run: |
-          docker compose -f ais/docker-compose.yml run \
+          docker compose -f atlantes/docker-compose.yml run \
             -e TEST_PROJECTS_FOLDER_PREFIX=${{ secrets.TEST_PROJECTS_FOLDER_PREFIX }} \
             test_entity pytest tests/integration/inference/atlas_entity/ \
             --ignore=tests/integration/inference/atlas_entity/grpc_serve/test_serve_grpc.py \
             -vv
-          docker compose -f ais/docker-compose.yml run \
+          docker compose -f atlantes/docker-compose.yml run \
             -e TEST_PROJECTS_FOLDER_PREFIX=${{ secrets.TEST_PROJECTS_FOLDER_PREFIX }} \
             test_activity pytest tests/integration/inference/atlas_activity/ \
             --ignore=tests/integration/inference/atlas_activity/grpc_serve/test_serve_grpc.py \
             -vv
       - name: Run service tests
         run: |
-          COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ais/docker-compose.yml up -d --wait || {
+          COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f atlantes/docker-compose.yml up -d --wait || {
             echo "🚨 Containers failed to start! Printing logs..."
             docker ps -a
-            docker compose -f ais/docker-compose.yml logs
+            docker compose -f atlantes/docker-compose.yml logs
             exit 1
           }
           sleep 20
-          docker compose -f ais/docker-compose.yml exec -T \
+          docker compose -f atlantes/docker-compose.yml exec -T \
             -e TEST_PROJECTS_FOLDER_PREFIX=${{ secrets.TEST_PROJECTS_FOLDER_PREFIX }} \
             test_activity pytest tests/test_main_activity.py -vv
-          docker compose -f ais/docker-compose.yml exec -T \
+          docker compose -f atlantes/docker-compose.yml exec -T \
             -e TEST_PROJECTS_FOLDER_PREFIX=${{ secrets.TEST_PROJECTS_FOLDER_PREFIX }} \
             test_entity pytest tests/test_main_entity.py -vv
-          docker compose -f ais/docker-compose.yml exec -T \
+          docker compose -f atlantes/docker-compose.yml exec -T \
             -e TEST_PROJECTS_FOLDER_PREFIX=${{ secrets.TEST_PROJECTS_FOLDER_PREFIX }} \
             test_entity_postprocessor_grpc pytest tests/integration/inference/atlas_entity/grpc_serve/test_serve_grpc.py -vv
-          docker compose -f ais/docker-compose.yml exec -T \
+          docker compose -f atlantes/docker-compose.yml exec -T \
             -e TEST_PROJECTS_FOLDER_PREFIX=${{ secrets.TEST_PROJECTS_FOLDER_PREFIX }} \
             test_activity_postprocessor_grpc pytest tests/integration/inference/atlas_activity/grpc_serve/test_serve_grpc.py -vv
 
@@ -171,7 +171,7 @@ jobs:
         id: build-push
         uses: docker/build-push-action@v7
         with:
-          context: ais/
+          context: atlantes/
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
