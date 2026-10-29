@@ -151,3 +151,5 @@ dmypy.json
 
 .idea
 .vscode/
+# Licensed AIS tracks used by the detector tests; never commit them
+cpd/tests/data/*.csv

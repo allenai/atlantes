@@ -18,7 +18,7 @@ venv/bin/pytest tests --ignore=tests/integration/serve
 ```
 
 The detector integration tests read three AIS track CSVs from `tests/data/`
-(or `$CPD_TEST_DATA_DIR`); they skip when the files are absent, except under `CI`, where a missing file fails the test.
+(or `$CPD_TEST_DATA_DIR`); they skip when the files are absent. The tracks are licensed and must not be committed; `tests/data/*.csv` is gitignored.
 
 ## Run the service
 
